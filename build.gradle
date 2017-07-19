@@ -34,4 +34,8 @@ dependencies {
 }
 
 // Define the main class for the application
-mainClassName = 'me.ericjiang.catan.Main'
+mainClassName = 'me.ericjiang.pioneers.Pioneers'
+
+task stage {
+    dependsOn installDist
+}
