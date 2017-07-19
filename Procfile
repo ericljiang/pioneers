@@ -1,0 +1,1 @@
+web: ./build/install/pioneers/bin/pioneers
