@@ -2,18 +2,26 @@ package me.ericjiang.settlers;
 
 import static spark.Spark.*;
 
-import lombok.extern.slf4j.Slf4j;
+import me.ericjiang.settlers.login.LoginHandler;
+import me.ericjiang.settlers.login.UnimplementedLoginHandler;
 
-@Slf4j
 public class Settlers {
     
     public static void main(String[] args) {
-        log.info("Hello world.");
-        port(getHerokuAssignedPort());
-        get(Routes.LOGIN, LoginController.loginPage);
+        // assign port
+        port(getPort());
+
+        // dependencies
+        LoginHandler loginHandler = new UnimplementedLoginHandler();
+
+        // routes
+        get("/login",       (req, res) -> loginHandler.renderLoginPage());
+        post("/login",      (req, res) -> loginHandler.authenticate(req, res));
+        get("/lobby",       (req, res) -> "Not yet implemented.");
+        get("/game",        (req, res) -> "Not yet implemented.");
     }
 
-    static int getHerokuAssignedPort() {
+    static int getPort() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         if (processBuilder.environment().get("PORT") != null) {
             return Integer.parseInt(processBuilder.environment().get("PORT"));
