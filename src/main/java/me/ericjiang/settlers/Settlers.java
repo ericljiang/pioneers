@@ -1,11 +1,11 @@
-package me.ericjiang.pioneers;
+package me.ericjiang.settlers;
 
 import static spark.Spark.*;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Pioneers {
+public class Settlers {
     
     public static void main(String[] args) {
         log.info("Hello world.");

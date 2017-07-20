@@ -1,4 +1,4 @@
-package me.ericjiang.pioneers;
+package me.ericjiang.settlers;
 
 import spark.Route;
 
