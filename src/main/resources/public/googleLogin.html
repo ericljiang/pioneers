@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <title>Login</title>
+    <meta name="google-signin-client_id" content="224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com">
+</head>
+
+<body>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>    
+    <script type="text/javascript">
+        function onSignIn(googleUser) {
+            var id_token = googleUser.getAuthResponse().id_token;
+            console.log("ID Token: " + id_token);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', window.location.href);
+            console.log(window.location.href);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                console.log('Signed in as: ' + xhr.responseText);
+                if (xhr.responseText != 'null') {
+                    console.log('Redirecting to /lobby');
+                    //window.location.pathname = '/lobby';
+                    window.location.replace(window.location.protocol + '//' + window.location.host + '/lobby');
+                }
+            };
+            xhr.send(id_token);
+        }
+    </script>
+</body>
+</html>

@@ -2,26 +2,40 @@ package me.ericjiang.settlers;
 
 import static spark.Spark.*;
 
-import me.ericjiang.settlers.login.LoginHandler;
-import me.ericjiang.settlers.login.UnimplementedLoginHandler;
+import me.ericjiang.settlers.auth.Authenticator;
+import me.ericjiang.settlers.auth.GoogleAuthenticator;
 
 public class Settlers {
     
     public static void main(String[] args) {
-        // assign port
         port(getPort());
+        staticFileLocation("/public");
 
         // dependencies
-        LoginHandler loginHandler = new UnimplementedLoginHandler();
+        Authenticator authenticator = new GoogleAuthenticator();
+
+        // filters
+        before("/lobby", (req, res) -> {
+            if (!authenticator.sessionIsAuthenticated(req, res)) {
+                res.redirect("/login");
+            }
+        });
+
+        before("/game", (req, res) -> {
+            if (!authenticator.sessionIsAuthenticated(req, res)) {
+                res.redirect("/login");
+            }
+        });
 
         // routes
-        get("/login",       (req, res) -> loginHandler.renderLoginPage());
-        post("/login",      (req, res) -> loginHandler.authenticate(req, res));
-        get("/lobby",       (req, res) -> "Not yet implemented.");
-        get("/game",        (req, res) -> "Not yet implemented.");
+        redirect.get("/", "/login");
+        get("/login",   authenticator::renderLoginPage);
+        post("/login",  authenticator::login);
+        get("/lobby",   (req, res) -> "Lobby: Not yet implemented.");
+        get("/game",    (req, res) -> "Game: Not yet implemented.");
     }
 
-    static int getPort() {
+    private static int getPort() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         if (processBuilder.environment().get("PORT") != null) {
             return Integer.parseInt(processBuilder.environment().get("PORT"));
