@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.auth;
+package me.ericjiang.settlers.spark.auth;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
