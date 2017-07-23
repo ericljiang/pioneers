@@ -15,23 +15,24 @@ import me.ericjiang.settlers.spark.util.Attributes;
 
 import spark.Request;
 import spark.Response;
+import spark.Session;
 import spark.Spark;
 import spark.utils.IOUtils;
 
 @Slf4j
 public class GoogleAuthenticator extends Authenticator {
     private static final String CLIENT_ID = "224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com";
-    private static final String LOGIN_PAGE_LOCATION = "/public/googleLogin.html";
+    private static final String SIGN_IN_PAGE = "/public/googleSignIn.html";
 
     @Override
     @SneakyThrows
-    public Object renderLoginPage(Request request, Response response) {
-        return IOUtils.toString(Spark.class.getResourceAsStream(LOGIN_PAGE_LOCATION));
+    public Object renderSignInPage(Request request, Response response) {
+        return IOUtils.toString(Spark.class.getResourceAsStream(SIGN_IN_PAGE));
     }
 
     @Override
     @SneakyThrows
-    public Object login(Request request, Response response) {
+    public Object signIn(Request request, Response response) {
         NetHttpTransport transport = new NetHttpTransport();
         JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
@@ -44,8 +45,9 @@ public class GoogleAuthenticator extends Authenticator {
             log.info("Verified user ID token.");
             Payload payload = idToken.getPayload();
             String userId = payload.getSubject();
-            log.info("User ID: " + userId);
+            log.info("User " + userId + " signed in.");
 
+            request.session().attribute(Attributes.SIGNED_IN, true);
             request.session().attribute(Attributes.USER_ID, userId);
             return userId;
         } else {
@@ -55,7 +57,12 @@ public class GoogleAuthenticator extends Authenticator {
     }
 
     @Override
-    public Object logout(Request request, Response response) {
-        return "Not yet implemented.";
+    public Object signOut(Request request, Response response) {
+        Session session = request.session();
+        log.info("Signing out user " + session.attribute(Attributes.USER_ID));
+        session.attribute(Attributes.SIGNED_IN, false);
+        session.removeAttribute(Attributes.USER_ID);
+        response.redirect("/");
+        return "200 OK";
     }
 }

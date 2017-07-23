@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Sign-in</title>
     <meta name="google-signin-client_id" content="224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com">
 </head>
 
@@ -20,7 +20,6 @@
                 if (xhr.responseText != 'null') {
                     console.log('Signed in as: ' + xhr.responseText);
                     console.log('Redirecting to /lobby');
-                    //window.location.pathname = '/lobby';
                     window.location.replace(window.location.protocol + '//' + window.location.host + '/lobby');
                 }
             };

@@ -44,8 +44,9 @@ public class Settlers {
         before("/game",     this::redirectUnauthenticated);
 
         // routes
-        get("/login",       authenticator::renderLoginPage);
-        post("/login",      authenticator::login);
+        get("/sign-in",     authenticator::renderSignInPage);
+        post("/sign-in",    authenticator::signIn);
+        get("/sign-out",    authenticator::signOut);
         get("/lobby",       (req, res) -> renderer.renderLobby(req, lobby));
         get("/game",        (req, res) -> "Game: Not yet implemented.");
 
@@ -61,11 +62,11 @@ public class Settlers {
     }
 
     /**
-     * Check if user is signed in and redirect to login page if not.
+     * Check if user is signed in and redirect to sign-in page if not.
      */
     private void redirectUnauthenticated(Request request, Response response) {
         if (!authenticator.sessionIsAuthenticated(request)) {
-            response.redirect("/login");
+            response.redirect("/sign-in");
         }
     }
 }
