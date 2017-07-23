@@ -2,10 +2,12 @@ package me.ericjiang.settlers.spark;
 
 import static spark.Spark.*;
 
-import lombok.AllArgsConstructor;
 import me.ericjiang.settlers.core.Lobby;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
+
+import lombok.AllArgsConstructor;
+
 import spark.Response;
 import spark.Request;
 

@@ -7,7 +7,7 @@
 
 <body>
     <div class="g-signin2" data-onsuccess="onSignIn"></div>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>    
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script type="text/javascript">
         function onSignIn(googleUser) {
             var id_token = googleUser.getAuthResponse().id_token;
@@ -17,8 +17,8 @@
             console.log(window.location.href);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
-                console.log('Signed in as: ' + xhr.responseText);
                 if (xhr.responseText != 'null') {
+                    console.log('Signed in as: ' + xhr.responseText);
                     console.log('Redirecting to /lobby');
                     //window.location.pathname = '/lobby';
                     window.location.replace(window.location.protocol + '//' + window.location.host + '/lobby');
