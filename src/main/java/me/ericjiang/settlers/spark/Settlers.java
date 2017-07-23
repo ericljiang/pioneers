@@ -33,6 +33,13 @@ public class Settlers {
         staticFileLocation("/public");
 
         // filters
+        before((req, res) -> {
+            String url = req.url();
+            if (!url.contains("localhost") && url.startsWith("http://")) {
+                res.redirect("https://" + url.split("http://")[1]);
+            }
+        });
+
         before("/lobby",    this::redirectUnauthenticated);
         before("/game",     this::redirectUnauthenticated);
 
