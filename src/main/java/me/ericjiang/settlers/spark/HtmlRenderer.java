@@ -17,7 +17,20 @@ public class HtmlRenderer {
                     meta().withName("google-signin-client_id").withContent("224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com")
                 ),
                 body(
-                    a("Sign out").withHref("/sign-out").attr("onClick", "signOut();"),
+                    div(
+                        form(
+                            button("Sign out")
+                        ).withAction("/sign-out").withMethod("post").attr("onsubmit", "signOut();")
+                    ),
+                    div(
+                        form(
+                            label("Name").attr("for", "name"), br(),
+                            input().withType("text").withName("name"), br(),
+                            label("Max players").attr("for", "maxPlayers"), br(),
+                            input().withType("number").withName("maxPlayers"), br(),
+                            button("Create game")
+                        ).withAction("/create-game").withMethod("post")
+                    ),
                     div(
                         h1("Your games"),
                         each(lobby.gamesForPlayer(request.session().attribute(Attributes.USER_ID)), game ->

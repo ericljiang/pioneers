@@ -7,11 +7,12 @@ import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 
 import lombok.AllArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 import spark.Response;
 import spark.Request;
 
 @AllArgsConstructor
+@Slf4j
 public class Settlers {
 
     private Authenticator authenticator;
@@ -40,15 +41,23 @@ public class Settlers {
             }
         });
 
-        before("/lobby",    this::redirectUnauthenticated);
-        before("/game",     this::redirectUnauthenticated);
+        before("/lobby",        this::redirectUnauthenticated);
+        before("/game",         this::redirectUnauthenticated);
 
         // routes
-        get("/sign-in",     authenticator::renderSignInPage);
-        post("/sign-in",    authenticator::signIn);
-        get("/sign-out",    authenticator::signOut);
-        get("/lobby",       (req, res) -> renderer.renderLobby(req, lobby));
-        get("/game",        (req, res) -> "Game: Not yet implemented.");
+        get("/sign-in",         authenticator::renderSignInPage);
+        post("/sign-in",        authenticator::signIn);
+        post("/sign-out",       authenticator::signOut);
+        get("/lobby",           (req, res) -> renderer.renderLobby(req, lobby));
+        post("/create-game",    (req, res) -> {
+                                    String name = req.queryParams("name");
+                                    int maxPlayers = Integer.parseInt(req.queryParams("maxPlayers"));
+                                    log.info(String.format("Creating game '%s' with %d max players.", name, maxPlayers));
+                                    lobby.createGame(name, maxPlayers);
+                                    res.redirect("/lobby", 303);
+                                    return "303 See Other";
+                                });
+        get("/game",            (req, res) -> halt(501, "Game view not implemented"));
 
         redirect.get("/", "/lobby");
     }
