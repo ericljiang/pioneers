@@ -9,6 +9,9 @@ import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import spark.Response;
+import spark.TemplateEngine;
+import spark.template.thymeleaf.ThymeleafTemplateEngine;
+import spark.ModelAndView;
 import spark.Request;
 
 @AllArgsConstructor
@@ -19,13 +22,13 @@ public class Settlers {
 
     private Lobby lobby;
 
-    private HtmlRenderer renderer;
+    private TemplateEngine templateEngine;
 
     public static void main(String[] args) {
         Settlers app = new Settlers(
                 new GoogleAuthenticator(),
                 new Lobby(),
-                new HtmlRenderer());
+                new ThymeleafTemplateEngine());
         app.start();
     }
 
@@ -48,7 +51,7 @@ public class Settlers {
         get("/sign-in",         authenticator::renderSignInPage);
         post("/sign-in",        authenticator::signIn);
         post("/sign-out",       authenticator::signOut);
-        get("/lobby",           (req, res) -> renderer.renderLobby(req, lobby));
+        get("/lobby",           (req, res) -> templateEngine.render(new ModelAndView(new LobbyModel(lobby, req), "lobby")));
         post("/create-game",    (req, res) -> {
                                     String name = req.queryParams("name");
                                     int maxPlayers = Integer.parseInt(req.queryParams("maxPlayers"));
