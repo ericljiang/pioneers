@@ -61,8 +61,8 @@ public class Settlers {
                                 });
         post("/create-game",    (req, res) -> {
                                     String name = req.queryParams("name");
-                                    int maxPlayers = Integer.parseInt(req.queryParams("maxPlayers"));
-                                    lobby.createGame(name, maxPlayers);
+                                    String expansion = req.queryParams("expansion");
+                                    lobby.createGame(name, expansion);
                                     res.redirect("/lobby", 303);
                                     return "303 See Other";
                                 });

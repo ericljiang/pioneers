@@ -7,18 +7,34 @@ import lombok.Getter;
 
 @Getter
 public class Game {
-    private String name;
-    private int maxPlayers;
-    private List<String> players;
 
-    public Game(String name, int maxPlayers) {
-        this.name = name;
-        if (maxPlayers > 0) {
+    @Getter
+    public static enum Expansion {
+        BASE(3, 4),
+        EXTENDED(5, 6);
+
+        private int minPlayers;
+        private int maxPlayers;
+
+        Expansion(int minPlayers, int maxPlayers) {
+            this.minPlayers = minPlayers;
             this.maxPlayers = maxPlayers;
-        } else {
-            throw new IllegalArgumentException("maxPlayers must be greater than 0.");
         }
-        players = new ArrayList<String>(maxPlayers);
+
+        @Override
+        public String toString() {
+            return name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
+        }
+    }
+
+    private String name;
+    private List<String> players;
+    private Expansion expansion;
+
+    public Game(String name, String expansion) {
+        this.name = name;
+        this.expansion = Expansion.valueOf(expansion);
+        players = new ArrayList<String>(this.expansion.getMaxPlayers());
     }
 
     public int currentPlayerCount() {
@@ -26,6 +42,14 @@ public class Game {
     }
 
     public boolean isOpen() {
-        return currentPlayerCount() < maxPlayers;
+        return currentPlayerCount() < expansion.getMaxPlayers();
+    }
+
+    public int getMaxPlayers() {
+        return expansion.getMaxPlayers();
+    }
+
+    public static Expansion[] values() {
+        return Expansion.values();
     }
 }

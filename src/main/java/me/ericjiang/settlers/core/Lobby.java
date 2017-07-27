@@ -15,9 +15,9 @@ public class Lobby {
         games = new ArrayList<Game>();
     }
 
-    public void createGame(String name, int maxPlayers) {
-        log.info(String.format("Creating game '%s' with %d max players.", name, maxPlayers));
-        games.add(new Game(name, maxPlayers));
+    public void createGame(String name, String expansion) {
+        log.info(String.format("Creating game '%s' with expansion '%s'.", name, expansion));
+        games.add(new Game(name, expansion));
     }
 
     public List<Game> gamesForPlayer(String userId) {

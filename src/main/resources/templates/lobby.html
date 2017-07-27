@@ -1,54 +1,67 @@
 <!doctype html>
 <html>
-    <head>
-        <meta name="google-signin-client_id" content="224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com">
-    </head>
-    <body>
-        <div>
-            <form action="/sign-out" method="post" onsubmit="signOut();">
-                <button>Sign out</button>
-            </form>
-        </div>
-        <div>
-            <form action="/create-game" method="post">
-                <label for="name">Name</label><br>
-                <input type="text" name="name"><br>
-                <label for="maxPlayers">Max players</label><br>
-                <input type="number" name="maxPlayers"><br>
-                <button>Create game</button>
-            </form>
-        </div>
-        <div>
-            <h1 th:text="|Games for ${userId}|">Your games</h1>
-            <table>
-                <thead>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Online</th>
-                </thead>
-                <tr th:each="game : ${lobby.gamesForPlayer(userId)}">
-                    <td th:text="${game.getName()}">yeah</td>
-                    <td th:text="${game.getMaxPlayers()}">3-4</td>
-                    <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
-                </tr>
-            </table>
-        </div>
-        <div>
-            <h1>Open games</h1>
-            <table>
-                <thead>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Players</th>
-                </thead>
-                <tr th:each="game : ${lobby.openGames()}">
-                    <td th:text="${game.getName()}">yeah</td>
-                    <td th:text="${game.getMaxPlayers()}">3-4</td>
-                    <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
-                </tr>
-            </table>
-        </div>
-        <script src="/googleSignOut.js"></script>
-        <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
-    </body>
+
+<head>
+    <meta name="google-signin-client_id" content="224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com">
+</head>
+
+<body>
+    <div>
+        <form action="/sign-out" method="post" onsubmit="signOut();">
+            <button>Sign out</button>
+        </form>
+    </div>
+
+    <div>
+        <form action="/create-game" method="post">
+            <label for="name">Name</label><br>
+            <input type="text" name="name"><br>
+            <label for="expansion">Expansion</label><br>
+            <select name="expansion">
+                    <option th:each="expansion : ${@me.ericjiang.settlers.core.Game@values()}"
+                            th:value="${expansion.name()}"
+                            th:text="${expansion.toString()}"
+                            value="BASE">
+                        Base
+                    </option>
+                </select><br>
+            <button>Create game</button>
+        </form>
+    </div>
+
+    <div>
+        <h1 th:text="|Games for ${userId}|">Your games</h1>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Online</th>
+            </thead>
+            <tr th:each="game : ${lobby.gamesForPlayer(userId)}">
+                <td th:text="${game.getName()}">yeah</td>
+                <td th:text="${game.getMaxPlayers()}">3-4</td>
+                <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
+            </tr>
+        </table>
+    </div>
+
+    <div>
+        <h1>Open games</h1>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Expansion</th>
+                <th>Players</th>
+            </thead>
+            <tr th:each="game : ${lobby.openGames()}">
+                <td th:text="${game.getName()}">yeah</td>
+                <td th:text="${game.getExpansion()}">3-4</td>
+                <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
+            </tr>
+        </table>
+    </div>
+    <script src="/googleSignOut.js"></script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+</body>
+
 </html>
