@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Lobby {
 
     private List<Game> games;
@@ -13,6 +16,7 @@ public class Lobby {
     }
 
     public void createGame(String name, int maxPlayers) {
+        log.info(String.format("Creating game '%s' with %d max players.", name, maxPlayers));
         games.add(new Game(name, maxPlayers));
     }
 

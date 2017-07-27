@@ -2,20 +2,22 @@ package me.ericjiang.settlers.spark;
 
 import static spark.Spark.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import lombok.AllArgsConstructor;
+
 import me.ericjiang.settlers.core.Lobby;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import spark.ModelAndView;
+import spark.Request;
 import spark.Response;
 import spark.TemplateEngine;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
-import spark.ModelAndView;
-import spark.Request;
 
 @AllArgsConstructor
-@Slf4j
 public class Settlers {
 
     private Authenticator authenticator;
@@ -51,11 +53,15 @@ public class Settlers {
         get("/sign-in",         authenticator::renderSignInPage);
         post("/sign-in",        authenticator::signIn);
         post("/sign-out",       authenticator::signOut);
-        get("/lobby",           (req, res) -> templateEngine.render(new ModelAndView(new LobbyModel(lobby, req), "lobby")));
+        get("/lobby",           (req, res) -> {
+                                    Map<String, Object> model = new HashMap<String, Object>();
+                                    model.put("userId", req.session().attribute(Authenticator.USER_ID));
+                                    model.put("lobby", lobby);
+                                    return templateEngine.render(new ModelAndView(model, "lobby"));
+                                });
         post("/create-game",    (req, res) -> {
                                     String name = req.queryParams("name");
                                     int maxPlayers = Integer.parseInt(req.queryParams("maxPlayers"));
-                                    log.info(String.format("Creating game '%s' with %d max players.", name, maxPlayers));
                                     lobby.createGame(name, maxPlayers);
                                     res.redirect("/lobby", 303);
                                     return "303 See Other";

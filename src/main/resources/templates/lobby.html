@@ -26,7 +26,7 @@
                     <th>Size</th>
                     <th>Online</th>
                 </thead>
-                <tr th:each="game : ${gamesForPlayer}">
+                <tr th:each="game : ${lobby.gamesForPlayer(userId)}">
                     <td th:text="${game.getName()}">yeah</td>
                     <td th:text="${game.getMaxPlayers()}">3-4</td>
                     <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
@@ -41,7 +41,7 @@
                     <th>Size</th>
                     <th>Players</th>
                 </thead>
-                <tr th:each="game : ${openGames}">
+                <tr th:each="game : ${lobby.openGames()}">
                     <td th:text="${game.getName()}">yeah</td>
                     <td th:text="${game.getMaxPlayers()}">3-4</td>
                     <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
