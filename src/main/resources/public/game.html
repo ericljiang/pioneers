@@ -9,14 +9,15 @@
         //Establish the WebSocket connection and set up event handlers
         var webSocketAddress = "ws://" + location.host + "/play" + location.search;
         var webSocket = new WebSocket(webSocketAddress);
-        var timerId = 0;        
+        var heartbeatTimer = 0;
         webSocket.onopen = onConnect;
         webSocket.onmessage = onMessage;
         webSocket.onclose = onClose;
 
         function onConnect() {
+            console.log("Connected to websocket at " + webSocketAddress);
             webSocket.send("hi");  
-            heartbeat();          
+            heartbeatTimer = setInterval(heartbeat, 20000);
         }
 
         function onMessage(message) {
@@ -30,21 +31,13 @@
 
         function onClose() {
             alert("WebSocket connection closed")
-            cancelHeartbeat();
+            clearInterval(heartbeatTimer);
         }
 
         function heartbeat() {
-            var timeout = 20000;
             if (webSocket.readyState == webSocket.OPEN) {
                 webSocket.send("");
-            }
-            // setInterval
-            timerId = setTimeout(heartbeat, timeout);
-        }
-
-        function cancelHeartbeat() {
-            if (timerId) {
-                clearTimeout(timerId);
+                console.log("Sent heartbeat to server.");
             }
         }
     </script>
