@@ -14,8 +14,10 @@ import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
+import spark.Spark;
 import spark.TemplateEngine;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
+import spark.utils.IOUtils;
 
 @AllArgsConstructor
 public class Settlers {
@@ -38,6 +40,8 @@ public class Settlers {
         port(getPort());
         staticFileLocation("/public");
 
+        webSocket("/play", new WebSocketHandler(lobby));        
+
         // filters
         before((req, res) -> {
             String url = req.url();
@@ -46,27 +50,29 @@ public class Settlers {
             }
         });
 
-        before("/lobby",        this::redirectUnauthenticated);
-        before("/game",         this::redirectUnauthenticated);
+        before("/lobby", this::redirectUnauthenticated);
+        before("/game", this::redirectUnauthenticated);
 
         // routes
-        get("/sign-in",         authenticator::renderSignInPage);
-        post("/sign-in",        authenticator::signIn);
-        post("/sign-out",       authenticator::signOut);
-        get("/lobby",           (req, res) -> {
-                                    Map<String, Object> model = new HashMap<String, Object>();
-                                    model.put("userId", req.session().attribute(Authenticator.USER_ID));
-                                    model.put("lobby", lobby);
-                                    return templateEngine.render(new ModelAndView(model, "lobby"));
-                                });
-        post("/create-game",    (req, res) -> {
-                                    String name = req.queryParams("name");
-                                    String expansion = req.queryParams("expansion");
-                                    lobby.createGame(name, expansion);
-                                    res.redirect("/lobby", 303);
-                                    return "303 See Other";
-                                });
-        get("/game",            (req, res) -> halt(501, "Game view not implemented"));
+        get("/sign-in", authenticator::renderSignInPage);
+        post("/sign-in", authenticator::signIn);
+        post("/sign-out", authenticator::signOut);
+        get("/lobby", (req, res) -> {
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("userId", req.session().attribute(Authenticator.USER_ID));
+            model.put("lobby", lobby);
+            return templateEngine.render(new ModelAndView(model, "lobby"));
+        });
+        post("/create-game", (req, res) -> {
+            String name = req.queryParams("name");
+            String expansion = req.queryParams("expansion");
+            lobby.createGame(name, expansion);
+            res.redirect("/lobby", 303);
+            return "303 See Other";
+        });
+        get("/game", (req, res) -> {
+            return IOUtils.toString(Spark.class.getResourceAsStream("/public/game.html"));
+        });
 
         redirect.get("/", "/lobby");
     }

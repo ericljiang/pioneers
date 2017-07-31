@@ -2,6 +2,7 @@ package me.ericjiang.settlers.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Getter;
 
@@ -27,11 +28,13 @@ public class Game {
         }
     }
 
+    private final String uuid;
     private String name;
     private List<String> players;
     private Expansion expansion;
 
     public Game(String name, String expansion) {
+        uuid = UUID.randomUUID().toString();
         this.name = name;
         this.expansion = Expansion.valueOf(expansion);
         players = new ArrayList<String>(this.expansion.getMaxPlayers());

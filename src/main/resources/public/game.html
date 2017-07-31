@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <title>Game</title>
+</head>
+
+<body>
+    <script type="text/javascript">
+        //Establish the WebSocket connection and set up event handlers
+        var webSocketAddress = "ws://" + location.host + "/play" + location.search;
+        var webSocket = new WebSocket(webSocketAddress);
+        var timerId = 0;        
+        webSocket.onopen = onConnect;
+        webSocket.onmessage = onMessage;
+        webSocket.onclose = onClose;
+
+        function onConnect() {
+            webSocket.send("hi");  
+            heartbeat();          
+        }
+
+        function onMessage(message) {
+            message = message.data;
+            if (message == "") {
+                console.log("Received heartbeat from server.");
+                return;
+            }
+            console.log("Server: " + message);
+        }
+
+        function onClose() {
+            alert("WebSocket connection closed")
+            cancelHeartbeat();
+        }
+
+        function heartbeat() {
+            var timeout = 20000;
+            if (webSocket.readyState == webSocket.OPEN) {
+                webSocket.send("");
+            }
+            // setInterval
+            timerId = setTimeout(heartbeat, timeout);
+        }
+
+        function cancelHeartbeat() {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+        }
+    </script>
+</body>
+</html>
