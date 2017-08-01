@@ -5,6 +5,7 @@
 </head>
 
 <body>
+    <script src="/actions.js"></script>
     <script type="text/javascript">
         //Establish the WebSocket connection and set up event handlers
         var webSocketAddress = "ws://" + location.host + "/play" + location.search;
@@ -16,8 +17,12 @@
 
         function onConnect() {
             console.log("Connected to websocket at " + webSocketAddress);
-            webSocket.send("hi");  
+            //webSocket.send("hi");  
             heartbeatTimer = setInterval(heartbeat, 20000);
+            var action = new SimpleAction();
+            var message = JSON.stringify(action);
+            console.log("Sending message: " + message);
+            webSocket.send(message);
         }
 
         function onMessage(message) {

@@ -35,6 +35,6 @@ public class Lobby {
 
     public Game getGame(String id) {
         // TODO
-        return null;
+        return games.get(0);
     }
 }

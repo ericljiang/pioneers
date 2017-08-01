@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.Game;
 import me.ericjiang.settlers.core.Lobby;
 import me.ericjiang.settlers.core.actions.PlayerAction;
+import me.ericjiang.settlers.core.actions.SimpleAction;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -22,6 +23,10 @@ public class WebSocketHandler {
     @OnWebSocketConnect
     public void onConnect(Session session) {
         log.info("Session connected to websocket.");
+        WebSocketPlayer player = new WebSocketPlayer(session);
+        String gameId = getParameter(session, "g");
+        Game game = lobby.getGame(gameId);
+        game.connectPlayer(player);
     }
 
     @OnWebSocketMessage
@@ -48,6 +53,10 @@ public class WebSocketHandler {
 
     private PlayerAction parseMessage(String message) {
         // TODO gson
-        return null;
+        return new SimpleAction();
+    }
+
+    private String getParameter(Session session, String key) {
+        return session.getUpgradeRequest().getParameterMap().get(key).get(0);
     }
 }
