@@ -2,13 +2,15 @@ package me.ericjiang.settlers.spark;
 
 import java.io.IOException;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import me.ericjiang.settlers.core.Game;
 import me.ericjiang.settlers.core.Lobby;
+import me.ericjiang.settlers.core.actions.PlayerAction;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @WebSocket
@@ -38,9 +40,14 @@ public class WebSocketHandler {
     }
 
     private void processMessage(Session session, String message) throws IOException {
-        // parse message
-        // identify game e.g. game = lobby.getGame(uuid);
-        // send message to game
-        session.getRemote().sendString(message);
+        //session.getRemote().sendString(message);
+        PlayerAction action = parseMessage(message);
+        Game game = lobby.getGame(action.getGameId());
+        game.processAction(action);
+    }
+
+    private PlayerAction parseMessage(String message) {
+        // TODO gson
+        return null;
     }
 }

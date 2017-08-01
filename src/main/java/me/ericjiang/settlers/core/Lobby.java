@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Lobby {
 
+    // replace with database
     private List<Game> games;
 
     public Lobby() {
@@ -22,7 +23,7 @@ public class Lobby {
 
     public List<Game> gamesForPlayer(String userId) {
         return games.stream()
-                .filter(game -> game.getPlayers().contains(userId))
+                .filter(game -> game.hasPlayer(userId))
                 .collect(Collectors.toList());
     }
 
@@ -30,5 +31,10 @@ public class Lobby {
         return games.stream()
                 .filter(game -> game.isOpen())
                 .collect(Collectors.toList());
+    }
+
+    public Game getGame(String id) {
+        // TODO
+        return null;
     }
 }
