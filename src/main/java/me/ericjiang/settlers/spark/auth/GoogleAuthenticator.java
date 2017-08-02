@@ -5,12 +5,9 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-
 import java.util.Collections;
-
 import lombok.extern.slf4j.Slf4j;
 import lombok.SneakyThrows;
-
 import spark.Request;
 import spark.Response;
 import spark.Session;
@@ -19,6 +16,7 @@ import spark.utils.IOUtils;
 
 @Slf4j
 public class GoogleAuthenticator extends Authenticator {
+
     private static final String ID_TOKEN = "idToken";
 
     private static final String CLIENT_ID = "224119011410-5hbr37e370ieevfk9t64v9799kivttan.apps.googleusercontent.com";

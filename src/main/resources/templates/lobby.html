@@ -7,13 +7,13 @@
 
 <body>
     <div>
-        <form action="/sign-out" method="post" onsubmit="signOut();">
+        <form action="sign-out" method="post" onsubmit="signOut();">
             <button>Sign out</button>
         </form>
     </div>
 
     <div>
-        <form action="/create-game" method="post">
+        <form action="create-game" method="post">
             <label for="name">Name</label><br>
             <input type="text" name="name"><br>
             <label for="expansion">Expansion</label><br>
@@ -41,6 +41,9 @@
                 <td th:text="${game.getName()}">yeah</td>
                 <td th:text="${game.getMaxPlayers()}">3-4</td>
                 <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
+                <td>
+                    <a href="game?g=0" th:href="@{game(g=${game.getUuid()})}">Connect</a>
+                </td>
             </tr>
         </table>
     </div>
@@ -57,10 +60,13 @@
                 <td th:text="${game.getName()}">yeah</td>
                 <td th:text="${game.getExpansion()}">3-4</td>
                 <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
+                <td>
+                    <a href="game?g=0" th:href="@{game(g=${game.getId()}, u=${userId})}">Connect</a>
+                </td>
             </tr>
         </table>
     </div>
-    <script src="/googleSignOut.js"></script>
+    <script src="googleSignOut.js"></script>
     <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 </body>
 
