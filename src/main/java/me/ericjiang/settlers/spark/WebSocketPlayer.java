@@ -1,15 +1,14 @@
 package me.ericjiang.settlers.spark;
 
+import java.io.IOException;
 import lombok.AllArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.Player;
 import me.ericjiang.settlers.core.actions.Action;
-
-import java.io.IOException;
-
 import org.eclipse.jetty.websocket.api.Session;
 
 @AllArgsConstructor
+@Slf4j
 public class WebSocketPlayer implements Player {
     private Session session;
 
@@ -18,13 +17,13 @@ public class WebSocketPlayer implements Player {
     }
 
     public void update(Action action) {
-        if (!session.isOpen()) {
-            return;
-        }
-        try {
-            session.getRemote().sendString("{\"id\":1,\"gameId\":1}");
-        } catch (IOException e) {
-            throw new InternalError(e);
+        if (session.isOpen()) {
+            try {
+                log.info("Sending action to player: " + action.toString());
+                session.getRemote().sendString(action.toString());
+            } catch (IOException e) {
+                throw new InternalError("Exception occured while updating a client with an action.", e);
+            }
         }
     }
 }

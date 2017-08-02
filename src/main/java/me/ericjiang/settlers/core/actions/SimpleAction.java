@@ -1,5 +1,8 @@
 package me.ericjiang.settlers.core.actions;
 
-public class SimpleAction extends PlayerAction {
+import lombok.Getter;
 
+@Getter
+public class SimpleAction extends PlayerAction {
+    private String data;
 }

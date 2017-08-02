@@ -3,7 +3,6 @@ package me.ericjiang.settlers.core;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
@@ -56,6 +55,7 @@ public class Game {
     }
 
     public void processAction(PlayerAction action) {
+        log.info("Received action (id=" + action.getId() + ")");
         // TODO
         // validate
         // broadcast changes to players e.g. player.update(action)
@@ -88,6 +88,7 @@ public class Game {
     }
 
     private void broadcast(Action action) {
+        log.info("Broadcasting action (id=" + action.getId() + ")");
         for (Player player : players.values()) {
             if (player != null) {
                 player.update(action);

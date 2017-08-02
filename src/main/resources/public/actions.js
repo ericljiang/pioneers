@@ -1,4 +1,5 @@
-function SimpleAction() {
-    this.id = 1;
-    this.gameId = 1;
+function SimpleAction(gameId) {
+    this.type = "SimpleAction";
+    this.gameId = gameId;
+    this.data = "test";
 }

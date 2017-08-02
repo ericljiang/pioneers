@@ -4,13 +4,10 @@ import static spark.Spark.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.AllArgsConstructor;
-
 import me.ericjiang.settlers.core.Lobby;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
-
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
