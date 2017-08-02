@@ -63,7 +63,9 @@ public class Game {
     }
 
     public int currentPlayerCount() {
-        return players.size();
+        return (int) players.values().stream()
+                .filter(p -> p != null)
+                .count();
     }
 
     public boolean isOpen() {

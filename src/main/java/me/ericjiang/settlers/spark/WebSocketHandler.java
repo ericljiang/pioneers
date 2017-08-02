@@ -39,7 +39,11 @@ public class WebSocketHandler {
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        log.info("Session disconnected from websocket.");
+        log.debug("Session disconnected from websocket: " + statusCode + ":" + reason);
+        WebSocketPlayer player = new WebSocketPlayer(session);
+        String gameId = getGameId(session);
+        Game game = lobby.getGame(gameId);
+        game.disconnectPlayer(player);
     }
 
     private void processMessage(Session session, String message) throws IOException {
