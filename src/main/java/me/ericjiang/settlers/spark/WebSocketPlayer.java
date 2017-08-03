@@ -19,7 +19,7 @@ public class WebSocketPlayer implements Player {
     public void update(Action action) {
         if (session.isOpen()) {
             try {
-                log.info("Sending action to player: " + action.toString());
+                log.debug("Sending action to player: " + action.toString());
                 session.getRemote().sendString(action.toString());
             } catch (IOException e) {
                 throw new InternalError("Exception occured while updating a client with an action.", e);

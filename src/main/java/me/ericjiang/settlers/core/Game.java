@@ -6,7 +6,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
-import me.ericjiang.settlers.core.actions.PlayerAction;
+import me.ericjiang.settlers.core.actions.SimpleAction;
 
 @Getter
 @Slf4j
@@ -54,14 +54,6 @@ public class Game {
         players.put(player.id(), null);
     }
 
-    public void processAction(PlayerAction action) {
-        log.info("Received action (id=" + action.getId() + ")");
-        // TODO
-        // validate
-        // broadcast changes to players e.g. player.update(action)
-        broadcast(action);
-    }
-
     public int currentPlayerCount() {
         return (int) players.values().stream()
                 .filter(p -> p != null)
@@ -85,12 +77,19 @@ public class Game {
         return false;
     }
 
+    public void processAction(SimpleAction action) {
+        log.info(String.format("Received SimpleAction %s from %s with data=%s",
+                action.getId(), action.getPlayerId(), action.getData()));
+        broadcast(action);
+    }
+
     public static Expansion[] values() {
+        // TODO delete this
         return Expansion.values();
     }
 
     private void broadcast(Action action) {
-        log.info("Broadcasting action (id=" + action.getId() + ")");
+        log.info("Broadcasting action " + action.getId());
         for (Player player : players.values()) {
             if (player != null) {
                 player.update(action);

@@ -35,6 +35,7 @@ public class WebSocketHandler {
             return;
         }
         processMessage(session, message);
+        // if an exception occurs, swallow but notify client
     }
 
     @OnWebSocketClose
@@ -53,7 +54,7 @@ public class WebSocketHandler {
             action.setPlayerId(getUserId(session));
             action.setGameId(getGameId(session));
             Game game = lobby.getGame(action.getGameId());
-            game.processAction(action);
+            action.accept(game);
         } catch (ClassCastException e) {
             throw new InternalError("Server received an Action that wasn't a PlayerAction.", e);
         }
