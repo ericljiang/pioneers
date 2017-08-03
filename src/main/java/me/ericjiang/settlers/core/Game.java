@@ -83,11 +83,6 @@ public class Game {
         broadcast(action);
     }
 
-    public static Expansion[] values() {
-        // TODO delete this
-        return Expansion.values();
-    }
-
     private void broadcast(Action action) {
         log.info("Broadcasting action " + action.getId());
         for (Player player : players.values()) {

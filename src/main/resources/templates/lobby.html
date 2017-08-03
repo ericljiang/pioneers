@@ -18,7 +18,7 @@
             <input type="text" name="name"><br>
             <label for="expansion">Expansion</label><br>
             <select name="expansion">
-                    <option th:each="expansion : ${@me.ericjiang.settlers.core.Game@values()}"
+                    <option th:each="expansion : ${@me.ericjiang.settlers.core.Game$Expansion@values()}"
                             th:value="${expansion.name()}"
                             th:text="${expansion.toString()}"
                             value="BASE">
