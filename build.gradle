@@ -27,7 +27,7 @@ dependencies {
     compile 'org.projectlombok:lombok:1.16.18'
     compile 'com.google.api-client:google-api-client:1.22.0'
     compile 'com.google.code.gson:gson:2.8.1'
-    compile 'com.google.guava:guava:21.0'
+    compile 'com.google.guava:guava:22.0'
     compile 'com.j2html:j2html:1.0.0'
     compile 'com.sparkjava:spark-core:2.6.0'
     compile 'com.sparkjava:spark-template-thymeleaf:2.5.5'

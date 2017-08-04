@@ -12,6 +12,9 @@ import me.ericjiang.settlers.core.actions.SimpleAction;
 @Slf4j
 public class Game {
 
+    /**
+     * Base-64 encoded UUID without padding
+     */
     private final String id;
 
     private String name;

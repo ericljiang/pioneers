@@ -5,6 +5,9 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.common.io.BaseEncoding;
+
+import java.math.BigInteger;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import lombok.SneakyThrows;
@@ -43,7 +46,7 @@ public class GoogleAuthenticator extends Authenticator {
         if (idToken != null) {
             log.info("Verified user ID token.");
             Payload payload = idToken.getPayload();
-            String userId = payload.getSubject();
+            String userId = encodeUserId(payload.getSubject());
             log.info("User " + userId + " signed in.");
 
             request.session().attribute(SIGNED_IN, true);
@@ -63,5 +66,10 @@ public class GoogleAuthenticator extends Authenticator {
         session.removeAttribute(USER_ID);
         response.redirect("/");
         return "200 OK";
+    }
+
+    private String encodeUserId(String userId) {
+        byte[] bytes = new BigInteger(userId).toByteArray();
+        return BaseEncoding.base64Url().omitPadding().encode(bytes);
     }
 }

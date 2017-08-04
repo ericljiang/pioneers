@@ -3,9 +3,9 @@ package me.ericjiang.settlers.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import me.ericjiang.settlers.util.ShortUUID;
 
 @Slf4j
 public class Lobby {
@@ -19,7 +19,7 @@ public class Lobby {
 
     public void createGame(String name, String expansion) {
         log.info(String.format("Creating game '%s' with expansion '%s'.", name, expansion));
-        String id = UUID.randomUUID().toString();
+        String id = ShortUUID.randomUUID().toString();
         Game game = new Game(id, name, expansion);
         games.put(id, game);
     }

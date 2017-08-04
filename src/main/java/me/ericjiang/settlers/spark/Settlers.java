@@ -37,7 +37,7 @@ public class Settlers {
         port(getPort());
         staticFileLocation("/public");
 
-        webSocket("/play", new WebSocketHandler(lobby));        
+        webSocket("/game", new WebSocketHandler(lobby));        
 
         // filters
         before((req, res) -> {
@@ -48,7 +48,7 @@ public class Settlers {
         });
 
         before("/lobby", this::redirectUnauthenticated);
-        before("/game", this::redirectUnauthenticated);
+        before("/play", this::redirectUnauthenticated);
 
         // routes
         get("/sign-in", authenticator::renderSignInPage);
@@ -67,8 +67,8 @@ public class Settlers {
             res.redirect("/lobby", 303);
             return "303 See Other";
         });
-        get("/game", (req, res) -> {
-            return IOUtils.toString(Spark.class.getResourceAsStream("/public/game.html"));
+        get("/play", (req, res) -> {
+            return IOUtils.toString(Spark.class.getResourceAsStream("/public/play.html"));
         });
 
         redirect.get("/", "/lobby");

@@ -42,7 +42,7 @@
                 <td th:text="${game.getMaxPlayers()}">3-4</td>
                 <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
                 <td>
-                    <a href="game?g=0" th:href="@{game(g=${game.getUuid()})}">Connect</a>
+                    <a href="play?g=0" th:href="@{play(g=${game.getUuid()})}">Connect</a>
                 </td>
             </tr>
         </table>
@@ -61,7 +61,7 @@
                 <td th:text="${game.getExpansion()}">3-4</td>
                 <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
                 <td>
-                    <a href="game?g=0" th:href="@{game(g=${game.getId()}, u=${userId})}">Connect</a>
+                    <a href="play?g=0" th:href="@{play(g=${game.getId()}, u=${userId})}">Connect</a>
                 </td>
             </tr>
         </table>

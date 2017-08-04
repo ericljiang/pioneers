@@ -2,12 +2,15 @@ package me.ericjiang.settlers.core.actions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.util.UUID;
 import lombok.Getter;
 import me.ericjiang.settlers.util.RuntimeTypeAdapterFactory;
+import me.ericjiang.settlers.util.ShortUUID;
 
 public abstract class Action {
 
+    /**
+     * Base-64 encoded UUID without padding
+     */
     @Getter
     private String id;
 
@@ -22,7 +25,7 @@ public abstract class Action {
     }
 
     public Action() {
-        id = UUID.randomUUID().toString();
+        id = ShortUUID.randomUUID().toString();
     }
 
     @Override

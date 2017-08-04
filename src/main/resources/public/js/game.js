@@ -5,7 +5,7 @@ if (location.protocol == "https:") {
 } else {
     protocol = "ws:"
 }
-var webSocketAddress = protocol + "//" + location.host + "/play" + location.search;
+var webSocketAddress = protocol + "//" + location.host + "/game" + location.search;
 var webSocket = new WebSocket(webSocketAddress);
 var heartbeatTimer = 0;
 webSocket.onopen = onConnect;
