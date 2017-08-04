@@ -1,4 +1,4 @@
-//Establish the WebSocket connection and set up event handlers
+// Establish the WebSocket connection and set up event handlers
 var protocol;
 if (location.protocol == "https:") {
     protocol = "wss:"
@@ -14,7 +14,6 @@ webSocket.onclose = onClose;
 
 function onConnect() {
     console.log("Connected to websocket at " + webSocketAddress);
-    //webSocket.send("hi");  
     heartbeatTimer = setInterval(heartbeat, 20000);
     var action = new SimpleAction();
     var message = JSON.stringify(action);
@@ -30,8 +29,8 @@ function onMessage(message) {
     }
     console.debug("Server says: " + message);
     var action = JSON.parse(message);
-    console.log(String.format("Player {0} sent {1} {2} to game {3}",
-        action.playerId, action.type, action.id, action.gameId));
+    console.log(String.format("Player {0} sent {1} {2}",
+        action.playerId, action.type, action.id));
 }
 
 function onClose() {

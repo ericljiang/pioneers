@@ -3,13 +3,14 @@ package me.ericjiang.settlers.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Lobby {
 
-    // replace with database
+    // TODO: replace with database
     private Map<String, Game> games;
 
     public Lobby() {
@@ -18,8 +19,9 @@ public class Lobby {
 
     public void createGame(String name, String expansion) {
         log.info(String.format("Creating game '%s' with expansion '%s'.", name, expansion));
-        Game game = new Game(name, expansion);
-        games.put(game.getId(), game);
+        String id = UUID.randomUUID().toString();
+        Game game = new Game(id, name, expansion);
+        games.put(id, game);
     }
 
     public List<Game> gamesForPlayer(String userId) {

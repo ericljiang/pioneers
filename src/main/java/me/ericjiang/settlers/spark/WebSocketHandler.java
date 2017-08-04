@@ -1,7 +1,6 @@
 package me.ericjiang.settlers.spark;
 
 import java.io.IOException;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.Game;
@@ -35,7 +34,7 @@ public class WebSocketHandler {
             return;
         }
         processMessage(session, message);
-        // if an exception occurs, swallow but notify client
+        // TODO: if an exception occurs, swallow but notify client
     }
 
     @OnWebSocketClose
@@ -50,10 +49,8 @@ public class WebSocketHandler {
     private void processMessage(Session session, String message) throws IOException {
         try {
             PlayerAction action = (PlayerAction) Action.valueOf(message);
-            action.setId(UUID.randomUUID().toString());
             action.setPlayerId(getUserId(session));
-            action.setGameId(getGameId(session));
-            Game game = lobby.getGame(action.getGameId());
+            Game game = lobby.getGame(getGameId(session));
             action.accept(game);
         } catch (ClassCastException e) {
             throw new InternalError("Server received an Action that wasn't a PlayerAction.", e);

@@ -8,8 +8,6 @@ import me.ericjiang.settlers.core.Game;
 @Setter
 public abstract class PlayerAction extends Action {
 
-    private String gameId;
-
     private String playerId;
 
     public abstract void accept(Game game);
