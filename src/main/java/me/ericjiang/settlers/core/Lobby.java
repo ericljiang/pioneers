@@ -11,7 +11,7 @@ import me.ericjiang.settlers.core.game.GameFactory;
 @Slf4j
 public class Lobby {
 
-    // TODO: replace with database
+    // TODO: replace with database gameDAO.getGame(id)
     private Map<String, Game> games;
 
     public Lobby() {

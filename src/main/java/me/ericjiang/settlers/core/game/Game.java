@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.Player;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.SimpleAction;
+import me.ericjiang.settlers.core.game.board.Board;
 import me.ericjiang.settlers.util.ShortUUID;
 
 @Getter
@@ -23,6 +24,8 @@ public abstract class Game {
 
     @Getter(AccessLevel.NONE)
     private Map<String, Player> players;
+
+    private Board board;
 
     public Game(String name) {
         this.id = ShortUUID.randomUUID().toString();
