@@ -1,7 +1,7 @@
 package me.ericjiang.settlers.core.actions;
 
 import lombok.Getter;
-import me.ericjiang.settlers.core.Game;
+import me.ericjiang.settlers.core.game.Game;
 
 @Getter
 public class SimpleAction extends PlayerAction {

@@ -1,16 +1,18 @@
-package me.ericjiang.settlers.core;
+package me.ericjiang.settlers.core.game;
 
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import me.ericjiang.settlers.core.Player;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.SimpleAction;
+import me.ericjiang.settlers.util.ShortUUID;
 
 @Getter
 @Slf4j
-public class Game {
+public abstract class Game {
 
     /**
      * Base-64 encoded UUID without padding
@@ -19,17 +21,20 @@ public class Game {
 
     private String name;
 
-    private Expansion expansion;
-
     @Getter(AccessLevel.NONE)
     private Map<String, Player> players;
 
-    public Game(String id, String name, String expansion) {
-        this.id = id;
+    public Game(String name) {
+        this.id = ShortUUID.randomUUID().toString();
         this.name = name;
-        this.expansion = Expansion.valueOf(expansion);
-        players = new HashMap<String, Player>(this.expansion.getMaxPlayers());
+        players = new HashMap<String, Player>(getMaxPlayers());
     }
+
+    public abstract String getExpansion();
+
+    public abstract int getMaxPlayers();
+
+    public abstract int getMinPlayers();
 
 	public void connectPlayer(Player player) {
         // TODO: if game has started, check if open and if player id is valid
@@ -46,10 +51,6 @@ public class Game {
         return (int) players.values().stream()
                 .filter(p -> p != null)
                 .count();
-    }
-
-    public int getMaxPlayers() {
-        return expansion.getMaxPlayers();
     }
 
     public boolean isOpen() {
@@ -77,25 +78,6 @@ public class Game {
             if (player != null) {
                 player.update(action);
             }
-        }
-    }
-
-    @Getter
-    public enum Expansion {
-        BASE(3, 4),
-        EXTENDED(5, 6);
-
-        private int minPlayers;
-        private int maxPlayers;
-
-        Expansion(int minPlayers, int maxPlayers) {
-            this.minPlayers = minPlayers;
-            this.maxPlayers = maxPlayers;
-        }
-
-        @Override
-        public String toString() {
-            return name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
         }
     }
 }

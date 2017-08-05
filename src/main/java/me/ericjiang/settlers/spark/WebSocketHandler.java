@@ -3,10 +3,10 @@ package me.ericjiang.settlers.spark;
 import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.Game;
 import me.ericjiang.settlers.core.Lobby;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.PlayerAction;
+import me.ericjiang.settlers.core.game.Game;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
