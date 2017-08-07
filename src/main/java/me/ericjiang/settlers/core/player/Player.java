@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.core;
+package me.ericjiang.settlers.core.player;
 
 import me.ericjiang.settlers.core.actions.Action;
 

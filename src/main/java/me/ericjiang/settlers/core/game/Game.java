@@ -2,32 +2,40 @@ package me.ericjiang.settlers.core.game;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.Player;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.SimpleAction;
-import me.ericjiang.settlers.util.ShortUUID;
+import me.ericjiang.settlers.core.board.BoardDao;
+import me.ericjiang.settlers.core.player.Player;
+import me.ericjiang.settlers.core.player.PlayerDao;
 
-@Getter
 @Slf4j
 public abstract class Game {
 
     /**
      * Base-64 encoded UUID without padding
      */
+    @Getter
     private final String id;
 
+    @Getter
     private String name;
 
-    @Getter(AccessLevel.NONE)
-    private Map<String, Player> players;
+    @Setter
+    private transient BoardDao boardDao;
 
-    public Game(String name) {
-        this.id = ShortUUID.randomUUID().toString();
+    @Setter
+    private transient PlayerDao playerDao;
+
+    private transient Map<String, Player> connectedPlayers;
+
+    public Game(String id, String name) {
+        this.id = id;
         this.name = name;
-        players = new HashMap<String, Player>(getMaxPlayers());
+        connectedPlayers = new HashMap<String, Player>(getMaxPlayers());
+        createBoard();
     }
 
     public abstract String getExpansion();
@@ -36,21 +44,23 @@ public abstract class Game {
 
     public abstract int getMinPlayers();
 
+    protected abstract void createBoard();
+
 	public void connectPlayer(Player player) {
-        // TODO: if game has started, check if open and if player id is valid
+        // TODO: if setup phase, playerDao.addPlayerToGame(id, player.id());
+        // if game has started, check if open and if player id is valid
+        playerDao.addPlayerToGame(id, player.id());
+        connectedPlayers.put(player.id(), player);
         log.info("Player " + player.id() + " connected to game " + id);
-        players.put(player.id(), player);
     }
     
     public void disconnectPlayer(Player player) {
+        connectedPlayers.remove(player.id());
         log.info("Player " + player.id() + " disconnected from game " + id);
-        players.put(player.id(), null);
     }
 
     public int currentPlayerCount() {
-        return (int) players.values().stream()
-                .filter(p -> p != null)
-                .count();
+        return connectedPlayers.size();
     }
 
     public boolean isOpen() {
@@ -58,12 +68,7 @@ public abstract class Game {
     }
 
     public boolean hasPlayer(String playerId) {
-        for (String player : players.keySet()) {
-            if (player == playerId) {
-                return true;
-            }
-        }
-        return false;
+        return playerDao.playersForGame(id).contains(playerId);
     }
 
     public void processAction(SimpleAction action) {
@@ -72,12 +77,10 @@ public abstract class Game {
         broadcast(action);
     }
 
-    private void broadcast(Action action) {
+    protected void broadcast(Action action) {
         log.info("Broadcasting action " + action.getId());
-        for (Player player : players.values()) {
-            if (player != null) {
-                player.update(action);
-            }
+        for (Player player : connectedPlayers.values()) {
+            player.update(action);
         }
     }
 }

@@ -3,8 +3,8 @@ package me.ericjiang.settlers.spark;
 import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.Player;
 import me.ericjiang.settlers.core.actions.Action;
+import me.ericjiang.settlers.core.player.Player;
 import org.eclipse.jetty.websocket.api.Session;
 
 @AllArgsConstructor

@@ -34,12 +34,12 @@
         <table>
             <thead>
                 <th>Name</th>
-                <th>Size</th>
+                <th>Expansion</th>
                 <th>Online</th>
             </thead>
-            <tr th:each="game : ${lobby.gamesForPlayer(userId)}">
+            <tr th:each="game : ${gameDao.gamesForPlayer(userId)}">
                 <td th:text="${game.getName()}">yeah</td>
-                <td th:text="${game.getMaxPlayers()}">3-4</td>
+                <td th:text="${game.getExpansion()}">Base</td>
                 <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
                 <td>
                     <a href="play?g=0&u=0" th:href="@{play(g=${game.getId()}, u=${userId})}">Connect</a>
@@ -56,9 +56,9 @@
                 <th>Expansion</th>
                 <th>Players</th>
             </thead>
-            <tr th:each="game : ${lobby.openGames()}">
+            <tr th:each="game : ${gameDao.openGamesWithoutPlayer(userId)}">
                 <td th:text="${game.getName()}">yeah</td>
-                <td th:text="${game.getExpansion()}">3-4</td>
+                <td th:text="${game.getExpansion()}">Base</td>
                 <td th:text="|${game.currentPlayerCount()}/${game.getMaxPlayers()}|">2/3</td>
                 <td>
                     <a href="play?g=0&u=0" th:href="@{play(g=${game.getId()}, u=${userId})}">Connect</a>
