@@ -6,6 +6,11 @@
  * user guide available at https://docs.gradle.org/4.0.1/userguide/tutorial_java_projects.html
  */
 
+plugins {
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
+}
+
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 
@@ -41,4 +46,11 @@ mainClassName = 'me.ericjiang.settlers.spark.Settlers'
 
 task stage {
     dependsOn installDist
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
