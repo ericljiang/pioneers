@@ -1,15 +1,17 @@
-package me.ericjiang.settlers.core.game.board;
+package me.ericjiang.settlers.core.board;
 
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Getter; 
 
 @Getter
 @AllArgsConstructor
 public class Tile {
 
     private Coordinates coordinates;
+
+    public enum Resource { ORE, GRAIN, LUMBER, WOOL, BRICK }
 
     /**
      * http://www-cs-students.stanford.edu/~amitp/game-programming/grids/

@@ -3,6 +3,9 @@ package me.ericjiang.settlers.core.game;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import me.ericjiang.settlers.core.board.BoardDao;
+import me.ericjiang.settlers.core.player.PlayerDao;
+import me.ericjiang.settlers.util.ShortUUID;
 
 public class GameFactory {
 
@@ -18,8 +21,13 @@ public class GameFactory {
         EXPANSIONS.put(EXTENDED, ExtendedGame::new);
     }
 
-    public static Game newGame(String name, String expansion) {
-        return EXPANSIONS.get(expansion).instantiate(name);
+    public static Game newGame(String name, String expansion, BoardDao boardDao, PlayerDao playerDao) {
+        String id = ShortUUID.randomUUID().toString();
+        Game game = EXPANSIONS.get(expansion).instantiate(id, name);
+        // TODO:
+        game.setBoardDao(boardDao);
+        game.setPlayerDao(playerDao);
+        return game;
     }
 
     public static Set<String> expansions() {
@@ -27,7 +35,7 @@ public class GameFactory {
     }
 
     private interface GameConstructor {
-        Game instantiate(String name);
+        Game instantiate(String id, String name);
     }
 
 }

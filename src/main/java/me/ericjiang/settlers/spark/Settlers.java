@@ -5,7 +5,12 @@ import static spark.Spark.*;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import me.ericjiang.settlers.core.Lobby;
+import me.ericjiang.settlers.core.board.BoardDao;
+import me.ericjiang.settlers.core.board.BoardDaoInMemory;
+import me.ericjiang.settlers.core.game.GameDao;
+import me.ericjiang.settlers.core.game.GameDaoInMemory;
+import me.ericjiang.settlers.core.player.PlayerDao;
+import me.ericjiang.settlers.core.player.PlayerDaoInMemory;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import spark.ModelAndView;
@@ -21,14 +26,20 @@ public class Settlers {
 
     private Authenticator authenticator;
 
-    private Lobby lobby;
+    private GameDao gameDao;
+
+    private BoardDao boardDao;
+
+    private PlayerDao playerDao;
 
     private TemplateEngine templateEngine;
 
     public static void main(String[] args) {
         Settlers app = new Settlers(
                 new GoogleAuthenticator(),
-                new Lobby(),
+                new GameDaoInMemory(),
+                new BoardDaoInMemory(),
+                new PlayerDaoInMemory(),
                 new ThymeleafTemplateEngine());
         app.start();
     }
@@ -37,7 +48,7 @@ public class Settlers {
         port(getPort());
         staticFileLocation("/public");
 
-        webSocket("/game", new WebSocketHandler(lobby));        
+        webSocket("/game", new WebSocketHandler(gameDao));        
 
         // filters
         before((req, res) -> {
@@ -57,13 +68,13 @@ public class Settlers {
         get("/lobby", (req, res) -> {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("userId", req.session().attribute(Authenticator.USER_ID));
-            model.put("lobby", lobby);
+            model.put("gameDao", gameDao);
             return templateEngine.render(new ModelAndView(model, "lobby"));
         });
         post("/create-game", (req, res) -> {
             String name = req.queryParams("name");
             String expansion = req.queryParams("expansion");
-            lobby.createGame(name, expansion);
+            gameDao.createGame(name, expansion, boardDao, playerDao);
             res.redirect("/lobby", 303);
             return "303 See Other";
         });

@@ -1,9 +1,10 @@
-package me.ericjiang.settlers.core.game.board;
+package me.ericjiang.settlers.core.board;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 public class Edge {
+
     @Getter
     @AllArgsConstructor
     public static class Coordinates {
