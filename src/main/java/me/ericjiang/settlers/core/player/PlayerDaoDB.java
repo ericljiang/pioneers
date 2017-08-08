@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +34,7 @@ public class PlayerDaoDB implements PlayerDao {
     }
 
     public List<String> playersForGame(String gameId) {
+        log.info("Querying database for players for game " + gameId);
         String sql = String.format(
                 "SELECT player_id FROM player WHERE game_id = '%s'",
                 gameId);

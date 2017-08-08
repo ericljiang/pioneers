@@ -11,7 +11,6 @@ import me.ericjiang.settlers.core.game.GameDao;
 import me.ericjiang.settlers.core.game.GameDaoInMemory;
 import me.ericjiang.settlers.core.player.PlayerDao;
 import me.ericjiang.settlers.core.player.PlayerDaoDB;
-import me.ericjiang.settlers.core.player.PlayerDaoInMemory;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import spark.ModelAndView;
