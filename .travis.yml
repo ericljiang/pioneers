@@ -1,7 +1,10 @@
 language: java
 
 services:
-  - postgresql: "9.5"
+  - postgresql
+
+addons:
+  postgresql: "9.6"
 
 before_script:
   - psql -c 'select version()' -U postgres
