@@ -9,7 +9,6 @@
 plugins {
     id 'jacoco'
     id 'com.github.kt3k.coveralls' version '2.6.3'
-    id 'com.github.ksoichiro.console.reporter' version '0.5.0'
 }
 
 // Apply the java plugin to add support for Java
@@ -74,6 +73,10 @@ task dropdb {
 // Heroku task
 task stage {
     dependsOn installDist
+}
+
+test {
+    testLogging.showStandardStreams = true
 }
 
 check {
