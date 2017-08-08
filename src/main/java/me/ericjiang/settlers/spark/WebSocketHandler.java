@@ -1,5 +1,7 @@
 package me.ericjiang.settlers.spark;
 
+import static spark.Spark.halt;
+
 import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,9 @@ public class WebSocketHandler {
         WebSocketPlayer player = new WebSocketPlayer(session);
         String gameId = getGameId(session);
         Game game = lobby.getGame(gameId);
-        game.connectPlayer(player);
+        if (!game.connectPlayer(player)) {
+            halt(403);
+        }
     }
 
     @OnWebSocketMessage

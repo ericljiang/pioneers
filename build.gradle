@@ -29,6 +29,7 @@ dependencies {
     compile 'org.json:json:20170516'
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile 'org.postgresql:postgresql:42.1.4'
     compile 'org.projectlombok:lombok:1.16.18'
     compile 'com.google.api-client:google-api-client:1.22.0'
     compile 'com.google.code.gson:gson:2.8.1'
@@ -44,6 +45,32 @@ dependencies {
 // Define the main class for the application
 mainClassName = 'me.ericjiang.settlers.spark.Settlers'
 
+def database = 'settlers'
+
+task createdb {
+    doLast {
+        exec {
+            commandLine 'createdb'
+            args database
+        }
+        exec {
+            workingDir 'src/main/sql'
+            commandLine 'psql'
+            args database, '-af', 'create.sql'
+        }
+    }
+}
+
+task dropdb {
+    doLast {
+        exec {
+            commandLine 'dropdb'
+            args database
+        }
+    }
+}
+
+// Heroku task
 task stage {
     dependsOn installDist
 }

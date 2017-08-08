@@ -46,14 +46,22 @@ public abstract class Game {
 
     protected abstract void createBoard();
 
-	public void connectPlayer(Player player) {
+	public boolean connectPlayer(Player player) {
         // TODO: if setup phase, playerDao.addPlayerToGame(id, player.id());
         // if game has started, check if open and if player id is valid
-        playerDao.addPlayerToGame(id, player.id());
+        boolean setup = true;
+        if (!hasPlayer(player.id())) {
+            if (!setup) {
+                return false;
+            } else {
+                playerDao.addPlayerToGame(id, player.id());
+            }
+        }
         connectedPlayers.put(player.id(), player);
         log.info("Player " + player.id() + " connected to game " + id);
+        return true;
     }
-    
+
     public void disconnectPlayer(Player player) {
         connectedPlayers.remove(player.id());
         log.info("Player " + player.id() + " disconnected from game " + id);

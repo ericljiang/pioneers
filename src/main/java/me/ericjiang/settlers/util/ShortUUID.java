@@ -34,6 +34,14 @@ public class ShortUUID {
         return new ShortUUID(mostSignificantBits, leastSignificantBits);
     }
 
+    public static String expand(String shortUUID) {
+        return ShortUUID.valueOf(shortUUID).asUUID().toString();
+    }
+
+    public static String shorten(String longUUID) {
+        return new ShortUUID(UUID.fromString(longUUID)).toString();
+    }
+
     @Override
     public String toString() {
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES * 2);

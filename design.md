@@ -43,14 +43,14 @@ The board consists of resource tiles, roads, and settlements/cities. Each of the
 
 ## Relational database tables
 
-*Game (__gameId__, expansion, name, owner)*
+*game (__game_id__, expansion, name, owner)*
 
-*Player (__gameId__, __playerId__, color)*
+*player (__game_id__, __player_id__, color)*
 
-*Nickname (__playerId__, nickname)*
+*nickname (__player_id__, name)*
 
-*Tile (__gameId__, __column__, __row__, resource, token)*
+*tile (__game_id__, __column__, __row__, resource, number_token)*
 
-*Road (__gameId__, __column__, __row__, __direction__, playerId)*
+*road (__game_id__, __column__, __row__, __direction__, owner)*
 
-*Settlement (__gameId__, __column__, __row__, __direction__, playerId, isUpgraded)*
+*settlement (__game_id__, __column__, __row__, __direction__, owner, is_upgraded)*

@@ -10,6 +10,7 @@ import me.ericjiang.settlers.core.board.BoardDaoInMemory;
 import me.ericjiang.settlers.core.game.GameDao;
 import me.ericjiang.settlers.core.game.GameDaoInMemory;
 import me.ericjiang.settlers.core.player.PlayerDao;
+import me.ericjiang.settlers.core.player.PlayerDaoDB;
 import me.ericjiang.settlers.core.player.PlayerDaoInMemory;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
@@ -39,7 +40,7 @@ public class Settlers {
                 new GoogleAuthenticator(),
                 new GameDaoInMemory(),
                 new BoardDaoInMemory(),
-                new PlayerDaoInMemory(),
+                new PlayerDaoDB(),
                 new ThymeleafTemplateEngine());
         app.start();
     }
@@ -48,7 +49,7 @@ public class Settlers {
         port(getPort());
         staticFileLocation("/public");
 
-        webSocket("/game", new WebSocketHandler(gameDao));        
+        webSocket("/game", new WebSocketHandler(gameDao));
 
         // filters
         before((req, res) -> {
