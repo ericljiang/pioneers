@@ -1,7 +1,7 @@
 language: java
 
 services:
-  - postgresql
+  - postgresql: "9.6"
 
 before_script:
   - psql -c 'create database settlers;' -U postgres
