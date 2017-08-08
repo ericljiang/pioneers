@@ -1,4 +1,13 @@
 language: java
 
+services:
+  - postgresql
+
+before_script:
+  - ./gradlew createdb
+
+after_script:
+  - ./gradlew dropdb
+
 after_success:
-- ./gradlew jacocoTestReport coveralls
+  - ./gradlew jacocoTestReport coveralls
