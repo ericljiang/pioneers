@@ -4,10 +4,11 @@ services:
   - postgresql
 
 before_script:
-  - ./gradlew createdb
+  - psql -c 'create database settlers;' -U postgres
+  - psql settlers -af src/main/sql/create.sql -U postgres
 
 after_script:
-  - ./gradlew dropdb
+  - psql -c 'drop database settlers;' -U postgres
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
