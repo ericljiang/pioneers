@@ -16,7 +16,7 @@ A single instance of a game of Settlers. Can be an instance of the base game or 
 
 ### Actions
 
-Messages that encapsulate player moves. These are minimally composed of an UUID, an action type and a player origin. 
+Messages that encapsulate player moves. These are minimally composed of an UUID, an action type and a player origin.
 
 #### Examples:
 
@@ -43,7 +43,7 @@ The board consists of resource tiles, roads, and settlements/cities. Each of the
 
 ## Relational database tables
 
-*game (__game_id__, expansion, name, owner)*
+*game (__game_id__, creation_time, name, expansion, owner)*
 
 *player (__game_id__, __player_id__, color)*
 

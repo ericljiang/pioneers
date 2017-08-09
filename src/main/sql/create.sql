@@ -1,8 +1,8 @@
 CREATE TABLE game (
     game_id text,
-    expansion text,
+    creation_time timestamp,
     name text,
-    owner text,
+    expansion text,
     PRIMARY KEY (game_id)
 );
 

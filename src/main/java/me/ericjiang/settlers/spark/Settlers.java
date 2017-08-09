@@ -2,15 +2,19 @@ package me.ericjiang.settlers.spark;
 
 import static spark.Spark.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import me.ericjiang.settlers.core.board.BoardDao;
-import me.ericjiang.settlers.core.board.BoardDaoInMemory;
-import me.ericjiang.settlers.core.game.GameDao;
-import me.ericjiang.settlers.core.game.GameDaoInMemory;
-import me.ericjiang.settlers.core.player.PlayerDao;
-import me.ericjiang.settlers.core.player.PlayerDaoDB;
+import lombok.extern.slf4j.Slf4j;
+import me.ericjiang.settlers.data.board.BoardDao;
+import me.ericjiang.settlers.data.board.BoardDaoInMemory;
+import me.ericjiang.settlers.data.game.GameDao;
+import me.ericjiang.settlers.data.game.GameDaoPostgres;
+import me.ericjiang.settlers.data.player.PlayerDao;
+import me.ericjiang.settlers.data.player.PlayerDaoPostgres;
 import me.ericjiang.settlers.spark.auth.Authenticator;
 import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import spark.ModelAndView;
@@ -21,6 +25,7 @@ import spark.TemplateEngine;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 import spark.utils.IOUtils;
 
+@Slf4j
 @AllArgsConstructor
 public class Settlers {
 
@@ -28,20 +33,25 @@ public class Settlers {
 
     private GameDao gameDao;
 
-    private BoardDao boardDao;
-
-    private PlayerDao playerDao;
-
     private TemplateEngine templateEngine;
 
-    public static void main(String[] args) {
-        Settlers app = new Settlers(
-                new GoogleAuthenticator(),
-                new GameDaoInMemory(),
-                new BoardDaoInMemory(),
-                new PlayerDaoDB(),
-                new ThymeleafTemplateEngine());
-        app.start();
+    public static void main(String[] args) throws SQLException {
+        Authenticator authenticator = new GoogleAuthenticator();
+        Connection connection = getDatabaseConnection();
+        BoardDao boardDao = new BoardDaoInMemory();
+        PlayerDao playerDao = new PlayerDaoPostgres(connection);
+        GameDao gameDao = new GameDaoPostgres(connection, boardDao, playerDao);
+        TemplateEngine templateEngine = new ThymeleafTemplateEngine();
+
+        new Settlers(authenticator, gameDao, templateEngine).start();
+    }
+
+    public static Connection getDatabaseConnection() throws SQLException {
+        String dbUrl = System.getenv("JDBC_DATABASE_URL");
+        dbUrl = (dbUrl != null) ? dbUrl : "jdbc:postgresql:settlers";
+        Connection connection = DriverManager.getConnection(dbUrl);
+        log.info("Connected to database at " + dbUrl);
+        return connection;
     }
 
     public void start() {
@@ -74,7 +84,7 @@ public class Settlers {
         post("/create-game", (req, res) -> {
             String name = req.queryParams("name");
             String expansion = req.queryParams("expansion");
-            gameDao.createGame(name, expansion, boardDao, playerDao);
+            gameDao.createGame(name, expansion);
             res.redirect("/lobby", 303);
             return "303 See Other";
         });

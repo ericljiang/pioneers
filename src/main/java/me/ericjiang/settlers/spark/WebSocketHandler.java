@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.PlayerAction;
 import me.ericjiang.settlers.core.game.Game;
-import me.ericjiang.settlers.core.game.GameDao;
+import me.ericjiang.settlers.data.game.GameDao;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
