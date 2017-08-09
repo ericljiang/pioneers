@@ -29,22 +29,27 @@ public abstract class Game {
     @Setter
     private transient PlayerDao playerDao;
 
+    // consider using Multimap so players can have multiple connections
     private transient Map<String, Player> connectedPlayers;
 
     public Game(String id, String name) {
         this.id = id;
         this.name = name;
         connectedPlayers = new HashMap<String, Player>(getMaxPlayers());
-        createBoard();
+        log.info(String.format("%s game '%s' created with id %s", getExpansion(), name, id));
     }
+
+    /**
+     * Create new board and store in DAO. Should not be called when a game is
+     * is resumed as this will overwrite any existing board data.
+     */
+    public abstract void initializeBoard();
 
     public abstract String getExpansion();
 
     public abstract int getMaxPlayers();
 
     public abstract int getMinPlayers();
-
-    protected abstract void createBoard();
 
 	public boolean connectPlayer(Player player) {
         // TODO: if setup phase, playerDao.addPlayerToGame(id, player.id());

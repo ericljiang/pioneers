@@ -7,6 +7,11 @@ public class ExtendedGame extends Game {
     }
 
     @Override
+    public void initializeBoard() {
+
+    }
+
+    @Override
     public String getExpansion() {
         return GameFactory.EXTENDED;
     }
@@ -19,10 +24,5 @@ public class ExtendedGame extends Game {
     @Override
     public int getMaxPlayers() {
         return 6;
-    }
-
-    @Override
-    protected void createBoard() {
-        
     }
 }

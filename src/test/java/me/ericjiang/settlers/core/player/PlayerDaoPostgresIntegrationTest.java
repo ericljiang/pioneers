@@ -2,21 +2,23 @@ package me.ericjiang.settlers.core.player;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
 import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
+import me.ericjiang.settlers.spark.Settlers;
 import me.ericjiang.settlers.util.ShortUUID;
 
-public class PlayerDaoDBIntegrationTest {
+public class PlayerDaoPostgresIntegrationTest {
 
     private static PlayerDao playerDao;
 
     @BeforeClass
-    public static void beforeClass() {
-        playerDao = new PlayerDaoDB();
+    public static void beforeClass() throws SQLException {
+        playerDao = new PlayerDaoPostgres(Settlers.getDatabaseConnection());
     }
 
     @Test

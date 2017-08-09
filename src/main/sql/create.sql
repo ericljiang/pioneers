@@ -2,7 +2,6 @@ CREATE TABLE game (
     game_id text,
     expansion text,
     name text,
-    owner text,
     PRIMARY KEY (game_id)
 );
 
