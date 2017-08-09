@@ -70,6 +70,24 @@ task dropdb {
     }
 }
 
+task resetdb {
+    doLast {
+        exec {
+            commandLine 'dropdb'
+            args database
+        }
+        exec {
+            commandLine 'createdb'
+            args database
+        }
+        exec {
+            workingDir 'src/main/sql'
+            commandLine 'psql'
+            args database, '-af', 'create.sql'
+        }
+    }
+}
+
 // Heroku task
 task stage {
     dependsOn installDist

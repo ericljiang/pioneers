@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.core.player;
+package me.ericjiang.settlers.data.player;
 
 import static spark.Spark.halt;
 
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.PostgresDao;
+import me.ericjiang.settlers.data.PostgresDao;
 
 @Slf4j
 public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {

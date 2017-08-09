@@ -1,18 +1,23 @@
-package me.ericjiang.settlers.core.game;
+package me.ericjiang.settlers.data.game;
 
 import static spark.Spark.halt;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.PostgresDao;
-import me.ericjiang.settlers.core.board.BoardDao;
-import me.ericjiang.settlers.core.player.PlayerDao;
+import me.ericjiang.settlers.core.game.Game;
+import me.ericjiang.settlers.core.game.GameFactory;
+import me.ericjiang.settlers.data.PostgresDao;
+import me.ericjiang.settlers.data.board.BoardDao;
+import me.ericjiang.settlers.data.player.PlayerDao;
 
 /**
  * Loads games from postgres and keeps them stored in memory. Every new game is
@@ -31,17 +36,18 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
         super(connection);
         this.boardDao = boardDao;
         this.playerDao = playerDao;
-        games = new HashMap<String, Game>();
+        games = new LinkedHashMap<String, Game>();
 
         // populate from posgres
-        String sql = String.format("SELECT * FROM game");
+        String sql = "SELECT * FROM game ORDER BY creation_time";
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 String id = resultSet.getString("game_id");
+                LocalDateTime creationTime = resultSet.getTimestamp("creation_time").toLocalDateTime();
                 String name = resultSet.getString("name");
                 String expansion = resultSet.getString("expansion");
-                Game game = GameFactory.loadGame(id, name, expansion);
+                Game game = GameFactory.loadGame(id, creationTime, name, expansion);
                 game.setBoardDao(boardDao);
                 game.setPlayerDao(playerDao);
                 games.put(id, game);
@@ -53,7 +59,8 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
     }
 
     @Override
-    public void createGame(String name, String expansion) {
+    public Game createGame(String name, String expansion) {
+        // create new instance
         log.info(String.format("Creating game '%s' with expansion '%s'.", name, expansion));
         Game game = GameFactory.newGame(name, expansion);
         game.setBoardDao(boardDao);
@@ -61,16 +68,21 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
         game.initializeBoard();
         games.put(game.getId(), game);
 
-        String sql = String.format(
-                "INSERT INTO game VALUES ('%s', '%s', '%s')",
-                game.getId(), expansion, name);
+        // record in database
+        String sql = "INSERT INTO game VALUES (?, ?, ?, ?)";
 
-        try {
-            statement.executeUpdate(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, game.getId());
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(game.getCreationTime()));
+            preparedStatement.setString(3, name);
+            preparedStatement.setString(4, expansion);
+            preparedStatement.execute();
         } catch (SQLException e) {
             log.error("Error occured while creating record in game table: " + sql, e);
             halt(500);
         }
+
+        return game;
     }
 
     @Override

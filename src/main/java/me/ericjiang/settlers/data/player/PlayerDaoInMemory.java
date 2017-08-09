@@ -1,14 +1,12 @@
-package me.ericjiang.settlers.core.player;
+package me.ericjiang.settlers.data.player;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.player.PlayerDao;
+import me.ericjiang.settlers.data.player.PlayerDao;
 
 @Slf4j
 public class PlayerDaoInMemory implements PlayerDao {
@@ -30,7 +28,7 @@ public class PlayerDaoInMemory implements PlayerDao {
         playersForGame.put(gameId, playerId);
         log.info(String.format("Added player %s to game %s", playerId, gameId));
     }
-    
+
     public String getName(String playerId) {
         return nickNames.get(playerId);
     }

@@ -1,5 +1,6 @@
 package me.ericjiang.settlers.core.game;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -7,9 +8,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.SimpleAction;
-import me.ericjiang.settlers.core.board.BoardDao;
 import me.ericjiang.settlers.core.player.Player;
-import me.ericjiang.settlers.core.player.PlayerDao;
+import me.ericjiang.settlers.data.board.BoardDao;
+import me.ericjiang.settlers.data.player.PlayerDao;
 
 @Slf4j
 public abstract class Game {
@@ -19,6 +20,9 @@ public abstract class Game {
      */
     @Getter
     private final String id;
+
+    @Getter
+    private final LocalDateTime creationTime;
 
     @Getter
     private String name;
@@ -32,8 +36,9 @@ public abstract class Game {
     // consider using Multimap so players can have multiple connections
     private transient Map<String, Player> connectedPlayers;
 
-    public Game(String id, String name) {
+    public Game(String id, LocalDateTime creationTime, String name) {
         this.id = id;
+        this.creationTime = creationTime;
         this.name = name;
         connectedPlayers = new HashMap<String, Player>(getMaxPlayers());
         log.info(String.format("%s game '%s' created with id %s", getExpansion(), name, id));

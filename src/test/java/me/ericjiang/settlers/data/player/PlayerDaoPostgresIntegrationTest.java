@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.core.player;
+package me.ericjiang.settlers.data.player;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-
+import me.ericjiang.settlers.data.player.PlayerDao;
+import me.ericjiang.settlers.data.player.PlayerDaoPostgres;
 import me.ericjiang.settlers.spark.Settlers;
 import me.ericjiang.settlers.util.ShortUUID;
 

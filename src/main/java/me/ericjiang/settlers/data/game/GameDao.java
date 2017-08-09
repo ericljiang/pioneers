@@ -1,11 +1,11 @@
-package me.ericjiang.settlers.core.game;
+package me.ericjiang.settlers.data.game;
 
 import java.util.List;
 import me.ericjiang.settlers.core.game.Game;
 
 public interface GameDao {
 
-    void createGame(String name, String expansion);
+    Game createGame(String name, String expansion);
 
     List<Game> gamesForPlayer(String playerId);
 

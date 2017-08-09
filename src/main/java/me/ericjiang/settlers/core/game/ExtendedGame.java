@@ -1,9 +1,11 @@
 package me.ericjiang.settlers.core.game;
 
+import java.time.LocalDateTime;
+
 public class ExtendedGame extends Game {
 
-    public ExtendedGame(String id, String name) {
-        super(id, name);
+    public ExtendedGame(String id, LocalDateTime creationTime, String name) {
+        super(id, creationTime, name);
     }
 
     @Override

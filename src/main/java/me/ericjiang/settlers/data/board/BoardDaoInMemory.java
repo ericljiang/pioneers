@@ -1,7 +1,10 @@
-package me.ericjiang.settlers.core.board;
+package me.ericjiang.settlers.data.board;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import me.ericjiang.settlers.core.board.Edge;
+import me.ericjiang.settlers.core.board.Intersection;
+import me.ericjiang.settlers.core.board.Tile;
 
 public class BoardDaoInMemory implements BoardDao {
 

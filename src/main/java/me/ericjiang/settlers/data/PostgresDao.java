@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.core;
+package me.ericjiang.settlers.data;
 
 import static spark.Spark.halt;
 
