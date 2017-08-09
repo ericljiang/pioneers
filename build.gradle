@@ -94,7 +94,11 @@ task stage {
 }
 
 test {
-    testLogging.showStandardStreams = true
+    testLogging {
+        // show stacktrace and logs
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
 }
 
 check {
