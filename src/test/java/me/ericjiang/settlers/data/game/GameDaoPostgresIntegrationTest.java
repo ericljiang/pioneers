@@ -36,10 +36,10 @@ public class GameDaoPostgresIntegrationTest {
     }
 
     @Test
-    public void shouldRetrieveGamesWeStoreInOrder() {
+    public void shouldRetrieveGamesWeStoreInReverseOrder() {
         String name = "foo";
         Game game = gameDao.createGame(name, GameFactory.BASE);
         List<Game> games = gameDao.openGames();
-        assertEquals(game, games.get(games.size() - 1));
+        assertEquals(game, games.get(0));
     }
 }
