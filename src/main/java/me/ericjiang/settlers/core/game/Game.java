@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.SimpleAction;
@@ -28,22 +27,23 @@ public abstract class Game {
     @Getter
     private String name;
 
-    @Setter
     private transient GameDao gameDao;
 
-    @Setter
     private transient BoardDao boardDao;
 
-    @Setter
     private transient PlayerDao playerDao;
 
     // consider using Multimap so players can have multiple connections
     private transient Map<String, Player> connectedPlayers;
 
-    public Game(String id, LocalDateTime creationTime, String name) {
+    public Game(String id, LocalDateTime creationTime, String name,
+            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
         this.id = id;
         this.creationTime = creationTime;
         this.name = name;
+        this.gameDao = gameDao;
+        this.boardDao = boardDao;
+        this.playerDao = playerDao;
         connectedPlayers = new HashMap<String, Player>(getMaxPlayers());
         log.info(String.format("%s game '%s' created with id %s", getExpansion(), name, id));
     }

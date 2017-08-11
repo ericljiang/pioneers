@@ -49,10 +49,7 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
                 LocalDateTime creationTime = resultSet.getTimestamp("creation_time").toLocalDateTime();
                 String name = resultSet.getString("name");
                 String expansion = resultSet.getString("expansion");
-                Game game = GameFactory.loadGame(id, creationTime, name, expansion);
-                game.setGameDao(this);
-                game.setBoardDao(boardDao);
-                game.setPlayerDao(playerDao);
+                Game game = GameFactory.loadGame(id, creationTime, name, this, boardDao, playerDao, expansion);
                 games.put(id, game);
             }
         } catch (SQLException e) {
@@ -65,9 +62,7 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
     public Game createGame(String name, String expansion) {
         // create new instance
         log.info(String.format("Creating game '%s' with expansion '%s'.", name, expansion));
-        Game game = GameFactory.newGame(name, expansion);
-        game.setBoardDao(boardDao);
-        game.setPlayerDao(playerDao);
+        Game game = GameFactory.newGame(name, this, boardDao, playerDao, expansion);
         game.initializeBoard();
         games.put(game.getId(), game);
 
