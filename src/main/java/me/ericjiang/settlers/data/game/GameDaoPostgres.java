@@ -8,11 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.game.Game;
+import me.ericjiang.settlers.core.game.Game.Phase;
 import me.ericjiang.settlers.core.game.GameFactory;
 import me.ericjiang.settlers.data.PostgresDao;
 import me.ericjiang.settlers.data.board.BoardDao;
@@ -48,6 +50,7 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
                 String name = resultSet.getString("name");
                 String expansion = resultSet.getString("expansion");
                 Game game = GameFactory.loadGame(id, creationTime, name, expansion);
+                game.setGameDao(this);
                 game.setBoardDao(boardDao);
                 game.setPlayerDao(playerDao);
                 games.put(id, game);
@@ -69,13 +72,14 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
         games.put(game.getId(), game);
 
         // record in database
-        String sql = "INSERT INTO game VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO game VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, game.getId());
             preparedStatement.setTimestamp(2, Timestamp.valueOf(game.getCreationTime()));
             preparedStatement.setString(3, name);
             preparedStatement.setString(4, expansion);
+            preparedStatement.setString(5, Phase.SETUP.toString());
             preparedStatement.execute();
         } catch (SQLException e) {
             log.error("Error occured while creating record in game table: " + sql, e);
@@ -87,27 +91,78 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
 
     @Override
     public List<Game> gamesForPlayer(String playerId) {
-        return games.values().stream()
-                .filter(game -> game.hasPlayer(playerId))
-                .collect(Collectors.toList());
+        List<Game> gamesForPlayer = new ArrayList<Game>();
+        String sql = "SELECT game_id FROM player WHERE player_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, playerId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String gameId = resultSet.getString("game_id");
+                gamesForPlayer.add(games.get(gameId));
+            }
+        } catch (SQLException e) {
+            log.error("Error occured while querying games for player: " + sql, e);
+            halt(500);
+        }
+        return gamesForPlayer;
     }
 
     @Override
     public List<Game> openGames() {
-        return games.values().stream()
-                .filter(game -> game.isOpen())
-                .collect(Collectors.toList());
+        List<Game> openGames = new ArrayList<>();
+        String sql = "SELECT game_id FROM game WHERE phase = ? ORDER BY creation_time DESC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, Phase.SETUP.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String id = resultSet.getString("game_id");
+                openGames.add(games.get(id));
+            }
+        } catch (SQLException e) {
+            log.error("Error while finding open games: " + sql, e);
+            halt(500);
+        }
+        return openGames;
     }
 
     @Override
     public List<Game> openGamesWithoutPlayer(String playerId) {
-        return games.values().stream()
-                .filter(game -> game.isOpen() && !game.hasPlayer(playerId))
+        return openGames().stream()
+                .filter(game -> !game.hasPlayer(playerId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Game getGame(String id) {
         return games.get(id);
+    }
+
+    public Phase getPhase(String gameId) {
+        Phase phase = null;
+        String sql = "SELECT phase FROM game WHERE game_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, gameId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            phase = Phase.valueOf(resultSet.getString("phase"));
+        } catch (SQLException e) {
+            log.error("Error getting game phase: " + sql, e);
+            halt(500);
+        }
+        return phase;
+    }
+
+    public void setPhase(String gameId, Phase phase) {
+        String sql = "UPDATE game SET phase = ? WHERE game_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, phase.toString());
+            preparedStatement.setString(2, gameId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            phase = Phase.valueOf(resultSet.getString("phase"));
+        } catch (SQLException e) {
+            log.error("Error getting game phase: " + sql, e);
+            halt(500);
+        }
     }
 }

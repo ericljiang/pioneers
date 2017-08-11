@@ -3,6 +3,7 @@ CREATE TABLE game (
     creation_time timestamp,
     name text,
     expansion text,
+    phase text,
     PRIMARY KEY (game_id)
 );
 

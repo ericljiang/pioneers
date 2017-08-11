@@ -10,6 +10,7 @@ import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.SimpleAction;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
+import me.ericjiang.settlers.data.game.GameDao;
 import me.ericjiang.settlers.data.player.PlayerDao;
 
 @Slf4j
@@ -26,6 +27,9 @@ public abstract class Game {
 
     @Getter
     private String name;
+
+    @Setter
+    private transient GameDao gameDao;
 
     @Setter
     private transient BoardDao boardDao;
@@ -59,9 +63,8 @@ public abstract class Game {
 	public boolean connectPlayer(Player player) {
         // TODO: if setup phase, playerDao.addPlayerToGame(id, player.id());
         // if game has started, check if open and if player id is valid
-        boolean setup = true;
         if (!hasPlayer(player.id())) {
-            if (!setup) {
+            if (gameDao.getPhase(id) != Phase.SETUP) {
                 return false;
             } else {
                 playerDao.addPlayerToGame(id, player.id());
@@ -81,10 +84,6 @@ public abstract class Game {
         return connectedPlayers.size();
     }
 
-    public boolean isOpen() {
-        return currentPlayerCount() < getMaxPlayers(); // TODO: && phase == Phase.SETUP
-    }
-
     public boolean hasPlayer(String playerId) {
         return playerDao.playersForGame(id).contains(playerId);
     }
@@ -100,5 +99,9 @@ public abstract class Game {
         for (Player player : connectedPlayers.values()) {
             player.update(action);
         }
+    }
+
+    public enum Phase {
+        SETUP, ROLL, TRADE, BUILD
     }
 }

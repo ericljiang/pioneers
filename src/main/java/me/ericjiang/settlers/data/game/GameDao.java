@@ -2,6 +2,7 @@ package me.ericjiang.settlers.data.game;
 
 import java.util.List;
 import me.ericjiang.settlers.core.game.Game;
+import me.ericjiang.settlers.core.game.Game.Phase;
 
 public interface GameDao {
 
@@ -14,5 +15,9 @@ public interface GameDao {
     List<Game> openGamesWithoutPlayer(String playerId);
 
     Game getGame(String id);
+
+    Phase getPhase(String gameId);
+
+    void setPhase(String gameId, Phase phase);
 
 }
