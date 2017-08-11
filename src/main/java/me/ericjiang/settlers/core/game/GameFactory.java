@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import me.ericjiang.settlers.data.board.BoardDao;
+import me.ericjiang.settlers.data.game.GameDao;
+import me.ericjiang.settlers.data.player.PlayerDao;
 import me.ericjiang.settlers.util.ShortUUID;
 
 public class GameFactory {
@@ -23,10 +26,10 @@ public class GameFactory {
     /**
      * Create a new Game instance.
      */
-    public static Game newGame(String name, String expansion) {
+    public static Game newGame(String name, GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, String expansion) {
         String id = ShortUUID.randomUUID().toString();
         LocalDateTime creationTime = LocalDateTime.now();
-        Game game = loadGame(id, creationTime, name, expansion);
+        Game game = loadGame(id, creationTime, name, gameDao, boardDao, playerDao, expansion);
         return game;
     }
 
@@ -34,8 +37,9 @@ public class GameFactory {
      * Create a Game instance corresponding to a previously persisted game.
      * @param creationTime
      */
-    public static Game loadGame(String id, LocalDateTime creationTime, String name, String expansion) {
-        Game game = EXPANSIONS.get(expansion).instantiate(id, creationTime, name);
+    public static Game loadGame(String id, LocalDateTime creationTime, String name,
+            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, String expansion) {
+        Game game = EXPANSIONS.get(expansion).instantiate(id, creationTime, name, gameDao, boardDao, playerDao);
         return game;
     }
 
@@ -44,7 +48,8 @@ public class GameFactory {
     }
 
     private interface GameConstructor {
-        Game instantiate(String id, LocalDateTime creationTime, String name);
+        Game instantiate(String id, LocalDateTime creationTime, String name,
+                GameDao gameDao, BoardDao boardDao, PlayerDao playerDao);
     }
 
 }
