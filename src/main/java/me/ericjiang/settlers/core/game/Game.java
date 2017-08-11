@@ -63,10 +63,10 @@ public abstract class Game {
 	public boolean connectPlayer(Player player) {
         // TODO: if setup phase, playerDao.addPlayerToGame(id, player.id());
         // if game has started, check if open and if player id is valid
-        if (!hasPlayer(player.id())) {
-            if (gameDao.getPhase(id) != Phase.SETUP) {
+        if (!hasPlayer(player.id())) { // unknown player
+            if (gameDao.getPhase(id) != Phase.SETUP) { // game has started
                 return false;
-            } else {
+            } else { // setup mode
                 playerDao.addPlayerToGame(id, player.id());
             }
         }
@@ -76,6 +76,9 @@ public abstract class Game {
     }
 
     public void disconnectPlayer(Player player) {
+        if (gameDao.getPhase(id) == Phase.SETUP) {
+            playerDao.removePlayerFromGame(id, player.id());
+        }
         connectedPlayers.remove(player.id());
         log.info("Player " + player.id() + " disconnected from game " + id);
     }

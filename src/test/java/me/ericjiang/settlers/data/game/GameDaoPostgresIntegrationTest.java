@@ -51,8 +51,24 @@ public class GameDaoPostgresIntegrationTest {
         game.connectPlayer(new Player() {
             public void update(Action action) {}
             public String id() {
-                return "";
+                return "1";
             }
         });
+    }
+
+    @Test
+    public void shouldPreserverGameOrderOnPlayerDisconnect() {
+        Game olderGame = gameDao.createGame("foo1", GameFactory.BASE);
+        Game newerGame = gameDao.createGame("foo2", GameFactory.BASE);
+        Player player = new Player() {
+            public void update(Action action) {}
+            public String id() {
+                return "1";
+            }
+        };
+        olderGame.connectPlayer(player);
+        olderGame.disconnectPlayer(player);
+        Game mostRecent = gameDao.openGamesWithoutPlayer(player.id()).get(0);
+        assertEquals(newerGame, mostRecent);
     }
 }
