@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +17,7 @@ import me.ericjiang.settlers.core.game.GameFactory;
 import me.ericjiang.settlers.data.PostgresDao;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.player.PlayerDao;
+import me.ericjiang.settlers.util.ReverseInsertionOrderHashMap;
 
 /**
  * Loads games from postgres and keeps them stored in memory. Every new game is
@@ -36,7 +36,7 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
         super(connection);
         this.boardDao = boardDao;
         this.playerDao = playerDao;
-        games = new LinkedHashMap<String, Game>();
+        games = new ReverseInsertionOrderHashMap<String, Game>();
 
         // populate from posgres
         String sql = "SELECT * FROM game ORDER BY creation_time";

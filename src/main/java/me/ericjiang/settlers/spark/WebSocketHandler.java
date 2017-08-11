@@ -17,14 +17,14 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 @Slf4j
 public class WebSocketHandler {
 
-    private GameDao lobby;
+    private GameDao gameDao;
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
         log.info("Session connected to websocket.");
         WebSocketPlayer player = new WebSocketPlayer(session);
         String gameId = getGameId(session);
-        Game game = lobby.getGame(gameId);
+        Game game = gameDao.getGame(gameId);
         if (!game.connectPlayer(player)) {
             halt(403);
         }
@@ -46,7 +46,7 @@ public class WebSocketHandler {
         log.debug("Session disconnected from websocket: " + statusCode + ":" + reason);
         WebSocketPlayer player = new WebSocketPlayer(session);
         String gameId = getGameId(session);
-        Game game = lobby.getGame(gameId);
+        Game game = gameDao.getGame(gameId);
         game.disconnectPlayer(player);
     }
 
@@ -54,7 +54,7 @@ public class WebSocketHandler {
         try {
             PlayerAction action = (PlayerAction) Action.valueOf(message);
             action.setPlayerId(getUserId(session));
-            Game game = lobby.getGame(getGameId(session));
+            Game game = gameDao.getGame(getGameId(session));
             action.accept(game);
         } catch (ClassCastException e) {
             throw new InternalError("Server received an Action that wasn't a PlayerAction.", e);
