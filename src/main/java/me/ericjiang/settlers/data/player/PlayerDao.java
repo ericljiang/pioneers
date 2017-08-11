@@ -8,6 +8,8 @@ public interface PlayerDao {
 
     void addPlayerToGame(String gameId, String playerId);
 
+    void removePlayerFromGame(String gameId, String playerId);
+
     String getName(String playerId);
 
     void setName(String playerId, String name);

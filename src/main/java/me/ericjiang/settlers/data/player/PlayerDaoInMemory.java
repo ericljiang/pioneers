@@ -29,6 +29,10 @@ public class PlayerDaoInMemory implements PlayerDao {
         log.info(String.format("Added player %s to game %s", playerId, gameId));
     }
 
+    public void removePlayerFromGame(String gameId, String playerId) {
+        playersForGame.remove(gameId, playerId);
+    }
+
     public String getName(String playerId) {
         return nickNames.get(playerId);
     }

@@ -3,6 +3,7 @@ package me.ericjiang.settlers.data.player;
 import static spark.Spark.halt;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {
     }
 
     public void addPlayerToGame(String gameId, String playerId) {
-        log.info("Adding player " + playerId + " to game");
+        log.info("Adding player " + playerId + " to game " + gameId);
 
         String sql = String.format(
                 "INSERT INTO player VALUES ('%s', '%s')",
@@ -48,6 +49,21 @@ public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             log.error("Error adding player to game: " + sql, e);
+            halt(500);
+        }
+    }
+
+    public void removePlayerFromGame(String gameId, String playerId) {
+        log.info("Removing player " + playerId + " from game " + gameId);
+
+        String sql = "DELETE FROM player WHERE game_id = ? AND player_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, gameId);
+            preparedStatement.setString(2, playerId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error removing player from game: " + sql, e);
             halt(500);
         }
     }
