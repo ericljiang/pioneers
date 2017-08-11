@@ -13,3 +13,4 @@ cd settlers
 ./gradlew createdb
 ./gradlew run
 ```
+Connect to https://localhost:4567
