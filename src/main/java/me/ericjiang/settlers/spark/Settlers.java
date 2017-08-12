@@ -7,8 +7,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.ericjiang.settlers.core.game.Game;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.board.BoardDaoInMemory;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -20,10 +23,8 @@ import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.Spark;
 import spark.TemplateEngine;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
-import spark.utils.IOUtils;
 
 @Slf4j
 @AllArgsConstructor
@@ -31,7 +32,11 @@ public class Settlers {
 
     private Authenticator authenticator;
 
+    private PlayerDao playerDao;
+
     private GameDao gameDao;
+
+    private WebSocketHandler webSocketHandler;
 
     private TemplateEngine templateEngine;
 
@@ -41,9 +46,10 @@ public class Settlers {
         BoardDao boardDao = new BoardDaoInMemory();
         PlayerDao playerDao = new PlayerDaoPostgres(connection);
         GameDao gameDao = new GameDaoPostgres(connection, boardDao, playerDao);
+        WebSocketHandler webSocketHandler = new WebSocketHandler(gameDao);
         TemplateEngine templateEngine = new ThymeleafTemplateEngine();
 
-        new Settlers(authenticator, gameDao, templateEngine).start();
+        new Settlers(authenticator, playerDao, gameDao, webSocketHandler, templateEngine).start();
     }
 
     public static Connection getDatabaseConnection() throws SQLException {
@@ -58,7 +64,7 @@ public class Settlers {
         port(getPort());
         staticFileLocation("/public");
 
-        webSocket("/game", new WebSocketHandler(gameDao));
+        webSocket("/game", webSocketHandler);
 
         // filters
         before((req, res) -> {
@@ -76,8 +82,15 @@ public class Settlers {
         post("/sign-in", authenticator::signIn);
         post("/sign-out", authenticator::signOut);
         get("/lobby", (req, res) -> {
+            String userId = req.session().attribute(Authenticator.USER_ID);
+            String nickname = playerDao.getName(userId);
+            if (nickname == null) {
+                String firstName = req.session().attribute(Authenticator.NAME);
+                playerDao.setName(userId, firstName);
+            }
             Map<String, Object> model = new HashMap<String, Object>();
-            model.put("userId", req.session().attribute(Authenticator.USER_ID));
+            model.put("userId", userId);
+            model.put("nickname", nickname);
             model.put("gameDao", gameDao);
             return templateEngine.render(new ModelAndView(model, "lobby"));
         });
@@ -89,18 +102,30 @@ public class Settlers {
             return "303 See Other";
         });
         get("/play", (req, res) -> {
-            return IOUtils.toString(Spark.class.getResourceAsStream("/public/play.html"));
+            String gameId = req.queryParams("g");
+            String playerId = req.queryParams("u");
+            Game game = gameDao.getGame(gameId);
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("gameName", game.getName());
+            model.put("gameId", gameId);
+            model.put("expansion", game.getExpansion());
+            model.put("maxPlayers", game.getMaxPlayers());
+            model.put("minPlayers", game.getMinPlayers());
+            model.put("playerId", playerId);
+            model.put("players", game.players().stream()
+                    .map(id -> playerDao.getName(playerId))
+                    .collect(Collectors.toList()));
+            log.info("Rendering template play.html");
+            return templateEngine.render(new ModelAndView(model, "play"));
         });
 
         redirect.get("/", "/lobby");
     }
 
     private int getPort() {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        if (processBuilder.environment().get("PORT") != null) {
-            return Integer.parseInt(processBuilder.environment().get("PORT"));
-        }
-        return 4567; // return default port if heroku-port isn't set (i.e. on localhost)
+        String port = System.getenv("PORT");
+        // return default port if heroku-port isn't set (i.e. on localhost)
+        return port != null ? Integer.parseInt(port) : 4567;
     }
 
     /**

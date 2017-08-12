@@ -71,14 +71,15 @@ public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {
     public String getName(String playerId) {
         log.info("Getting name for " + playerId);
 
-        String sql = String.format(
-                "SELECT name FROM nickname WHERE player_id = '%s';",
-                playerId);
+        String sql = "SELECT name FROM nickname WHERE player_id = ?";
 
         String name = null;
-        try (ResultSet resultSet = statement.executeQuery(sql)) {
-            resultSet.next();
-            name = resultSet.getString("name");
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, playerId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                name = resultSet.getString("name");
+            }
         } catch (SQLException e) {
             log.error("Error getting player name: " + sql, e);
             halt(500);

@@ -9,6 +9,8 @@ public abstract class Authenticator {
 
     public static final String SIGNED_IN = "signedIn";
 
+    public static final String NAME = "name";
+
     public abstract Object renderSignInPage(Request request, Response response);
 
     public abstract Object signIn(Request request, Response response);

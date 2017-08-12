@@ -2,6 +2,7 @@ package me.ericjiang.settlers.core.game;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -87,8 +88,12 @@ public abstract class Game {
         return connectedPlayers.size();
     }
 
+    public List<String> players() {
+        return playerDao.playersForGame(id);
+    }
+
     public boolean hasPlayer(String playerId) {
-        return playerDao.playersForGame(id).contains(playerId);
+        return players().contains(playerId);
     }
 
     public void processAction(SimpleAction action) {
