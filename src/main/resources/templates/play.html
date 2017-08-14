@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <title>Game</title>
+</head>
+
+<body>
+    <div>
+        <h1 th:text="${gameName}">Game name</h1>
+        <h2 th:text="${gameId}">12345abcde</h2>
+        <p>Created by player</p>
+        <p th:text="|${expansion} game|">Base game</p>
+        <p th:text="|${minPlayers}-${maxPlayers} players|">3-4 players</p>
+    </div>
+
+    <div>
+        <h1>Players</h1>
+        <h2 id="playerCount" th:text="|0/${maxPlayers}|">2/3</h2>
+        <ul id="playerList">
+            <!-- <li th:each="player : ${players}" th:text="${player}">player</li> -->
+        </ul>
+    </div>
+
+    <div>
+        <button id="startButton" disabled="disabled">Start</button>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="js/stringFormat.js"></script>
+    <script src="js/actions.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

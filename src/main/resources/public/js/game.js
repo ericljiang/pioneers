@@ -8,6 +8,7 @@ if (location.protocol == "https:") {
 var webSocketAddress = protocol + "//" + location.host + "/game" + location.search;
 var webSocket = new WebSocket(webSocketAddress);
 var heartbeatTimer = 0;
+
 webSocket.onopen = onConnect;
 webSocket.onmessage = onMessage;
 webSocket.onclose = onClose;
@@ -15,10 +16,6 @@ webSocket.onclose = onClose;
 function onConnect() {
     console.log("Connected to websocket at " + webSocketAddress);
     heartbeatTimer = setInterval(heartbeat, 20000);
-    var action = new SimpleAction();
-    var message = JSON.stringify(action);
-    console.log("Sending message: " + message);
-    webSocket.send(message);
 }
 
 function onMessage(message) {
@@ -29,8 +26,7 @@ function onMessage(message) {
     }
     console.debug("Server says: " + message);
     var action = JSON.parse(message);
-    console.log(String.format("Player {0} sent {1} {2}",
-        action.playerId, action.type, action.id));
+    handle(action);
 }
 
 function onClose() {
@@ -43,4 +39,37 @@ function heartbeat() {
         webSocket.send("");
         console.debug("Sent heartbeat to server.");
     }
+}
+
+function handle(action) {
+    var parser = "handle" + action.type;
+    return this[parser](action);
+}
+
+function handleConnectAction(action) {
+    var playerId = action.playerId;
+    var playerName = action.playerName;
+    console.log(playerName + " connected.");
+    // update player list and player count
+    $(document).ready(function() {
+        $("#playerList").append("<li id=" + playerId + ">" + playerName + "</li>");
+        var playerCount = $("#playerCount").text();
+        var connectedPlayers = parseInt(playerCount.split("/")[0]) + 1;
+        var maxPlayers = playerCount.split("/")[1];
+        $("#playerCount").text(connectedPlayers + "/" + maxPlayers);
+    });
+}
+
+function handleDisconnectAction(action) {
+    var playerId = action.playerId;
+    var playerName = action.playerName;
+    console.log(playerName + " disconnected.");
+    // update player list and player count
+    $(document).ready(function() {
+        $("#" + playerId).remove();
+        var playerCount = $("#playerCount").text();
+        var connectedPlayers = parseInt(playerCount.split("/")[0]) - 1;
+        var maxPlayers = playerCount.split("/")[1];
+        $("#playerCount").text(connectedPlayers + "/" + maxPlayers);
+    });
 }

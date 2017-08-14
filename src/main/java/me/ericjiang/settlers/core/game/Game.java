@@ -2,11 +2,14 @@ package me.ericjiang.settlers.core.game;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
-import me.ericjiang.settlers.core.actions.SimpleAction;
+import me.ericjiang.settlers.core.actions.ConnectAction;
+import me.ericjiang.settlers.core.actions.DisconnectAction;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -61,40 +64,40 @@ public abstract class Game {
     public abstract int getMinPlayers();
 
 	public boolean connectPlayer(Player player) {
-        // TODO: if setup phase, playerDao.addPlayerToGame(id, player.id());
-        // if game has started, check if open and if player id is valid
-        if (!hasPlayer(player.id())) { // unknown player
-            if (gameDao.getPhase(id) != Phase.SETUP) { // game has started
-                return false;
-            } else { // setup mode
-                playerDao.addPlayerToGame(id, player.id());
-            }
+        String playerId = player.id();
+        if (gameDao.getPhase(id) != Phase.SETUP && !hasPlayer(playerId)) {
+            return false;
         }
-        connectedPlayers.put(player.id(), player);
-        log.info("Player " + player.id() + " connected to game " + id);
+        log.info("Player " + playerId + " connected to game " + id);
+        connectedPlayers.keySet().forEach(c -> {
+            player.update(new ConnectAction(c, playerDao.getName(c)));
+        });
+        connectedPlayers.put(playerId, player);
+        broadcast(new ConnectAction(playerId, playerDao.getName(playerId)));
         return true;
     }
 
     public void disconnectPlayer(Player player) {
-        if (gameDao.getPhase(id) == Phase.SETUP) {
-            playerDao.removePlayerFromGame(id, player.id());
-        }
-        connectedPlayers.remove(player.id());
-        log.info("Player " + player.id() + " disconnected from game " + id);
+        String playerId = player.id();
+        connectedPlayers.remove(playerId);
+        log.info("Player " + playerId + " disconnected from game " + id);
+        broadcast(new DisconnectAction(playerId, playerDao.getName(playerId)));
     }
 
     public int currentPlayerCount() {
         return connectedPlayers.size();
     }
 
-    public boolean hasPlayer(String playerId) {
-        return playerDao.playersForGame(id).contains(playerId);
+    public List<String> players() {
+        return playerDao.playersForGame(id);
     }
 
-    public void processAction(SimpleAction action) {
-        log.info(String.format("Received SimpleAction %s from %s with data=%s",
-                action.getId(), action.getPlayerId(), action.getData()));
-        broadcast(action);
+    public Set<String> connectedPlayers() {
+        return connectedPlayers.keySet();
+    }
+
+    public boolean hasPlayer(String playerId) {
+        return players().contains(playerId);
     }
 
     protected void broadcast(Action action) {
@@ -102,6 +105,10 @@ public abstract class Game {
         for (Player player : connectedPlayers.values()) {
             player.update(action);
         }
+    }
+
+    private void start() {
+        connectedPlayers.keySet().forEach(playerId -> playerDao.addPlayerToGame(id, playerId));
     }
 
     public enum Phase {

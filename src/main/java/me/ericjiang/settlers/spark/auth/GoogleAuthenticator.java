@@ -46,12 +46,13 @@ public class GoogleAuthenticator extends Authenticator {
         if (idToken != null) {
             log.info("Verified user ID token.");
             Payload payload = idToken.getPayload();
-            String name = (String) payload.get("name");
+            String name = (String) payload.get("given_name");
             String userId = encodeUserId(payload.getSubject());
             log.info(String.format("User %s (%s) signed in.", userId, name));
 
             request.session().attribute(SIGNED_IN, true);
             request.session().attribute(USER_ID, userId);
+            request.session().attribute(NAME, name);
             return userId;
         } else {
             log.warn("Invalid ID token.");
