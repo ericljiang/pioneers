@@ -112,8 +112,8 @@ public class Settlers {
             model.put("maxPlayers", game.getMaxPlayers());
             model.put("minPlayers", game.getMinPlayers());
             model.put("playerId", playerId);
-            model.put("players", game.players().stream()
-                    .map(id -> playerDao.getName(playerId))
+            model.put("players", game.connectedPlayers().stream()
+                    .map(p -> playerDao.getName(p))
                     .collect(Collectors.toList()));
             log.info("Rendering template play.html");
             return templateEngine.render(new ModelAndView(model, "play"));
