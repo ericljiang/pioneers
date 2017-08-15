@@ -19,7 +19,9 @@ public abstract class Action {
     static {
         RuntimeTypeAdapterFactory<Action> actionAdapter = RuntimeTypeAdapterFactory.of(Action.class)
                 .registerSubtype(ConnectAction.class)
-                .registerSubtype(DisconnectAction.class);
+                .registerSubtype(DisconnectAction.class)
+                .registerSubtype(JoinAction.class)
+                .registerSubtype(LeaveAction.class);
         GSON = new GsonBuilder()
                 .registerTypeAdapterFactory(actionAdapter)
                 .create();

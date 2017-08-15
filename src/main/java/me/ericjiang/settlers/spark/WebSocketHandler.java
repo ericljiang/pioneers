@@ -9,6 +9,8 @@ import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.PlayerAction;
 import me.ericjiang.settlers.core.game.Game;
 import me.ericjiang.settlers.data.game.GameDao;
+import me.ericjiang.settlers.data.player.PlayerDao;
+
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
@@ -18,6 +20,8 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 public class WebSocketHandler {
 
     private GameDao gameDao;
+
+    private PlayerDao playerDao;
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
@@ -53,7 +57,9 @@ public class WebSocketHandler {
     private void processMessage(Session session, String message) throws IOException {
         try {
             PlayerAction action = (PlayerAction) Action.valueOf(message);
-            action.setPlayerId(getUserId(session));
+            String playerId = getUserId(session);
+            action.setPlayerId(playerId);
+            action.setPlayerName(playerDao.getName(playerId));
             Game game = gameDao.getGame(getGameId(session));
             action.accept(game);
         } catch (ClassCastException e) {

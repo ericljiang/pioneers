@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Game</title>
+    <!-- <script src="https://unpkg.com/vue/dist/vue.min.js"></script> -->
+    <script src="https://unpkg.com/vue"></script>
 </head>
 
 <body>
@@ -15,11 +17,11 @@
 
     <div id="players">
         <h1>Players</h1>
-        <h2 id="playerCount" th:text="|{{ players.length }}/${maxPlayers}|">2/3</h2>
+        <h2 id="playerCount" th:text="|{{ count }}/${maxPlayers}|">2/3</h2>
         <ul id="playerList">
             <!-- <li th:each="player : ${players}" th:text="${player}">player</li> -->
-            <li v-for="player in players">
-                {{ player.name }}
+            <li>
+                {{ red }}
             </li>
         </ul>
     </div>
@@ -28,9 +30,6 @@
         <button id="startButton" disabled="disabled">Start</button>
     </div>
 
-    <!-- <script src="https://unpkg.com/vue/dist/vue.min.js"></script> -->
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="js/stringFormat.js"></script>
     <script src="js/actions.js"></script>
     <script src="js/game.js"></script>

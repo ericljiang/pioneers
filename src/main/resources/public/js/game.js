@@ -44,9 +44,25 @@ function heartbeat() {
 var players = new Vue({
     el: '#players',
     data: {
-      players: []
+        count: 0,
+        red: null,
+        blue: null,
+        white: null,
+        orange: null,
+        green: null,
+        brown: null
     }
 })
+
+function join(color) {
+    var action = new JoinAction(color);
+    webSocket.send(JSON.stringify(action));
+}
+
+function leave(color) {
+    var action = new LeaveAction(color);
+    webSocket.send(JSON.stringify(action));
+}
 
 function handle(action) {
     var parser = "handle" + action.type;
@@ -54,16 +70,32 @@ function handle(action) {
 }
 
 function handleConnectAction(action) {
-    var playerId = action.playerId;
-    var playerName = action.playerName;
-    players.players.push({ name: playerName });
-    console.log(playerName + " connected.");
+    // var playerId = action.playerId;
+    // var playerName = action.playerName;
+    // players.players.push({ name: playerName });
+    // console.log(playerName + " connected.");
 }
 
 function handleDisconnectAction(action) {
-    var playerId = action.playerId;
+    // var playerId = action.playerId;
+    // var playerName = action.playerName;
+    // var index = players.players.findIndex(i => i.name === playerName);
+    // players.players.splice(index, 1);
+    // console.log(playerName + " disconnected.");
+}
+
+function handleJoinAction(action) {
     var playerName = action.playerName;
-    var index = players.players.findIndex(i => i.name === playerName);
-    players.players.splice(index, 1);
-    console.log(playerName + " disconnected.");
+    var color = action.color;
+    players[color] = playerName;
+    players.count += 1;
+    console.log(playerName + " joined " + color);
+}
+
+function handleLeaveAction(action) {
+    var playerName = action.playerName;
+    var color = action.color;
+    players[color] = null;
+    players.count -= 1;
+    console.log(playerName + " left " + color);
 }

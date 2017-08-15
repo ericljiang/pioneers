@@ -1,5 +1,7 @@
 package me.ericjiang.settlers.core.game;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -8,8 +10,9 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
-import me.ericjiang.settlers.core.actions.ConnectAction;
 import me.ericjiang.settlers.core.actions.DisconnectAction;
+import me.ericjiang.settlers.core.actions.JoinAction;
+import me.ericjiang.settlers.core.actions.LeaveAction;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -37,7 +40,14 @@ public abstract class Game {
     private transient PlayerDao playerDao;
 
     // consider using Multimap so players can have multiple connections
-    private transient Map<String, Player> connectedPlayers;
+    private transient Map<String, Player> playerConnections;
+
+    /**
+     * Keeps track of player (color) slots while in setup mode. Should be
+     * stored in PlayerDao when the game starts.
+     * K = color, V = playerId
+     */
+    private transient BiMap<String, String> playerSlots;
 
     public Game(String id, LocalDateTime creationTime, String name,
             GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
@@ -47,7 +57,8 @@ public abstract class Game {
         this.gameDao = gameDao;
         this.boardDao = boardDao;
         this.playerDao = playerDao;
-        connectedPlayers = new HashMap<String, Player>(getMaxPlayers());
+        playerConnections = new HashMap<String, Player>(getMaxPlayers());
+        playerSlots = HashBiMap.create();
         log.info(String.format("%s game '%s' created with id %s", getExpansion(), name, id));
     }
 
@@ -69,23 +80,29 @@ public abstract class Game {
             return false;
         }
         log.info("Player " + playerId + " connected to game " + id);
-        connectedPlayers.keySet().forEach(c -> {
-            player.update(new ConnectAction(c, playerDao.getName(c)));
+        // catch player up
+        playerSlots.entrySet().forEach(e -> {
+            String color = e.getKey();
+            String id = e.getValue();
+            player.update(new JoinAction(id, playerDao.getName(id), color));
         });
-        connectedPlayers.put(playerId, player);
-        broadcast(new ConnectAction(playerId, playerDao.getName(playerId)));
+        playerConnections.put(playerId, player);
         return true;
     }
 
     public void disconnectPlayer(Player player) {
         String playerId = player.id();
-        connectedPlayers.remove(playerId);
+        playerConnections.remove(playerId);
         log.info("Player " + playerId + " disconnected from game " + id);
         broadcast(new DisconnectAction(playerId, playerDao.getName(playerId)));
+        if (playerSlots.containsValue(playerId)) {
+            String color = playerSlots.inverse().remove(playerId);
+            broadcast(new LeaveAction(playerId, playerDao.getName(playerId), color));
+        }
     }
 
     public int currentPlayerCount() {
-        return connectedPlayers.size();
+        return playerConnections.size();
     }
 
     public List<String> players() {
@@ -93,22 +110,42 @@ public abstract class Game {
     }
 
     public Set<String> connectedPlayers() {
-        return connectedPlayers.keySet();
+        return playerConnections.keySet();
     }
 
     public boolean hasPlayer(String playerId) {
         return players().contains(playerId);
     }
 
+    public void handleJoinAction(JoinAction joinAction) {
+        String color = joinAction.getColor();
+        String playerId = joinAction.getPlayerId();
+        log.info(playerId + " wants to join " + color);
+        if (!playerSlots.containsKey(color)) {
+            playerSlots.put(color, playerId);
+            broadcast(joinAction);
+        }
+    }
+
+    public void handleLeaveAction(LeaveAction leaveAction) {
+        String color = leaveAction.getColor();
+        String playerId = leaveAction.getPlayerId();
+        log.info(playerId + " wants to leave " + color);
+        if (playerId.equals(playerSlots.get(color))) {
+            playerSlots.remove(leaveAction.getColor());
+            broadcast(leaveAction);
+        }
+    }
+
     protected void broadcast(Action action) {
         log.info("Broadcasting action " + action.getId());
-        for (Player player : connectedPlayers.values()) {
+        for (Player player : playerConnections.values()) {
             player.update(action);
         }
     }
 
     private void start() {
-        connectedPlayers.keySet().forEach(playerId -> playerDao.addPlayerToGame(id, playerId));
+        playerConnections.keySet().forEach(playerId -> playerDao.addPlayerToGame(id, playerId));
     }
 
     public enum Phase {
