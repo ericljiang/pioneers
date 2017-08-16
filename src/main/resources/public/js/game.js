@@ -1,13 +1,15 @@
 // Establish the WebSocket connection and set up event handlers
 var protocol;
-if (location.protocol == "https:") {
+if (window.location.protocol == "https:") {
     protocol = "wss:"
 } else {
     protocol = "ws:"
 }
-var webSocketAddress = protocol + "//" + location.host + "/game" + location.search;
+var webSocketAddress = protocol + "//" + window.location.host + "/game" + window.location.search;
 var webSocket = new WebSocket(webSocketAddress);
 var heartbeatTimer = 0;
+var urlParams = new URLSearchParams(window.location.search);
+var myPlayerId = urlParams.get("u");
 
 webSocket.onopen = onConnect;
 webSocket.onmessage = onMessage;
@@ -44,25 +46,46 @@ function heartbeat() {
 var players = new Vue({
     el: '#players',
     data: {
+        myColor: null,
         count: 0,
-        red: null,
-        blue: null,
-        white: null,
-        orange: null,
-        green: null,
-        brown: null
+        slots: [
+            {
+                color: "red",
+                player: null
+            },
+            {
+                color: "blue",
+                player: null
+            },
+            {
+                color: "white",
+                player: null
+            },
+            {
+                color: "orange",
+                player: null
+            },
+            {
+                color: "green",
+                player: null
+            },
+            {
+                color: "brown",
+                player: null
+            }
+        ]
+    },
+    methods: {
+        join: function(color) {
+            var action = new JoinAction(color);
+            webSocket.send(JSON.stringify(action));
+        },
+        leave: function(color) {
+            var action = new LeaveAction(color);
+            webSocket.send(JSON.stringify(action));
+        }
     }
 })
-
-function join(color) {
-    var action = new JoinAction(color);
-    webSocket.send(JSON.stringify(action));
-}
-
-function leave(color) {
-    var action = new LeaveAction(color);
-    webSocket.send(JSON.stringify(action));
-}
 
 function handle(action) {
     var parser = "handle" + action.type;
@@ -85,17 +108,27 @@ function handleDisconnectAction(action) {
 }
 
 function handleJoinAction(action) {
+    var playerId = action.playerId;
     var playerName = action.playerName;
     var color = action.color;
-    players[color] = playerName;
+    var slotIndex = players.slots.findIndex(s => s.color === color);
+    players.slots[slotIndex].player = playerName;
     players.count += 1;
+    if (playerId == myPlayerId) {
+        players.myColor = color;
+    }
     console.log(playerName + " joined " + color);
 }
 
 function handleLeaveAction(action) {
+    var playerId = action.playerId;
     var playerName = action.playerName;
     var color = action.color;
-    players[color] = null;
+    var slotIndex = players.slots.findIndex(s => s.color === color);
+    players.slots[slotIndex].player = null;
     players.count -= 1;
+    if (playerId == myPlayerId) {
+        players.myColor = null;
+    }
     console.log(playerName + " left " + color);
 }

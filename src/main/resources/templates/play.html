@@ -1,37 +1,44 @@
 <!doctype html>
 <html>
 <head>
-    <title>Game</title>
-    <!-- <script src="https://unpkg.com/vue/dist/vue.min.js"></script> -->
-    <script src="https://unpkg.com/vue"></script>
+  <title>Game</title>
+  <!-- <script src="https://unpkg.com/vue/dist/vue.min.js"></script> -->
+  <script src="https://unpkg.com/vue"></script>
 </head>
 
 <body>
-    <div>
-        <h1 th:text="${gameName}">Game name</h1>
-        <h2 th:text="${gameId}">12345abcde</h2>
-        <p>Created by player</p>
-        <p th:text="|${expansion} game|">Base game</p>
-        <p th:text="|${minPlayers}-${maxPlayers} players|">3-4 players</p>
-    </div>
+  <div>
+    <h1 th:text="${gameName}">Game name</h1>
+    <h2 th:text="${gameId}">12345abcde</h2>
+    <p>Created by player</p>
+    <p th:text="|${expansion} game|">Base game</p>
+    <p th:text="|${minPlayers}-${maxPlayers} players|">3-4 players</p>
+  </div>
 
-    <div id="players">
-        <h1>Players</h1>
-        <h2 id="playerCount" th:text="|{{ count }}/${maxPlayers}|">2/3</h2>
-        <ul id="playerList">
-            <!-- <li th:each="player : ${players}" th:text="${player}">player</li> -->
-            <li>
-                {{ red }}
-            </li>
-        </ul>
-    </div>
+  <div id="players">
+    <h1>Players</h1>
+    <h2 id="playerCount" th:text="|{{ count }}/${maxPlayers}|">2/3</h2>
+    <ul id="playerList">
+      <li v-for="slot in slots" v-bind:id="slot.color">
+        {{ slot.player }}
+        <transition>
+          <button v-if="slot.player == null" v-on:click="join(slot.color)" v-bind:disabled="myColor != null">
+            Join
+          </button>
+          <button v-else-if="slot.color == myColor" v-on:click="leave(slot.color)">
+            Leave
+          </button>
+        </transition>
+      </li>
+    </ul>
+  </div>
 
-    <div>
-        <button id="startButton" disabled="disabled">Start</button>
-    </div>
+  <div>
+    <button id="startButton" disabled="disabled">Start</button>
+  </div>
 
-    <script src="js/stringFormat.js"></script>
-    <script src="js/actions.js"></script>
-    <script src="js/game.js"></script>
+  <script src="js/stringFormat.js"></script>
+  <script src="js/actions.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>

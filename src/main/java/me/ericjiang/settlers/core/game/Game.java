@@ -102,7 +102,11 @@ public abstract class Game {
     }
 
     public int currentPlayerCount() {
-        return playerConnections.size();
+        if (gameDao.getPhase(id) == Phase.SETUP) {
+            return playerSlots.size();
+        } else {
+            return playerConnections.keySet().size();
+        }
     }
 
     public List<String> players() {
