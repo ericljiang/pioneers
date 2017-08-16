@@ -2,6 +2,7 @@ package me.ericjiang.settlers.core.game;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.gson.annotations.SerializedName;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,7 @@ public abstract class Game {
      * stored in PlayerDao when the game starts.
      * K = color, V = playerId
      */
-    private transient BiMap<String, String> playerSlots;
+    private transient BiMap<Color, String> playerSlots;
 
     public Game(String id, LocalDateTime creationTime, String name,
             GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
@@ -82,7 +83,7 @@ public abstract class Game {
         log.info("Player " + playerId + " connected to game " + id);
         // catch player up
         playerSlots.entrySet().forEach(e -> {
-            String color = e.getKey();
+            Color color = e.getKey();
             String id = e.getValue();
             player.update(new JoinAction(id, playerDao.getName(id), color));
         });
@@ -96,7 +97,7 @@ public abstract class Game {
         log.info("Player " + playerId + " disconnected from game " + id);
         broadcast(new DisconnectAction(playerId, playerDao.getName(playerId)));
         if (playerSlots.containsValue(playerId)) {
-            String color = playerSlots.inverse().remove(playerId);
+            Color color = playerSlots.inverse().remove(playerId);
             broadcast(new LeaveAction(playerId, playerDao.getName(playerId), color));
         }
     }
@@ -122,7 +123,7 @@ public abstract class Game {
     }
 
     public void handleJoinAction(JoinAction joinAction) {
-        String color = joinAction.getColor();
+        Color color = joinAction.getColor();
         String playerId = joinAction.getPlayerId();
         log.info(playerId + " wants to join " + color);
         if (!playerSlots.containsKey(color)) {
@@ -132,7 +133,7 @@ public abstract class Game {
     }
 
     public void handleLeaveAction(LeaveAction leaveAction) {
-        String color = leaveAction.getColor();
+        Color color = leaveAction.getColor();
         String playerId = leaveAction.getPlayerId();
         log.info(playerId + " wants to leave " + color);
         if (playerId.equals(playerSlots.get(color))) {
@@ -154,5 +155,14 @@ public abstract class Game {
 
     public enum Phase {
         SETUP, ROLL, TRADE, BUILD
+    }
+
+    public enum Color {
+        @SerializedName("red") RED,
+        @SerializedName("blue") BLUE,
+        @SerializedName("white") WHITE,
+        @SerializedName("orange") ORANGE,
+        @SerializedName("green") GREEN,
+        @SerializedName("brown") BROWN
     }
 }

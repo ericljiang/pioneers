@@ -2,6 +2,7 @@ package me.ericjiang.settlers.core.actions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.ericjiang.settlers.core.game.Game;
 
@@ -11,6 +12,7 @@ import me.ericjiang.settlers.core.game.Game;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public abstract class PlayerAction extends Action {
 
     private String playerId;

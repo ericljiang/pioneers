@@ -12,7 +12,7 @@ public abstract class Action {
      * Base-64 encoded UUID without padding
      */
     @Getter
-    private String id;
+    private final String id;
 
     private static final Gson GSON;
 
@@ -28,7 +28,7 @@ public abstract class Action {
     }
 
     public Action() {
-        id = ShortUUID.randomUUID().toString();
+        this.id = ShortUUID.randomUUID().toString();
     }
 
     @Override
