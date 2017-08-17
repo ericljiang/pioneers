@@ -25,6 +25,6 @@ public class ActionTest {
         Action joinAction = new JoinAction("id", "name", Color.BLUE);
         assertEquals(Color.BLUE, ((JoinAction) Action.valueOf(joinAction.toString())).getColor());
         Action leaveAction = new LeaveAction("id", "name", Color.BLUE);
-        assertEquals(Color.BLUE, ((JoinAction) Action.valueOf(leaveAction.toString())).getColor());
+        assertEquals(Color.BLUE, ((LeaveAction) Action.valueOf(leaveAction.toString())).getColor());
     }
 }
