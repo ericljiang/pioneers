@@ -48,6 +48,8 @@ var players = new Vue({
     data: {
         myColor: null,
         count: 0,
+        minPlayers: null,
+        maxPlayers: null,
         slots: [
             {
                 color: "red",
@@ -74,6 +76,11 @@ var players = new Vue({
                 player: null
             }
         ]
+    },
+    computed: {
+        canJoin: function() {
+            return this.myColor == null && this.count < this.maxPlayers;
+        }
     },
     methods: {
         join: function(color) {
@@ -105,6 +112,11 @@ function handleDisconnectAction(action) {
     // var index = players.players.findIndex(i => i.name === playerName);
     // players.players.splice(index, 1);
     // console.log(playerName + " disconnected.");
+}
+
+function handleGameUpdate(update) {
+    players.minPlayers = update.minPlayers;
+    players.maxPlayers = update.maxPlayers;
 }
 
 function handleJoinAction(action) {

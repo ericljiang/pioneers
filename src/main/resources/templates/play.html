@@ -22,11 +22,11 @@
       <li v-for="slot in slots" v-bind:id="slot.color">
         {{ slot.player }}
         <transition>
-          <button v-if="slot.player == null" v-on:click="join(slot.color)" v-bind:disabled="myColor != null">
-            Join
-          </button>
-          <button v-else-if="slot.color == myColor" v-on:click="leave(slot.color)">
+          <button v-if="slot.color == myColor" v-on:click="leave(slot.color)">
             Leave
+          </button>
+          <button v-else-if="slot.player == null" v-on:click="join(slot.color)" v-bind:disabled="!canJoin">
+            Join
           </button>
         </transition>
       </li>

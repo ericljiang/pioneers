@@ -8,10 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.actions.DisconnectAction;
+import me.ericjiang.settlers.core.actions.GameUpdate;
 import me.ericjiang.settlers.core.actions.JoinAction;
 import me.ericjiang.settlers.core.actions.LeaveAction;
 import me.ericjiang.settlers.core.player.Player;
@@ -77,17 +79,13 @@ public abstract class Game {
 
 	public boolean connectPlayer(Player player) {
         String playerId = player.id();
-        if (gameDao.getPhase(id) != Phase.SETUP && !hasPlayer(playerId)) {
+        Phase phase = gameDao.getPhase(id);
+        if (phase != Phase.SETUP && !hasPlayer(playerId)) {
             return false;
         }
         log.info("Player " + playerId + " connected to game " + id);
-        // catch player up
-        playerSlots.entrySet().forEach(e -> {
-            Color color = e.getKey();
-            String id = e.getValue();
-            player.update(new JoinAction(id, playerDao.getName(id), color));
-        });
         playerConnections.put(playerId, player);
+        briefPlayer(player);
         return true;
     }
 
@@ -126,7 +124,7 @@ public abstract class Game {
         Color color = joinAction.getColor();
         String playerId = joinAction.getPlayerId();
         log.info(playerId + " wants to join " + color);
-        if (!playerSlots.containsKey(color)) {
+        if (!playerSlots.containsKey(color) && connectedPlayers().size() < getMaxPlayers()) {
             playerSlots.put(color, playerId);
             broadcast(joinAction);
         }
@@ -147,6 +145,22 @@ public abstract class Game {
         for (Player player : playerConnections.values()) {
             player.update(action);
         }
+    }
+
+    /**
+     * Bring a player up to speed
+     */
+    private void briefPlayer(Player player) {
+        player.update(new GameUpdate(getExpansion(),
+                getMinPlayers(),
+                getMaxPlayers()));
+        // tell player who's connected
+        playerSlots.entrySet().forEach(e -> {
+            Color color = e.getKey();
+            String id = e.getValue();
+            String name = playerDao.getName(id);
+            player.update(new JoinAction(id, name, color));
+        });
     }
 
     private void start() {

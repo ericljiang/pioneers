@@ -18,6 +18,7 @@ public abstract class Action {
 
     static {
         RuntimeTypeAdapterFactory<Action> actionAdapter = RuntimeTypeAdapterFactory.of(Action.class)
+                .registerSubtype(GameUpdate.class)
                 .registerSubtype(ConnectAction.class)
                 .registerSubtype(DisconnectAction.class)
                 .registerSubtype(JoinAction.class)
