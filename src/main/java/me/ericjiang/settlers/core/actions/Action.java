@@ -2,10 +2,13 @@ package me.ericjiang.settlers.core.actions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.ericjiang.settlers.util.RuntimeTypeAdapterFactory;
 import me.ericjiang.settlers.util.ShortUUID;
 
+@EqualsAndHashCode
 public abstract class Action {
 
     /**
