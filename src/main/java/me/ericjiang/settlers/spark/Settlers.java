@@ -46,7 +46,7 @@ public class Settlers {
         BoardDao boardDao = new BoardDaoInMemory();
         PlayerDao playerDao = new PlayerDaoPostgres(connection);
         GameDao gameDao = new GameDaoPostgres(connection, boardDao, playerDao);
-        WebSocketHandler webSocketHandler = new WebSocketHandler(gameDao);
+        WebSocketHandler webSocketHandler = new WebSocketHandler(gameDao, playerDao);
         TemplateEngine templateEngine = new ThymeleafTemplateEngine();
 
         new Settlers(authenticator, playerDao, gameDao, webSocketHandler, templateEngine).start();

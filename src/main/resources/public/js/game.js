@@ -1,13 +1,15 @@
 // Establish the WebSocket connection and set up event handlers
 var protocol;
-if (location.protocol == "https:") {
+if (window.location.protocol == "https:") {
     protocol = "wss:"
 } else {
     protocol = "ws:"
 }
-var webSocketAddress = protocol + "//" + location.host + "/game" + location.search;
+var webSocketAddress = protocol + "//" + window.location.host + "/game" + window.location.search;
 var webSocket = new WebSocket(webSocketAddress);
 var heartbeatTimer = 0;
+var urlParams = new URLSearchParams(window.location.search);
+var myPlayerId = urlParams.get("u");
 
 webSocket.onopen = onConnect;
 webSocket.onmessage = onMessage;
@@ -44,7 +46,36 @@ function heartbeat() {
 var players = new Vue({
     el: '#players',
     data: {
-      players: []
+        myColor: null,
+        count: 0,
+        minPlayers: null,
+        maxPlayers: null,
+        slots: {
+            "red": null,
+            "blue": null,
+            "white": null,
+            "orange": null,
+            "green": null,
+            "brown": null
+        }
+    },
+    computed: {
+        canJoin: function() {
+            return this.myColor == null && this.count < this.maxPlayers;
+        }
+    },
+    methods: {
+        join: function(color) {
+            var action = new JoinAction(color);
+            webSocket.send(JSON.stringify(action));
+        },
+        leave: function(color) {
+            var action = new LeaveAction(color);
+            webSocket.send(JSON.stringify(action));
+        },
+        empty: function(color) {
+            return this.slots[color] == null;
+        }
     }
 })
 
@@ -54,16 +85,45 @@ function handle(action) {
 }
 
 function handleConnectAction(action) {
-    var playerId = action.playerId;
-    var playerName = action.playerName;
-    players.players.push({ name: playerName });
-    console.log(playerName + " connected.");
+    // var playerId = action.playerId;
+    // var playerName = action.playerName;
+    // players.players.push({ name: playerName });
+    // console.log(playerName + " connected.");
 }
 
 function handleDisconnectAction(action) {
+    // var playerId = action.playerId;
+    // var playerName = action.playerName;
+    // var index = players.players.findIndex(i => i.name === playerName);
+    // players.players.splice(index, 1);
+    // console.log(playerName + " disconnected.");
+}
+
+function handleGameUpdate(update) {
+    players.minPlayers = update.minPlayers;
+    players.maxPlayers = update.maxPlayers;
+}
+
+function handleJoinAction(action) {
     var playerId = action.playerId;
     var playerName = action.playerName;
-    var index = players.players.findIndex(i => i.name === playerName);
-    players.players.splice(index, 1);
-    console.log(playerName + " disconnected.");
+    var color = action.color;
+    players.slots[color] = playerName;
+    players.count += 1;
+    if (playerId == myPlayerId) {
+        players.myColor = color;
+    }
+    console.log(playerName + " joined " + color);
+}
+
+function handleLeaveAction(action) {
+    var playerId = action.playerId;
+    var playerName = action.playerName;
+    var color = action.color;
+    players.slots[color] = null;
+    players.count -= 1;
+    if (playerId == myPlayerId) {
+        players.myColor = null;
+    }
+    console.log(playerName + " left " + color);
 }

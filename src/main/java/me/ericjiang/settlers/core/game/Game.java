@@ -1,15 +1,21 @@
 package me.ericjiang.settlers.core.game;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.gson.annotations.SerializedName;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
-import me.ericjiang.settlers.core.actions.ConnectAction;
 import me.ericjiang.settlers.core.actions.DisconnectAction;
+import me.ericjiang.settlers.core.actions.GameUpdate;
+import me.ericjiang.settlers.core.actions.JoinAction;
+import me.ericjiang.settlers.core.actions.LeaveAction;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -37,7 +43,14 @@ public abstract class Game {
     private transient PlayerDao playerDao;
 
     // consider using Multimap so players can have multiple connections
-    private transient Map<String, Player> connectedPlayers;
+    private transient Map<String, Player> playerConnections;
+
+    /**
+     * Keeps track of player (color) slots while in setup mode. Should be
+     * stored in PlayerDao when the game starts.
+     * K = color, V = playerId
+     */
+    private transient BiMap<Color, String> playerSlots;
 
     public Game(String id, LocalDateTime creationTime, String name,
             GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
@@ -47,7 +60,8 @@ public abstract class Game {
         this.gameDao = gameDao;
         this.boardDao = boardDao;
         this.playerDao = playerDao;
-        connectedPlayers = new HashMap<String, Player>(getMaxPlayers());
+        playerConnections = new HashMap<String, Player>(getMaxPlayers());
+        playerSlots = HashBiMap.create();
         log.info(String.format("%s game '%s' created with id %s", getExpansion(), name, id));
     }
 
@@ -65,27 +79,33 @@ public abstract class Game {
 
 	public boolean connectPlayer(Player player) {
         String playerId = player.id();
-        if (gameDao.getPhase(id) != Phase.SETUP && !hasPlayer(playerId)) {
+        Phase phase = gameDao.getPhase(id);
+        if (phase != Phase.SETUP && !hasPlayer(playerId)) {
             return false;
         }
         log.info("Player " + playerId + " connected to game " + id);
-        connectedPlayers.keySet().forEach(c -> {
-            player.update(new ConnectAction(c, playerDao.getName(c)));
-        });
-        connectedPlayers.put(playerId, player);
-        broadcast(new ConnectAction(playerId, playerDao.getName(playerId)));
+        playerConnections.put(playerId, player);
+        briefPlayer(player);
         return true;
     }
 
     public void disconnectPlayer(Player player) {
         String playerId = player.id();
-        connectedPlayers.remove(playerId);
+        playerConnections.remove(playerId);
         log.info("Player " + playerId + " disconnected from game " + id);
         broadcast(new DisconnectAction(playerId, playerDao.getName(playerId)));
+        if (playerSlots.containsValue(playerId)) {
+            Color color = playerSlots.inverse().remove(playerId);
+            broadcast(new LeaveAction(playerId, playerDao.getName(playerId), color));
+        }
     }
 
     public int currentPlayerCount() {
-        return connectedPlayers.size();
+        if (gameDao.getPhase(id) == Phase.SETUP) {
+            return playerSlots.size();
+        } else {
+            return playerConnections.keySet().size();
+        }
     }
 
     public List<String> players() {
@@ -93,25 +113,70 @@ public abstract class Game {
     }
 
     public Set<String> connectedPlayers() {
-        return connectedPlayers.keySet();
+        return playerConnections.keySet();
     }
 
     public boolean hasPlayer(String playerId) {
         return players().contains(playerId);
     }
 
+    public void handleJoinAction(JoinAction joinAction) {
+        Color color = joinAction.getColor();
+        String playerId = joinAction.getPlayerId();
+        log.info(playerId + " wants to join " + color);
+        if (!playerSlots.containsKey(color) && connectedPlayers().size() < getMaxPlayers()) {
+            playerSlots.put(color, playerId);
+            broadcast(joinAction);
+        }
+    }
+
+    public void handleLeaveAction(LeaveAction leaveAction) {
+        Color color = leaveAction.getColor();
+        String playerId = leaveAction.getPlayerId();
+        log.info(playerId + " wants to leave " + color);
+        if (playerId.equals(playerSlots.get(color))) {
+            playerSlots.remove(leaveAction.getColor());
+            broadcast(leaveAction);
+        }
+    }
+
     protected void broadcast(Action action) {
         log.info("Broadcasting action " + action.getId());
-        for (Player player : connectedPlayers.values()) {
+        for (Player player : playerConnections.values()) {
             player.update(action);
         }
     }
 
+    /**
+     * Bring a player up to speed
+     */
+    private void briefPlayer(Player player) {
+        player.update(new GameUpdate(getExpansion(),
+                getMinPlayers(),
+                getMaxPlayers()));
+        // tell player who's connected
+        playerSlots.entrySet().forEach(e -> {
+            Color color = e.getKey();
+            String id = e.getValue();
+            String name = playerDao.getName(id);
+            player.update(new JoinAction(id, name, color));
+        });
+    }
+
     private void start() {
-        connectedPlayers.keySet().forEach(playerId -> playerDao.addPlayerToGame(id, playerId));
+        playerConnections.keySet().forEach(playerId -> playerDao.addPlayerToGame(id, playerId));
     }
 
     public enum Phase {
         SETUP, ROLL, TRADE, BUILD
+    }
+
+    public enum Color {
+        @SerializedName("red") RED,
+        @SerializedName("blue") BLUE,
+        @SerializedName("white") WHITE,
+        @SerializedName("orange") ORANGE,
+        @SerializedName("green") GREEN,
+        @SerializedName("brown") BROWN
     }
 }
