@@ -50,32 +50,14 @@ var players = new Vue({
         count: 0,
         minPlayers: null,
         maxPlayers: null,
-        slots: [
-            {
-                color: "red",
-                player: null
-            },
-            {
-                color: "blue",
-                player: null
-            },
-            {
-                color: "white",
-                player: null
-            },
-            {
-                color: "orange",
-                player: null
-            },
-            {
-                color: "green",
-                player: null
-            },
-            {
-                color: "brown",
-                player: null
-            }
-        ]
+        slots: {
+            "red": null,
+            "blue": null,
+            "white": null,
+            "orange": null,
+            "green": null,
+            "brown": null
+        }
     },
     computed: {
         canJoin: function() {
@@ -90,6 +72,9 @@ var players = new Vue({
         leave: function(color) {
             var action = new LeaveAction(color);
             webSocket.send(JSON.stringify(action));
+        },
+        empty: function(color) {
+            return this.slots[color] == null;
         }
     }
 })
@@ -123,8 +108,7 @@ function handleJoinAction(action) {
     var playerId = action.playerId;
     var playerName = action.playerName;
     var color = action.color;
-    var slotIndex = players.slots.findIndex(s => s.color === color);
-    players.slots[slotIndex].player = playerName;
+    players.slots[color] = playerName;
     players.count += 1;
     if (playerId == myPlayerId) {
         players.myColor = color;
@@ -136,8 +120,7 @@ function handleLeaveAction(action) {
     var playerId = action.playerId;
     var playerName = action.playerName;
     var color = action.color;
-    var slotIndex = players.slots.findIndex(s => s.color === color);
-    players.slots[slotIndex].player = null;
+    players.slots[color] = null;
     players.count -= 1;
     if (playerId == myPlayerId) {
         players.myColor = null;
