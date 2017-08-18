@@ -15,3 +15,9 @@ cd settlers
 ./gradlew run
 ```
 Connect to http://localhost:4567
+
+## Built With
+* [Spark](http://sparkjava.com/)
+* [PostgreSQL](https://www.postgresql.org/)
+* [Thymeleaf](http://www.thymeleaf.org/)
+* [Vue.js](https://vuejs.org/)
