@@ -1,0 +1,26 @@
+svg {
+    -webkit-filter: drop-shadow(3px 2px 2px rgba(0, 0, 0, .4));
+            filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, .4));
+}
+.tile {
+    stroke: aliceblue;
+    stroke-width: 0.15;
+}
+.tile[data-resource="ore"] {
+    fill: #34495E;
+}
+.tile[data-resource="grain"] {
+    fill: #F8C471;
+}
+.tile[data-resource="lumber"] {
+    fill: #6E2C00;
+}
+.tile[data-resource="wool"] {
+    fill: #1ABC9C;
+}
+.tile[data-resource="brick"] {
+    fill: #E74C3C;
+}
+.tile[data-resource="none"] {
+    fill: #FCF3CF;
+}

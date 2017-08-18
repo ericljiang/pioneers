@@ -77,7 +77,24 @@ var players = new Vue({
             return this.slots[color] == null;
         }
     }
-})
+});
+
+var board = new Vue({
+    el: '#board',
+    data: {
+        tiles: [],
+        edges: [],
+        intersections: []
+    },
+    methods: {
+        points: function(tile) {
+            var layout = Layout(layout_pointy, Point(1, 1), Point(0, 0));
+            var h = Hex(tile.coordinates.row, tile.coordinates.column);
+            var corners = polygon_corners(layout, h);
+            return corners.map(function(p) { return p.x + "," + p.y; }).join(" ");
+        }
+    }
+});
 
 function handle(action) {
     var parser = "handle" + action.type;
@@ -102,6 +119,7 @@ function handleDisconnectAction(action) {
 function handleGameUpdate(update) {
     players.minPlayers = update.minPlayers;
     players.maxPlayers = update.maxPlayers;
+    board.tiles = update.tiles;
 }
 
 function handleJoinAction(action) {

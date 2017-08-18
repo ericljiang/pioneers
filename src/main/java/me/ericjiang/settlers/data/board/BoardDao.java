@@ -1,5 +1,6 @@
 package me.ericjiang.settlers.data.board;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.ericjiang.settlers.core.board.Edge;
@@ -9,6 +10,8 @@ import me.ericjiang.settlers.core.board.Tile;
 public interface BoardDao {
 
     Tile getTile(String gameId, Tile.Coordinates coordinates);
+
+    Collection<Tile> getTiles(String gameId);
 
     void putTile(String gameId, Tile.Coordinates coordinates, Tile tile);
 

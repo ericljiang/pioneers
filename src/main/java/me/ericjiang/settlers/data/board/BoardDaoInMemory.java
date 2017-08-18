@@ -2,13 +2,14 @@ package me.ericjiang.settlers.data.board;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import java.util.Collection;
 import me.ericjiang.settlers.core.board.Edge;
 import me.ericjiang.settlers.core.board.Intersection;
 import me.ericjiang.settlers.core.board.Tile;
 
 public class BoardDaoInMemory implements BoardDao {
 
-    // TODO: replace with DAOs
+    // R = gameId, C = Coordinates
     private Table<String, Tile.Coordinates, Tile> tiles;
     private Table<String, Edge.Coordinates, Edge> edges;
     private Table<String, Intersection.Coordinates, Intersection> intersections;
@@ -22,6 +23,11 @@ public class BoardDaoInMemory implements BoardDao {
     @Override
     public Tile getTile(String gameId, Tile.Coordinates coordinates) {
         return tiles.get(gameId, coordinates);
+    }
+
+    @Override
+    public Collection<Tile> getTiles(String gameId) {
+        return tiles.row(gameId).values();
     }
 
     @Override
