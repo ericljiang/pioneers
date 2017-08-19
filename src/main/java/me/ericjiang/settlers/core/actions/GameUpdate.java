@@ -1,8 +1,11 @@
 package me.ericjiang.settlers.core.actions;
 
+import java.util.Collection;
 import lombok.AllArgsConstructor;
+import me.ericjiang.settlers.core.board.Tile;
 
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class GameUpdate extends Action {
 
     private String expansion;
@@ -10,5 +13,7 @@ public class GameUpdate extends Action {
     private int minPlayers;
 
     private int maxPlayers;
+
+    private Collection<Tile> tiles;
 
 }

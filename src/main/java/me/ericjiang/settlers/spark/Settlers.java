@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.game.Game;
 import me.ericjiang.settlers.data.board.BoardDao;
-import me.ericjiang.settlers.data.board.BoardDaoInMemory;
+import me.ericjiang.settlers.data.board.BoardDaoPostgres;
 import me.ericjiang.settlers.data.game.GameDao;
 import me.ericjiang.settlers.data.game.GameDaoPostgres;
 import me.ericjiang.settlers.data.player.PlayerDao;
@@ -43,7 +43,7 @@ public class Settlers {
     public static void main(String[] args) throws SQLException {
         Authenticator authenticator = new GoogleAuthenticator();
         Connection connection = getDatabaseConnection();
-        BoardDao boardDao = new BoardDaoInMemory();
+        BoardDao boardDao = new BoardDaoPostgres(connection);
         PlayerDao playerDao = new PlayerDaoPostgres(connection);
         GameDao gameDao = new GameDaoPostgres(connection, boardDao, playerDao);
         WebSocketHandler webSocketHandler = new WebSocketHandler(gameDao, playerDao);

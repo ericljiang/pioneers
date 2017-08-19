@@ -3,15 +3,21 @@ package me.ericjiang.settlers.core.board;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.Getter; 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Tile {
 
-    private Coordinates coordinates;
+    private Coordinates coordinates; // TODO: can this be removed?
 
-    public enum Resource { ORE, GRAIN, LUMBER, WOOL, BRICK }
+    private Resource resource;
+
+    private int numberToken;
+
+    public enum Resource { ORE, GRAIN, LUMBER, WOOL, BRICK, NONE }
 
     /**
      * http://www-cs-students.stanford.edu/~amitp/game-programming/grids/

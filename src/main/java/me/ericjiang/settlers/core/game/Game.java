@@ -28,7 +28,7 @@ public abstract class Game {
      * Base-64 encoded UUID without padding
      */
     @Getter
-    private final String id;
+    protected final String id;
 
     @Getter
     private final LocalDateTime creationTime;
@@ -38,7 +38,7 @@ public abstract class Game {
 
     private transient GameDao gameDao;
 
-    private transient BoardDao boardDao;
+    protected transient BoardDao boardDao;
 
     private transient PlayerDao playerDao;
 
@@ -66,8 +66,9 @@ public abstract class Game {
     }
 
     /**
-     * Create new board and store in DAO. Should not be called when a game is
-     * is resumed as this will overwrite any existing board data.
+     * Create new tiles, edges, and intersections and store in BoardDao. Should
+     * not be called when a game is is resumed as this will overwrite the
+     * existing board.
      */
     public abstract void initializeBoard();
 
@@ -153,7 +154,8 @@ public abstract class Game {
     private void briefPlayer(Player player) {
         player.update(new GameUpdate(getExpansion(),
                 getMinPlayers(),
-                getMaxPlayers()));
+                getMaxPlayers(),
+                boardDao.getTiles(id)));
         // tell player who's connected
         playerSlots.entrySet().forEach(e -> {
             Color color = e.getKey();

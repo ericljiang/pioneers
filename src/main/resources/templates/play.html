@@ -2,8 +2,8 @@
 <html>
 <head>
   <title>Game</title>
-  <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
-  <!-- <script src="https://unpkg.com/vue"></script> -->
+  <!-- <script src="https://unpkg.com/vue/dist/vue.min.js"></script> -->
+  <script src="https://unpkg.com/vue"></script>
 </head>
 
 <body>
@@ -15,7 +15,7 @@
     <p th:text="|${minPlayers}-${maxPlayers} players|">3-4 players</p>
   </div>
 
-  <div id="players">
+  <div id="players" v-cloak>
     <h1>Players</h1>
     <h2 id="playerCount" th:text="|{{ count }}/${maxPlayers}|">2/3</h2>
     <ul id="playerList">
@@ -37,8 +37,20 @@
     <button id="startButton" disabled="disabled">Start</button>
   </div>
 
+  <div id="board">
+    <svg width="500" height="440">
+      <g transform="translate(250, 220) scale(50)">
+        <g v-for="tile in tiles" class="tile" v-bind:data-resource="tile.resource.toLowerCase()">
+          <polygon v-bind:points="points(tile)"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
   <script src="js/stringFormat.js"></script>
   <script src="js/actions.js"></script>
+  <script src="js/hex.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>
+<link rel="stylesheet" type="text/css" href="css/game.css">
