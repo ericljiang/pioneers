@@ -40,13 +40,26 @@ public class BaseGame extends Game {
         resources.add(Resource.NONE);
         Collections.shuffle(resources);
 
+        // create number tokens
+        LinkedList<Integer> tokens = new LinkedList<Integer>();
+        tokens.add(2);
+        for (int i = 3; i <= 11; i++) {
+            tokens.add(i);
+            tokens.add(i);
+        }
+        tokens.add(12);
+        Collections.shuffle(tokens);
+
         // place tiles
         for (int column = -2; column <= 2; column++) {
             for (int row = -2; row <= 2; row++) {
                 if (column + row >= -2 && column + row <= 2) {
-                    Resource resource = resources.removeFirst();
+                    Resource resource = resources.remove();
                     Tile.Coordinates coordinates = new Tile.Coordinates(column, row);
-                    boardDao.putTile(id, coordinates, new Tile(coordinates, resource));
+                    int numberToken = resource == Resource.NONE ? 0 : tokens.remove();
+                    Tile tile = new Tile(coordinates, resource, numberToken);
+                    boardDao.putTile(id, coordinates, tile);
+                    //TODO: putTiles
                 }
             }
         }

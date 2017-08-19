@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import me.ericjiang.settlers.core.board.Tile;
 
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class GameUpdate extends Action {
 
     private String expansion;

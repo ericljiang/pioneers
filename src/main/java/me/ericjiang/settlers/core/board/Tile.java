@@ -13,6 +13,8 @@ public class Tile {
 
     private Resource resource;
 
+    private int numberToken;
+
     public enum Resource { ORE, GRAIN, LUMBER, WOOL, BRICK, NONE }
 
     /**

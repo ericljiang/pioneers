@@ -17,9 +17,13 @@ public interface BoardDao {
 
     Edge getEdge(String gameId, Edge.Coordinates coordinates);
 
+    Collection<Edge> getEdges(String gameId);
+
     void putEdge(String gameId, Edge.Coordinates coordinates, Edge edge);
 
     Intersection getIntersection(String gameId, Intersection.Coordinates coordinates);
+
+    Collection<Intersection> getIntersections(String gameId);
 
     void putIntersection(String gameId, Intersection.Coordinates coordinates, Intersection intersection);
 

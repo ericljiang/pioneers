@@ -3,7 +3,15 @@ package me.ericjiang.settlers.core.board;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public class Intersection {
+
+    private Coordinates coordinates;
+
+    private String owner;
+
+    private boolean isUpgraded;
 
     @Getter
     @AllArgsConstructor
