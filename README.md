@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/ericljiang/settlers.svg?branch=master)](https://travis-ci.org/ericljiang/settlers)
 [![Coverage Status](https://coveralls.io/repos/github/ericljiang/settlers/badge.svg?branch=master)](https://coveralls.io/github/ericljiang/settlers?branch=master)
 [![codecov](https://codecov.io/gh/ericljiang/settlers/branch/master/graph/badge.svg)](https://codecov.io/gh/ericljiang/settlers)
+[![yeah](https://img.shields.io/badge/yeah-👍-blue.svg)](https://en.wiktionary.org/wiki/yeah)
 
 ## Requirements
 * [PostgreSQL (9.5+)](https://www.postgresql.org/download/)
