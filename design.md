@@ -1,5 +1,7 @@
 # Settlers Design
 
+![design.png](design.png)
+
 ## Server and clients
 
 The server `Settlers` serves HTTP requests from the web-based client. Clients connect to a game instance through WebSockets, on which clients send Actions to the server to communicate player moves and the server broadcasts state-changes and player actions.
