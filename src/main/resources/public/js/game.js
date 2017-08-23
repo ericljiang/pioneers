@@ -66,6 +66,9 @@ var players = new Vue({
     computed: {
         canJoin: function() {
             return this.myColor == null && this.count < this.maxPlayers;
+        },
+        canStart: function() {
+            return this.count >= this.minPlayers;
         }
     },
     methods: {
