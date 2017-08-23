@@ -8,8 +8,8 @@ import me.ericjiang.settlers.data.player.PlayerDao;
 public class ExtendedGame extends Game {
 
     public ExtendedGame(String id, LocalDateTime creationTime, String name,
-            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
-        super(id, creationTime, name, gameDao, boardDao, playerDao);
+            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, boolean newGame) {
+        super(id, creationTime, name, gameDao, boardDao, playerDao, newGame);
     }
 
     @Override

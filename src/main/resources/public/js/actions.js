@@ -21,3 +21,9 @@ class LeaveAction extends Action {
         this.color = color;
     }
 }
+
+class StartAction extends Action {
+    constructor() {
+        super();
+    }
+}

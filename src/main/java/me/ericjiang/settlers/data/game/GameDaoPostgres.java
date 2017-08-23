@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.game.Game;
+import me.ericjiang.settlers.core.game.Game.Color;
 import me.ericjiang.settlers.core.game.Game.Phase;
 import me.ericjiang.settlers.core.game.GameFactory;
 import me.ericjiang.settlers.data.PostgresDao;
@@ -63,7 +64,6 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
         // create new instance
         log.info(String.format("Creating game '%s' with expansion '%s'.", name, expansion));
         Game game = GameFactory.newGame(name, this, boardDao, playerDao, expansion);
-        game.initializeBoard();
         games.put(game.getId(), game);
 
         // record in database
@@ -147,16 +147,44 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
         return phase;
     }
 
+    @Override
     public void setPhase(String gameId, Phase phase) {
         String sql = "UPDATE game SET phase = ? WHERE game_id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, phase.toString());
             preparedStatement.setString(2, gameId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error setting game phase: " + sql, e);
+            halt(500);
+        }
+    }
+
+    @Override
+    public Color getActivePlayer(String gameId) {
+        Color activePlayer = null;
+        String sql = "SELECT active_player FROM game WHERE game_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, gameId);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-            phase = Phase.valueOf(resultSet.getString("phase"));
+            activePlayer = Color.fromString(resultSet.getString("active_player"));
         } catch (SQLException e) {
-            log.error("Error getting game phase: " + sql, e);
+            log.error("Error getting active player: " + sql, e);
+            halt(500);
+        }
+        return activePlayer;
+    }
+
+    @Override
+    public void setActivePlayer(String gameId, Color activePlayer) {
+        String sql = "UPDATE game SET active_player = ? WHERE game_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, activePlayer.toString());
+            preparedStatement.setString(2, gameId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error setting active player: " + sql, e);
             halt(500);
         }
     }

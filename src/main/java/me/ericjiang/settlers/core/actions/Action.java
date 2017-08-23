@@ -25,7 +25,8 @@ public abstract class Action {
                 .registerSubtype(ConnectAction.class)
                 .registerSubtype(DisconnectAction.class)
                 .registerSubtype(JoinAction.class)
-                .registerSubtype(LeaveAction.class);
+                .registerSubtype(LeaveAction.class)
+                .registerSubtype(StartAction.class);
         GSON = new GsonBuilder()
                 .registerTypeAdapterFactory(actionAdapter)
                 .create();

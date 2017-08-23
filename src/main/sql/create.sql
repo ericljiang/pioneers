@@ -4,12 +4,15 @@ CREATE TABLE game (
     name text,
     expansion text,
     phase text,
+    active_player text,
     PRIMARY KEY (game_id)
 );
 
 CREATE TABLE player (
     game_id text,
     player_id text,
+    color text,
+    position integer,
     PRIMARY KEY (game_id, player_id)
 );
 

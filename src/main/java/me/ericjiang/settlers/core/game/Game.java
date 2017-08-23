@@ -2,13 +2,18 @@ package me.ericjiang.settlers.core.game;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.Iterators;
 import com.google.gson.annotations.SerializedName;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
@@ -16,6 +21,7 @@ import me.ericjiang.settlers.core.actions.DisconnectAction;
 import me.ericjiang.settlers.core.actions.GameUpdate;
 import me.ericjiang.settlers.core.actions.JoinAction;
 import me.ericjiang.settlers.core.actions.LeaveAction;
+import me.ericjiang.settlers.core.actions.StartAction;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -36,24 +42,34 @@ public abstract class Game {
     @Getter
     private String name;
 
+    /**
+     * Keeps track of player (color) slots. Becomes immutable and is stored in
+     * the PlayerDao when the game starts.
+     * K = color, V = playerId
+     */
+    private transient BiMap<Color, String> playerSlots;
+
+    /**
+     * Sequence of play. Determined on game start.
+     */
+    private transient Iterator<Color> playerSequence;
+
+    /**
+     * Maps playerIds to their connections
+     * K = playerId, V = connection
+     *
+     * TODO: Consider using Multimap so players can have multiple connections
+     */
+    private final transient Map<String, Player> playerConnections;
+
     private transient GameDao gameDao;
 
     protected transient BoardDao boardDao;
 
     private transient PlayerDao playerDao;
 
-    // consider using Multimap so players can have multiple connections
-    private transient Map<String, Player> playerConnections;
-
-    /**
-     * Keeps track of player (color) slots while in setup mode. Should be
-     * stored in PlayerDao when the game starts.
-     * K = color, V = playerId
-     */
-    private transient BiMap<Color, String> playerSlots;
-
-    public Game(String id, LocalDateTime creationTime, String name,
-            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
+    protected Game(String id, LocalDateTime creationTime, String name,
+            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, boolean newGame) {
         this.id = id;
         this.creationTime = creationTime;
         this.name = name;
@@ -61,22 +77,38 @@ public abstract class Game {
         this.boardDao = boardDao;
         this.playerDao = playerDao;
         playerConnections = new HashMap<String, Player>(getMaxPlayers());
-        playerSlots = HashBiMap.create();
+        if (newGame) {
+            playerSlots = HashBiMap.create();
+            playerSequence = null;
+            initializeBoard();
+        } else {
+            if (gameDao.getPhase(id) == Phase.SETUP) {
+                playerSlots = HashBiMap.create();
+                playerSequence = null;
+            } else {
+                Map<Color, String> players = playerDao.playersForGame(id);
+                playerSlots = ImmutableBiMap.copyOf(players);
+                playerSequence = Iterators.cycle(players.keySet());
+                while (playerSequence.next() != gameDao.getActivePlayer(id)) {
+                    // advance iterator
+                }
+            }
+        }
         log.info(String.format("%s game '%s' created with id %s", getExpansion(), name, id));
     }
-
-    /**
-     * Create new tiles, edges, and intersections and store in BoardDao. Should
-     * not be called when a game is is resumed as this will overwrite the
-     * existing board.
-     */
-    public abstract void initializeBoard();
 
     public abstract String getExpansion();
 
     public abstract int getMaxPlayers();
 
     public abstract int getMinPlayers();
+
+    /**
+     * Create new tiles, edges, and intersections and store in BoardDao. Should
+     * not be called when a game is is resumed as this will overwrite the
+     * existing board.
+     */
+    protected abstract void initializeBoard();
 
 	public boolean connectPlayer(Player player) {
         String playerId = player.id();
@@ -95,7 +127,7 @@ public abstract class Game {
         playerConnections.remove(playerId);
         log.info("Player " + playerId + " disconnected from game " + id);
         broadcast(new DisconnectAction(playerId, playerDao.getName(playerId)));
-        if (playerSlots.containsValue(playerId)) {
+        if (gameDao.getPhase(id) == Phase.SETUP && playerSlots.containsValue(playerId)) {
             Color color = playerSlots.inverse().remove(playerId);
             broadcast(new LeaveAction(playerId, playerDao.getName(playerId), color));
         }
@@ -109,8 +141,8 @@ public abstract class Game {
         }
     }
 
-    public List<String> players() {
-        return playerDao.playersForGame(id);
+    public Collection<String> players() {
+        return playerDao.playersForGame(id).values();
     }
 
     public Set<String> connectedPlayers() {
@@ -120,6 +152,9 @@ public abstract class Game {
     public boolean hasPlayer(String playerId) {
         return players().contains(playerId);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Action handlers
 
     public void handleJoinAction(JoinAction joinAction) {
         Color color = joinAction.getColor();
@@ -141,7 +176,16 @@ public abstract class Game {
         }
     }
 
-    protected void broadcast(Action action) {
+    public void handleStartAction(StartAction startAction) {
+        // TODO: validate phase, owner
+        start();
+        broadcast(startAction);
+    }
+
+    // End of Action handlers
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void broadcast(Action action) {
         log.info("Broadcasting action " + action.getId());
         for (Player player : playerConnections.values()) {
             player.update(action);
@@ -155,7 +199,9 @@ public abstract class Game {
         player.update(new GameUpdate(getExpansion(),
                 getMinPlayers(),
                 getMaxPlayers(),
-                boardDao.getTiles(id)));
+                boardDao.getTiles(id),
+                gameDao.getPhase(id),
+                gameDao.getActivePlayer(id)));
         // tell player who's connected
         playerSlots.entrySet().forEach(e -> {
             Color color = e.getKey();
@@ -166,7 +212,21 @@ public abstract class Game {
     }
 
     private void start() {
-        playerConnections.keySet().forEach(playerId -> playerDao.addPlayerToGame(id, playerId));
+        // add players to game and assign position
+        playerSlots = ImmutableBiMap.copyOf(playerSlots);
+        int position = 0;
+        List<Color> colors = new ArrayList<Color>(playerSlots.keySet());
+        Collections.shuffle(colors);
+        playerSequence = Iterators.cycle(Collections.unmodifiableCollection(colors));
+        for (Color color : colors) {
+            String playerId = playerSlots.get(color);
+            playerDao.addPlayerToGame(id, playerId, color, position);
+            position++;
+        }
+
+        // exit setup phase
+        gameDao.setPhase(id, Phase.ROLL);
+        gameDao.setActivePlayer(id, playerSequence.next());
     }
 
     public enum Phase {
@@ -179,6 +239,18 @@ public abstract class Game {
         @SerializedName("white") WHITE,
         @SerializedName("orange") ORANGE,
         @SerializedName("green") GREEN,
-        @SerializedName("brown") BROWN
+        @SerializedName("brown") BROWN;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+
+        public static Color fromString(String string) {
+            if (string == null) {
+                return null;
+            }
+            return valueOf(string.toUpperCase());
+        }
     }
 }

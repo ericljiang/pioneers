@@ -43,6 +43,10 @@ function heartbeat() {
     }
 }
 
+function send(action) {
+    webSocket.send(JSON.stringify(action));
+}
+
 var players = new Vue({
     el: '#players',
     data: {
@@ -65,16 +69,17 @@ var players = new Vue({
         }
     },
     methods: {
-        join: function(color) {
-            var action = new JoinAction(color);
-            webSocket.send(JSON.stringify(action));
-        },
-        leave: function(color) {
-            var action = new LeaveAction(color);
-            webSocket.send(JSON.stringify(action));
-        },
         empty: function(color) {
             return this.slots[color] == null;
+        },
+        join: function(color) {
+            send(new JoinAction(color));
+        },
+        leave: function(color) {
+            send(new LeaveAction(color));
+        },
+        start: function() {
+            send(new StartAction());
         }
     }
 });
@@ -95,6 +100,10 @@ var board = new Vue({
         }
     }
 });
+
+///////////////////////////////////////////////////////////////////////////////
+// Action handlers
+///////////////////////////////////////////////////////////////////////////////
 
 function handle(action) {
     var parser = "handle" + action.type;

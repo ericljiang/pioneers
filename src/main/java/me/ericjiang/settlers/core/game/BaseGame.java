@@ -12,8 +12,8 @@ import me.ericjiang.settlers.data.player.PlayerDao;
 public class BaseGame extends Game {
 
     public BaseGame(String id, LocalDateTime creationTime, String name,
-            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao) {
-        super(id, creationTime, name, gameDao, boardDao, playerDao);
+            GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, boolean newGame) {
+        super(id, creationTime, name, gameDao, boardDao, playerDao, newGame);
     }
 
     /**

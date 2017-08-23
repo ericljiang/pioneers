@@ -6,10 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import me.ericjiang.settlers.core.game.Game.Color;
 import me.ericjiang.settlers.data.PostgresDao;
 
 @Slf4j
@@ -19,40 +19,47 @@ public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {
         super(connection);
     }
 
-    public List<String> playersForGame(String gameId) {
+    @Override
+    public Map<Color, String> playersForGame(String gameId) {
         log.info("Querying database for players for game " + gameId);
 
-        String sql = String.format(
-                "SELECT player_id FROM player WHERE game_id = '%s'",
-                gameId);
+        String sql = "SELECT player_id, color FROM player WHERE game_id = ? ORDER BY position";
 
-        List<String> players = new ArrayList<String>();
-        try (ResultSet resultSet = statement.executeQuery(sql)) {
+        Map<Color, String> players = new LinkedHashMap<Color, String>();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, gameId);
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                players.add(resultSet.getString("player_id"));
+                Color color = Color.fromString(resultSet.getString("color"));
+                String playerId = resultSet.getString("player_id");
+                players.put(color, playerId);
             }
         } catch (SQLException e) {
-            log.error("Error getting player name: " + sql, e);
+            log.error("Error getting players: " + sql, e);
             halt(500);
         }
         return players;
     }
 
-    public void addPlayerToGame(String gameId, String playerId) {
+    @Override
+    public void addPlayerToGame(String gameId, String playerId, Color color, int position) {
         log.info("Adding player " + playerId + " to game " + gameId);
 
-        String sql = String.format(
-                "INSERT INTO player VALUES ('%s', '%s')",
-                gameId, playerId);
+        String sql = "INSERT INTO player VALUES (?, ?, ?, ?)";
 
-        try {
-            statement.executeUpdate(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, gameId);
+            preparedStatement.setString(2, playerId);
+            preparedStatement.setString(3, color.toString());
+            preparedStatement.setInt(4, position);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("Error adding player to game: " + sql, e);
             halt(500);
         }
     }
 
+    @Override
     public void removePlayerFromGame(String gameId, String playerId) {
         log.info("Removing player " + playerId + " from game " + gameId);
 
@@ -68,6 +75,7 @@ public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {
         }
     }
 
+    @Override
     public String getName(String playerId) {
         log.info("Getting name for " + playerId);
 
@@ -87,6 +95,7 @@ public class PlayerDaoPostgres extends PostgresDao implements PlayerDao {
         return name;
     }
 
+    @Override
     public void setName(String playerId, String name) {
         log.info(String.format("Assigning name %s to player %s", name, playerId));
 

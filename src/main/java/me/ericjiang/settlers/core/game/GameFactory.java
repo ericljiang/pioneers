@@ -29,7 +29,7 @@ public class GameFactory {
     public static Game newGame(String name, GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, String expansion) {
         String id = ShortUUID.randomUUID().toString();
         LocalDateTime creationTime = LocalDateTime.now();
-        Game game = loadGame(id, creationTime, name, gameDao, boardDao, playerDao, expansion);
+        Game game = EXPANSIONS.get(expansion).instantiate(id, creationTime, name, gameDao, boardDao, playerDao, true);
         return game;
     }
 
@@ -39,7 +39,7 @@ public class GameFactory {
      */
     public static Game loadGame(String id, LocalDateTime creationTime, String name,
             GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, String expansion) {
-        Game game = EXPANSIONS.get(expansion).instantiate(id, creationTime, name, gameDao, boardDao, playerDao);
+        Game game = EXPANSIONS.get(expansion).instantiate(id, creationTime, name, gameDao, boardDao, playerDao, false);
         return game;
     }
 
@@ -49,7 +49,7 @@ public class GameFactory {
 
     private interface GameConstructor {
         Game instantiate(String id, LocalDateTime creationTime, String name,
-                GameDao gameDao, BoardDao boardDao, PlayerDao playerDao);
+                GameDao gameDao, BoardDao boardDao, PlayerDao playerDao, boolean newGame);
     }
 
 }
