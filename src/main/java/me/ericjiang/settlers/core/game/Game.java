@@ -196,7 +196,9 @@ public abstract class Game {
      * Bring a player up to speed
      */
     private void briefPlayer(Player player) {
-        player.update(new GameUpdate(getExpansion(),
+        player.update(new GameUpdate(id,
+                name,
+                getExpansion(),
                 getMinPlayers(),
                 getMaxPlayers(),
                 boardDao.getTiles(id),

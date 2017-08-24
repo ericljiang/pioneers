@@ -10,6 +10,10 @@ import me.ericjiang.settlers.core.game.Game.Phase;
 @SuppressWarnings("unused")
 public class GameUpdate extends Action {
 
+    private String gameId;
+
+    private String gameName;
+
     private String expansion;
 
     private int minPlayers;

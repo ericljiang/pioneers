@@ -47,6 +47,18 @@ function send(action) {
     webSocket.send(JSON.stringify(action));
 }
 
+var info = new Vue({
+    el: '#info',
+    data: {
+        gameId: null,
+        gameName: null,
+        expansion: null,
+        minPlayers: null,
+        maxPlayers: null,
+        visible: true
+    }
+});
+
 var players = new Vue({
     el: '#players',
     data: {
@@ -61,7 +73,8 @@ var players = new Vue({
             "orange": null,
             "green": null,
             "brown": null
-        }
+        },
+        visible: true
     },
     computed: {
         canJoin: function() {
@@ -92,7 +105,8 @@ var board = new Vue({
     data: {
         tiles: [],
         edges: [],
-        intersections: []
+        intersections: [],
+        visible: false
     },
     methods: {
         points: function(tile) {
@@ -129,6 +143,11 @@ function handleDisconnectAction(action) {
 }
 
 function handleGameUpdate(update) {
+    info.gameId = update.gameId;
+    info.gameName = update.gameName;
+    info.expansion = update.expansion;
+    info.minPlayers = update.minPlayers;
+    info.maxPlayers = update.maxPlayers;
     players.minPlayers = update.minPlayers;
     players.maxPlayers = update.maxPlayers;
     board.tiles = update.tiles;
@@ -156,4 +175,12 @@ function handleLeaveAction(action) {
         players.myColor = null;
     }
     console.log(playerName + " left " + color);
+}
+
+function handleStartAction(action) {
+    console.log("Hiding setup screen.");
+    info.visible = false;
+    players.visible = false;
+    console.log("Showing game screen.");
+    board.visible = true;
 }
