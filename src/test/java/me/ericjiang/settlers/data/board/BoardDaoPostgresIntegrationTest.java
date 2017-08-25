@@ -4,19 +4,19 @@ import static org.junit.Assert.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-
+import java.util.Collection;
 import me.ericjiang.settlers.core.board.Edge;
 import me.ericjiang.settlers.core.board.Intersection;
 import me.ericjiang.settlers.core.board.Tile;
 import me.ericjiang.settlers.core.board.Tile.Resource;
+import me.ericjiang.settlers.data.PostgresDaoIntegrationTestBase;
 import me.ericjiang.settlers.spark.Settlers;
-
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class BoardDaoPostgresIntegrationTest {
+import com.google.common.collect.Sets;
+
+public class BoardDaoPostgresIntegrationTest extends PostgresDaoIntegrationTestBase {
 
     private static BoardDao boardDao;
 
@@ -24,7 +24,6 @@ public class BoardDaoPostgresIntegrationTest {
     public static void beforeClass() throws SQLException {
         Connection connection = Settlers.getDatabaseConnection();
         boardDao = new BoardDaoPostgres(connection);
-        clearTables();
     }
 
     @Test
@@ -54,16 +53,8 @@ public class BoardDaoPostgresIntegrationTest {
         assertEquals(1, boardDao.getIntersections("0").size());
     }
 
-    @AfterClass
-    public static void afterClass() throws SQLException {
-        clearTables();
-    }
-
-    private static void clearTables() throws SQLException {
-        Connection connection = Settlers.getDatabaseConnection();
-        Statement statement = connection.createStatement();
-        statement.execute("DELETE FROM tile");
-        statement.execute("DELETE FROM road");
-        statement.execute("DELETE FROM settlement");
+    @Override
+    public Collection<String> relevantTables() {
+        return Sets.newHashSet("tile", "road", "settlement");
     }
 }
