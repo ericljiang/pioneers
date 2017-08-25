@@ -17,7 +17,7 @@
 
   <div id="players" v-if="visible" v-cloak>
     <h1>Players</h1>
-    <h2 id="playerCount" th:text="|{{ count }}/${maxPlayers}|">2/3</h2>
+    <h2 id="playerCount">{{ count }}/{{ maxPlayers }}</h2>
 
     <ul id="playerList">
       <li v-for="color in Object.keys(slots)" v-bind:id="color">
