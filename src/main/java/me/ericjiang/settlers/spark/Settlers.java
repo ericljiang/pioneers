@@ -7,11 +7,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.game.Game;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.board.BoardDaoPostgres;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -23,8 +20,10 @@ import me.ericjiang.settlers.spark.auth.GoogleAuthenticator;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
+import spark.Spark;
 import spark.TemplateEngine;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
+import spark.utils.IOUtils;
 
 @Slf4j
 @AllArgsConstructor
@@ -102,21 +101,7 @@ public class Settlers {
             return "303 See Other";
         });
         get("/play", (req, res) -> {
-            String gameId = req.queryParams("g");
-            String playerId = req.queryParams("u");
-            Game game = gameDao.getGame(gameId);
-            Map<String, Object> model = new HashMap<String, Object>();
-            model.put("gameName", game.getName());
-            model.put("gameId", gameId);
-            model.put("expansion", game.getExpansion());
-            model.put("maxPlayers", game.getMaxPlayers());
-            model.put("minPlayers", game.getMinPlayers());
-            model.put("playerId", playerId);
-            model.put("players", game.connectedPlayers().stream()
-                    .map(p -> playerDao.getName(p))
-                    .collect(Collectors.toList()));
-            log.info("Rendering template play.html");
-            return templateEngine.render(new ModelAndView(model, "play"));
+            return IOUtils.toString(Spark.class.getResourceAsStream("/public/play.html"));
         });
 
         redirect.get("/", "/lobby");

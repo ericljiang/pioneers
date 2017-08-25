@@ -2,24 +2,32 @@ package me.ericjiang.settlers.data.player;
 
 import static org.junit.Assert.*;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import me.ericjiang.settlers.core.game.Game.Color;
+import me.ericjiang.settlers.data.PostgresDaoIntegrationTestBase;
 import me.ericjiang.settlers.data.player.PlayerDao;
 import me.ericjiang.settlers.data.player.PlayerDaoPostgres;
 import me.ericjiang.settlers.spark.Settlers;
 import me.ericjiang.settlers.util.ShortUUID;
 
-public class PlayerDaoPostgresIntegrationTest {
+public class PlayerDaoPostgresIntegrationTest extends PostgresDaoIntegrationTestBase {
 
     private static PlayerDao playerDao;
 
     @BeforeClass
     public static void beforeClass() throws SQLException {
-        playerDao = new PlayerDaoPostgres(Settlers.getDatabaseConnection());
+        Connection connection = Settlers.getDatabaseConnection();
+        playerDao = new PlayerDaoPostgres(connection);
     }
 
     @Test
@@ -48,20 +56,31 @@ public class PlayerDaoPostgresIntegrationTest {
                 ShortUUID.randomUUID().toString(),
                 ShortUUID.randomUUID().toString(),
                 ShortUUID.randomUUID().toString());
-        players.forEach(playerId -> playerDao.addPlayerToGame(gameId, playerId));
-        List<String> retrieved = playerDao.playersForGame(gameId);
-        players.forEach(playerId -> assertTrue(retrieved.contains(playerId)));
+        List<Color> colors = Lists.newArrayList(Color.BLUE, Color.BROWN, Color.GREEN);
+        for (int i = 0; i < 3; i++) {
+            playerDao.addPlayerToGame(gameId, players.get(i), colors.get(i), i);
+        }
+        Map<Color, String> retrieved = playerDao.playersForGame(gameId);
+        players.forEach(playerId -> assertTrue(retrieved.containsValue(playerId)));
     }
 
     @Test
-    public void shouldRetrievePlayersInOrderStored() {
+    public void shouldRetrievePlayersInSequenceOrder() {
         String gameId = ShortUUID.randomUUID().toString();
         List<String> players = Lists.newArrayList(
                 ShortUUID.randomUUID().toString(),
                 ShortUUID.randomUUID().toString(),
                 ShortUUID.randomUUID().toString());
-        players.forEach(playerId -> playerDao.addPlayerToGame(gameId, playerId));
-        assertEquals(players, playerDao.playersForGame(gameId));
+        List<Color> colors = Lists.newArrayList(Color.BLUE, Color.BROWN, Color.GREEN);
+        for (int i = 0; i < 3; i++) {
+            playerDao.addPlayerToGame(gameId, players.get(i), colors.get(i), i);
+        }
+        assertEquals(Sets.newLinkedHashSet(players), Sets.newLinkedHashSet(playerDao.playersForGame(gameId).values()));
+    }
+
+    @Override
+    public Collection<String> relevantTables() {
+        return Sets.newHashSet("player");
     }
 
 }

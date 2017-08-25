@@ -1,4 +1,7 @@
+///////////////////////////////////////////////////////////////////////////////
 // Establish the WebSocket connection and set up event handlers
+///////////////////////////////////////////////////////////////////////////////
+
 var protocol;
 if (window.location.protocol == "https:") {
     protocol = "wss:"
@@ -43,6 +46,26 @@ function heartbeat() {
     }
 }
 
+function send(action) {
+    webSocket.send(JSON.stringify(action));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Vue apps
+///////////////////////////////////////////////////////////////////////////////
+
+var info = new Vue({
+    el: '#info',
+    data: {
+        gameId: null,
+        gameName: null,
+        expansion: null,
+        minPlayers: null,
+        maxPlayers: null,
+        visible: true
+    }
+});
+
 var players = new Vue({
     el: '#players',
     data: {
@@ -57,24 +80,29 @@ var players = new Vue({
             "orange": null,
             "green": null,
             "brown": null
-        }
+        },
+        visible: true
     },
     computed: {
         canJoin: function() {
             return this.myColor == null && this.count < this.maxPlayers;
+        },
+        canStart: function() {
+            return this.count >= this.minPlayers;
         }
     },
     methods: {
-        join: function(color) {
-            var action = new JoinAction(color);
-            webSocket.send(JSON.stringify(action));
-        },
-        leave: function(color) {
-            var action = new LeaveAction(color);
-            webSocket.send(JSON.stringify(action));
-        },
         empty: function(color) {
             return this.slots[color] == null;
+        },
+        join: function(color) {
+            send(new JoinAction(color));
+        },
+        leave: function(color) {
+            send(new LeaveAction(color));
+        },
+        start: function() {
+            send(new StartAction());
         }
     }
 });
@@ -84,7 +112,8 @@ var board = new Vue({
     data: {
         tiles: [],
         edges: [],
-        intersections: []
+        intersections: [],
+        visible: false
     },
     methods: {
         points: function(tile) {
@@ -95,6 +124,10 @@ var board = new Vue({
         }
     }
 });
+
+///////////////////////////////////////////////////////////////////////////////
+// Action handlers
+///////////////////////////////////////////////////////////////////////////////
 
 function handle(action) {
     var parser = "handle" + action.type;
@@ -117,6 +150,11 @@ function handleDisconnectAction(action) {
 }
 
 function handleGameUpdate(update) {
+    info.gameId = update.gameId;
+    info.gameName = update.gameName;
+    info.expansion = update.expansion;
+    info.minPlayers = update.minPlayers;
+    info.maxPlayers = update.maxPlayers;
     players.minPlayers = update.minPlayers;
     players.maxPlayers = update.maxPlayers;
     board.tiles = update.tiles;
@@ -144,4 +182,12 @@ function handleLeaveAction(action) {
         players.myColor = null;
     }
     console.log(playerName + " left " + color);
+}
+
+function handleStartAction(action) {
+    console.log("Hiding setup screen.");
+    info.visible = false;
+    players.visible = false;
+    console.log("Showing game screen.");
+    board.visible = true;
 }

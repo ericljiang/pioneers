@@ -7,17 +7,18 @@
 </head>
 
 <body>
-  <div>
-    <h1 th:text="${gameName}">Game name</h1>
-    <h2 th:text="${gameId}">12345abcde</h2>
+  <div id="info" v-if="visible" v-cloak>
+    <h1>{{ gameName }}</h1>
+    <h2>{{ gameId }}</h2>
     <p>Created by player</p>
-    <p th:text="|${expansion} game|">Base game</p>
-    <p th:text="|${minPlayers}-${maxPlayers} players|">3-4 players</p>
+    <p>{{ expansion }} game</p>
+    <p>{{ minPlayers }}-{{ maxPlayers }} players</p>
   </div>
 
-  <div id="players" v-cloak>
+  <div id="players" v-if="visible" v-cloak>
     <h1>Players</h1>
-    <h2 id="playerCount" th:text="|{{ count }}/${maxPlayers}|">2/3</h2>
+    <h2 id="playerCount">{{ count }}/{{ maxPlayers }}</h2>
+
     <ul id="playerList">
       <li v-for="color in Object.keys(slots)" v-bind:id="color">
         {{ slots[color] }}
@@ -31,13 +32,11 @@
         </transition>
       </li>
     </ul>
+
+    <button id="startButton" v-on:click="start()" v-bind:disabled="!canStart">Start</button>
   </div>
 
-  <div>
-    <button id="startButton" disabled="disabled">Start</button>
-  </div>
-
-  <div id="board">
+  <div id="board" v-if="visible">
     <svg width="500" height="440">
       <g transform="translate(250, 220) scale(50)">
         <g v-for="tile in tiles" class="tile" v-bind:data-resource="tile.resource.toLowerCase()">

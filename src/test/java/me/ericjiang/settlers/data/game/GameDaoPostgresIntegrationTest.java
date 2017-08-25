@@ -2,27 +2,32 @@ package me.ericjiang.settlers.data.game;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
+import com.google.common.collect.Sets;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import me.ericjiang.settlers.core.actions.Action;
 import me.ericjiang.settlers.core.game.Game;
 import me.ericjiang.settlers.core.game.GameFactory;
+import me.ericjiang.settlers.core.game.Game.Color;
+import me.ericjiang.settlers.core.game.Game.Phase;
 import me.ericjiang.settlers.core.player.Player;
+import me.ericjiang.settlers.data.PostgresDaoIntegrationTestBase;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.board.BoardDaoInMemory;
 import me.ericjiang.settlers.data.player.PlayerDao;
 import me.ericjiang.settlers.data.player.PlayerDaoPostgres;
 import me.ericjiang.settlers.spark.Settlers;
 
-public class GameDaoPostgresIntegrationTest {
+public class GameDaoPostgresIntegrationTest extends PostgresDaoIntegrationTestBase {
 
-    private GameDao gameDao;
+    private static GameDao gameDao;
 
-    @Before
-    public void before() throws SQLException {
+    @BeforeClass
+    public static void beforeClass() throws SQLException {
         Connection connection = Settlers.getDatabaseConnection();
         BoardDao boardDao = new BoardDaoInMemory();
         PlayerDao playerDao = new PlayerDaoPostgres(connection);
@@ -70,5 +75,24 @@ public class GameDaoPostgresIntegrationTest {
         olderGame.disconnectPlayer(player);
         Game mostRecent = gameDao.openGamesWithoutPlayer(player.id()).get(0);
         assertEquals(newerGame, mostRecent);
+    }
+
+    @Test
+    public void shouldStorePhase() {
+        Game game = gameDao.createGame("foo", GameFactory.BASE);
+        gameDao.setPhase(game.getId(), Phase.TRADE);
+        assertEquals(Phase.TRADE, gameDao.getPhase(game.getId()));
+    }
+
+    @Test
+    public void shouldStoreActivePlayer() {
+        Game game = gameDao.createGame("foo", GameFactory.BASE);
+        gameDao.setActivePlayer(game.getId(), Color.BLUE);
+        assertEquals(Color.BLUE, gameDao.getActivePlayer(game.getId()));
+    }
+
+    @Override
+    public Collection<String> relevantTables() {
+        return Sets.newHashSet("game");
     }
 }
