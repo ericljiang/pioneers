@@ -25,7 +25,7 @@ public class WebSocketHandler {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        log.info("Session connected to websocket.");
+        log.info("Session connected to WebSocket.");
         WebSocketPlayer player = new WebSocketPlayer(session);
         String gameId = getGameId(session);
         Game game = gameDao.getGame(gameId);
@@ -47,7 +47,7 @@ public class WebSocketHandler {
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        log.debug("Session disconnected from websocket: " + statusCode + ":" + reason);
+        log.debug("Session disconnected from WebSocket: " + statusCode + ":" + reason);
         WebSocketPlayer player = new WebSocketPlayer(session);
         String gameId = getGameId(session);
         Game game = gameDao.getGame(gameId);
