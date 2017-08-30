@@ -6,8 +6,8 @@ import me.ericjiang.settlers.core.board.Tile;
 import me.ericjiang.settlers.core.game.Game.Color;
 import me.ericjiang.settlers.core.game.Game.Phase;
 
-@AllArgsConstructor
 @SuppressWarnings("unused")
+@AllArgsConstructor
 public class GameUpdate extends Action {
 
     private String gameId;

@@ -1,10 +1,9 @@
 package me.ericjiang.settlers.core.actions;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class DisconnectAction extends Action {
 
     private String playerId;

@@ -191,3 +191,9 @@ function handleStartAction(action) {
     console.log("Showing game screen.");
     board.visible = true;
 }
+
+function handlePhaseUpdate(action) {
+    phase = action.phase;
+    activePlayer = action.activePlayer;
+    console.log("Phase set to " + phase + " for " + activePlayer);
+}

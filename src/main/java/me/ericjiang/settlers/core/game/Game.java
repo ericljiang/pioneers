@@ -4,13 +4,13 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.PeekingIterator;
 import com.google.gson.annotations.SerializedName;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +21,7 @@ import me.ericjiang.settlers.core.actions.DisconnectAction;
 import me.ericjiang.settlers.core.actions.GameUpdate;
 import me.ericjiang.settlers.core.actions.JoinAction;
 import me.ericjiang.settlers.core.actions.LeaveAction;
+import me.ericjiang.settlers.core.actions.PhaseUpdate;
 import me.ericjiang.settlers.core.actions.StartAction;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
@@ -52,7 +53,7 @@ public abstract class Game {
     /**
      * Sequence of play. Determined on game start.
      */
-    private transient Iterator<Color> playerSequence;
+    private transient PeekingIterator<Color> playerSequence;
 
     /**
      * Maps playerIds to their connections
@@ -88,7 +89,7 @@ public abstract class Game {
             } else {
                 Map<Color, String> players = playerDao.playersForGame(id);
                 playerSlots = ImmutableBiMap.copyOf(players);
-                playerSequence = Iterators.cycle(players.keySet());
+                playerSequence = Iterators.peekingIterator(Iterators.unmodifiableIterator(Iterators.cycle(players.keySet())));
                 while (playerSequence.next() != gameDao.getActivePlayer(id)) {
                     // advance iterator
                 }
@@ -185,6 +186,23 @@ public abstract class Game {
     // End of Action handlers
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private void start() {
+        // add players to game and assign position
+        playerSlots = ImmutableBiMap.copyOf(playerSlots);
+        int position = 0;
+        List<Color> colors = new ArrayList<Color>(playerSlots.keySet());
+        Collections.shuffle(colors);
+        playerSequence = Iterators.peekingIterator(Iterators.unmodifiableIterator(Iterators.cycle(colors)));
+        for (Color color : colors) {
+            String playerId = playerSlots.get(color);
+            playerDao.addPlayerToGame(id, playerId, color, position);
+            position++;
+        }
+
+        // exit setup phase
+        changePhase(Phase.ROLL, false);
+    }
+
     private void broadcast(Action action) {
         log.info("Broadcasting action " + action.getId());
         for (Player player : playerConnections.values()) {
@@ -213,22 +231,12 @@ public abstract class Game {
         });
     }
 
-    private void start() {
-        // add players to game and assign position
-        playerSlots = ImmutableBiMap.copyOf(playerSlots);
-        int position = 0;
-        List<Color> colors = new ArrayList<Color>(playerSlots.keySet());
-        Collections.shuffle(colors);
-        playerSequence = Iterators.cycle(Collections.unmodifiableCollection(colors));
-        for (Color color : colors) {
-            String playerId = playerSlots.get(color);
-            playerDao.addPlayerToGame(id, playerId, color, position);
-            position++;
+    private void changePhase(Phase phase, boolean nextTurn) {
+        gameDao.setPhase(id, phase);
+        if (nextTurn) {
+            gameDao.setActivePlayer(id, playerSequence.next());
         }
-
-        // exit setup phase
-        gameDao.setPhase(id, Phase.ROLL);
-        gameDao.setActivePlayer(id, playerSequence.next());
+        broadcast(new PhaseUpdate(phase, playerSequence.peek()));
     }
 
     public enum Phase {
