@@ -43,6 +43,7 @@ public class BaseGameTest extends EasyMockSupport {
         expect(gameDao.getPhase("0")).andStubReturn(Phase.SETUP);
         expect(gameDao.getActivePlayer(anyString())).andStubReturn(Color.RED);
         gameDao.setPhase("0", Phase.INITIAL_PLACEMENT);
+        gameDao.setActivePlayer(eq("0"), anyObject());
         replayAll();
 
         game.connectPlayer(player);
