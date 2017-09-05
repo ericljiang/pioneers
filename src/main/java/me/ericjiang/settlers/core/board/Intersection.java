@@ -1,5 +1,7 @@
 package me.ericjiang.settlers.core.board;
 
+import com.google.gson.annotations.SerializedName;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,6 +24,18 @@ public class Intersection {
         private int row;
         private Direction direction;
 
-        public static enum Direction { L, R }
+        public static enum Direction {
+            @SerializedName("n") N,
+            @SerializedName("s") S;
+
+            @Override
+            public String toString() {
+                return name().toLowerCase();
+            }
+
+            public static Direction fromString(String string) {
+                return valueOf(string.toUpperCase());
+            }
+        }
     }
 }

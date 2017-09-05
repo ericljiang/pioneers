@@ -20,6 +20,6 @@ public class Edge {
         private int row;
         private Direction direction;
 
-        public static enum Direction { W, N, E }
+        public static enum Direction { NE, E, SE }
     }
 }

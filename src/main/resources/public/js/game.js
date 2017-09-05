@@ -121,6 +121,9 @@ var board = new Vue({
             var h = Hex(tile.coordinates.row, tile.coordinates.column);
             var corners = polygon_corners(layout, h);
             return corners.map(function(p) { return p.x + "," + p.y; }).join(" ");
+        },
+        buildSettlement: function(column, row, direction) {
+            send(new BuildSettlementAction(column, row, direction));
         }
     }
 });
@@ -196,4 +199,8 @@ function handlePhaseUpdate(action) {
     phase = action.phase;
     activePlayer = action.activePlayer;
     console.log("Phase set to " + phase + " for " + activePlayer);
+}
+
+function handleBuildSettlementAction(action) {
+    console.log("build settlement");
 }

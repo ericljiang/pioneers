@@ -27,3 +27,12 @@ class StartAction extends Action {
         super();
     }
 }
+
+class BuildSettlementAction extends Action {
+    constructor(column, row, direction) {
+        super();
+        this.column = column;
+        this.row = row;
+        this.direction = direction;
+    }
+}
