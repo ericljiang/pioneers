@@ -207,7 +207,9 @@ public abstract class Game {
      * @param validPhases - phases in which the action is valid
      */
     protected void validatePhase(Phase... validPhases) {
-        Arrays.stream(validPhases).anyMatch(v -> v == gameDao.getPhase(id));
+        if (Arrays.stream(validPhases).anyMatch(v -> v == gameDao.getPhase(id))) {
+            throw new InvalidActionException();
+        }
     }
 
     protected void changePhase(Phase phase, boolean nextTurn) {
