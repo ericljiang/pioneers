@@ -5,7 +5,8 @@ import static spark.Spark.*;
 public class Settlers {
 
     public Settlers() {
-        get("/", (req, res) -> new Settlers().getGreeting());
+        staticFiles.location("/public");
+        init();
     }
 
     public String getGreeting() {

@@ -31,3 +31,10 @@ dependencies {
 // Define the main class for the application
 mainClassName = 'me.ericjiang.settlers.Settlers'
 
+task copyClient(type: Copy) {
+    from 'src/main/react/client/build'
+    into 'build/resources/main/public'
+}
+
+build.finalizedBy(copyClient)
+
