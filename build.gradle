@@ -6,6 +6,10 @@
  * user guide available at https://docs.gradle.org/4.3/userguide/tutorial_java_projects.html
  */
 
+plugins {
+  id "com.moowork.node" version "1.2.0"
+}
+
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 
@@ -28,6 +32,17 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+node {
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.projectDir}/src/main/react/client")
+
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}/src/main/react/client/node_modules")
+}
+
 // Define the main class for the application
 mainClassName = 'me.ericjiang.settlers.Settlers'
 
@@ -36,5 +51,6 @@ task copyClient(type: Copy) {
     into 'build/resources/main/public'
 }
 
+build.dependsOn(npm_run_build)
 build.finalizedBy(copyClient)
 
