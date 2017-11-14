@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.ericjiang.settlers;
+package me.ericjiang.settlers.utility;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

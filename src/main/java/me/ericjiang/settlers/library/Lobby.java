@@ -1,4 +1,4 @@
-package me.ericjiang.settlers;
+package me.ericjiang.settlers.library;
 
 import java.util.Collection;
 import java.util.Map;
