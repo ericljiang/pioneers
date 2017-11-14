@@ -4,6 +4,12 @@ import './App.css';
 import getGreeting from './settlersClient.js';
 
 class App extends Component {
+  constructor() {
+    super();
+    var ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=1");
+    ws.onmessage = m => console.log(m);
+    this.state = { ws: ws }
+  }
   render() {
     return (
       <div className="App">
