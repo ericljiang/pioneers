@@ -18,7 +18,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 @WebSocket
 public abstract class MultiplayerModuleWebSocketRouter {
 
-    private Gson gson;
+    private final Gson gson;
 
     public MultiplayerModuleWebSocketRouter() {
         RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class);

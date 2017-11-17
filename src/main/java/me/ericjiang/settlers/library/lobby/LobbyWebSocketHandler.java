@@ -9,14 +9,13 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import com.google.common.collect.Lists;
 
+import lombok.AllArgsConstructor;
+
 @WebSocket
+@AllArgsConstructor
 public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
 
-    private Lobby lobby;
-
-    public LobbyWebSocketHandler(Lobby lobby) {
-        this.lobby = lobby;
-    }
+    private final Lobby lobby;
 
     @Override
     protected Lobby getModule(Session session) {

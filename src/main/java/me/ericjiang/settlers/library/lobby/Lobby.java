@@ -9,9 +9,9 @@ import com.google.common.collect.Maps;
 
 public class Lobby extends  MultiplayerModule {
 
-    private Map<String, Game> games;
+    private final Map<String, Game> games;
 
-    private Map<String, Player> players;
+    private final Map<String, Player> players;
 
     public Lobby() {
         games = Maps.newConcurrentMap();

@@ -8,13 +8,12 @@ import org.eclipse.jetty.websocket.api.StatusCode;
 
 import com.google.gson.Gson;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class WebSocketPlayer implements Player {
 
-    private Session session;
-
-    public WebSocketPlayer(Session session) {
-        this.session = session;
-    }
+    private final Session session;
 
     @Override
     public void transmit(Event event) {

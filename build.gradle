@@ -7,7 +7,8 @@
  */
 
 plugins {
-  id "com.moowork.node" version "1.2.0"
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id "com.moowork.node" version "1.2.0"
 }
 
 // Apply the java plugin to add support for Java
@@ -31,6 +32,11 @@ dependencies {
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
+}
+
+lombok {
+    version = "1.16.18"
+    sha256 = ""
 }
 
 node {
