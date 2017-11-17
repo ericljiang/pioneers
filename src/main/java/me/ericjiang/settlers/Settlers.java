@@ -3,9 +3,9 @@ package me.ericjiang.settlers;
 import static spark.Spark.*;
 
 import com.google.gson.Gson;
-import me.ericjiang.settlers.library.Lobby;
+import me.ericjiang.settlers.library.lobby.Lobby;
+import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
 import me.ericjiang.settlers.library.websockets.GameWebSocketRouter;
-import me.ericjiang.settlers.library.websockets.LobbyWebSocketHandler;
 
 public class Settlers {
 

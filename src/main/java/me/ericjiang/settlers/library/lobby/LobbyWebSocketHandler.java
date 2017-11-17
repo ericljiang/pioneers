@@ -1,8 +1,9 @@
-package me.ericjiang.settlers.library.websockets;
+package me.ericjiang.settlers.library.lobby;
 
 import java.util.List;
 import me.ericjiang.settlers.library.Event;
-import me.ericjiang.settlers.library.Lobby;
+import me.ericjiang.settlers.library.lobby.Lobby;
+import me.ericjiang.settlers.library.websockets.MultiplayerModuleWebSocketRouter;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 

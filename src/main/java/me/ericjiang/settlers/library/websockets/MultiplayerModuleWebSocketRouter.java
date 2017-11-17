@@ -30,6 +30,9 @@ public abstract class MultiplayerModuleWebSocketRouter {
 
     protected abstract MultiplayerModule getModule(Session session);
 
+    /**
+     * @return a list of valid Event type classes for this module
+     */
     protected abstract List<Class<Event>> getEventTypes();
 
     @OnWebSocketConnect

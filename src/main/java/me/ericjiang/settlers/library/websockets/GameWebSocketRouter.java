@@ -3,7 +3,7 @@ package me.ericjiang.settlers.library.websockets;
 import java.util.List;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.Game;
-import me.ericjiang.settlers.library.Lobby;
+import me.ericjiang.settlers.library.lobby.Lobby;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 

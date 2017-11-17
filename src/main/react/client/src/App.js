@@ -4,12 +4,6 @@ import './App.css';
 import getGreeting from './settlersClient.js';
 
 class App extends Component {
-  constructor() {
-    super();
-    var ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=1");
-    ws.onmessage = m => console.log(m);
-    this.state = { ws: ws }
-  }
   render() {
     return (
       <div className="App">
@@ -21,6 +15,7 @@ class App extends Component {
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
         <Message />
+        <Lobby />
       </div>
     );
   }
@@ -40,6 +35,32 @@ class Message extends Component {
   render() {
     return (
       <p>{this.state.message}</p>
+    );
+  }
+}
+
+class Lobby extends Component {
+  constructor() {
+    super();
+    this.state = { games: [] };
+  }
+
+  componentWillMount() {
+    var ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=1");
+    ws.onmessage = m => {
+      var data = JSON.parse(m.data);
+      console.log(data);
+      this.setState({ games: data.games });
+    };
+  }
+
+  render() {
+    return (
+      <div>
+        {this.state.games.map((game, index) =>
+          <p>{game.name}</p>
+        )}
+      </div>
     );
   }
 }
