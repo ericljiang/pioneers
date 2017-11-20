@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModule;
-import me.ericjiang.settlers.utility.RuntimeTypeAdapterFactory;
+import me.ericjiang.settlers.library.utility.RuntimeTypeAdapterFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
