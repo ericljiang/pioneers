@@ -3,10 +3,11 @@ package me.ericjiang.settlers;
 import static spark.Spark.*;
 
 import com.google.gson.Gson;
+import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.lobby.Lobby;
 import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
 import me.ericjiang.settlers.library.websockets.GameWebSocketRouter;
-import me.ericjiang.settlers.simple.SimpleGame;
+import me.ericjiang.settlers.simple.SimpleGameFactory;
 
 public class Settlers {
 
@@ -25,8 +26,8 @@ public class Settlers {
 
     public static void main(String[] args) {
         Gson gson = new Gson();
-        Lobby lobby = new Lobby();
-        lobby.add(new SimpleGame("yeah"));
+        GameFactory gameFactory = new SimpleGameFactory();
+        Lobby lobby = new Lobby(gameFactory);
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);
 

@@ -23,7 +23,7 @@ public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
     }
 
     @Override
-    protected List<Class<Event>> getEventTypes() {
-        return Lists.newArrayList();
+    protected List<Class<? extends Event>> getEventTypes() {
+        return Lists.newArrayList(GameCreationEvent.class);
     }
 }

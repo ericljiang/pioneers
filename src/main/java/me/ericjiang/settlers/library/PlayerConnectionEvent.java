@@ -1,11 +1,9 @@
 package me.ericjiang.settlers.library;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
 @AllArgsConstructor
 public class PlayerConnectionEvent extends Event {
 

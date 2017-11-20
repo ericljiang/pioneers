@@ -52,6 +52,14 @@ class Lobby extends Component {
       console.log(data);
       this.setState({ games: data.games });
     };
+    ws.onopen = function() {
+      ws.send(JSON.stringify({
+        type: "GameCreationEvent",
+        attributes: {
+          name: "foo"
+        }
+      }));
+    };
   }
 
   render() {

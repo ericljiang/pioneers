@@ -3,6 +3,7 @@ package me.ericjiang.settlers.library.lobby;
 import java.util.Collection;
 import java.util.Map;
 import me.ericjiang.settlers.library.Game;
+import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.PlayerConnectionEvent;
 
@@ -10,10 +11,13 @@ import com.google.common.collect.Maps;
 
 public class Lobby extends MultiplayerModule {
 
+    private final GameFactory gameFactory;
+
     private final Map<String, Game> games;
 
-    public Lobby() {
-        games = Maps.newConcurrentMap();
+    public Lobby(GameFactory gameFactory) {
+        this.gameFactory = gameFactory;
+        this.games = Maps.newConcurrentMap();
         setEventHandlers();
     }
 
@@ -25,13 +29,16 @@ public class Lobby extends MultiplayerModule {
         return games.values();
     }
 
-    public void add(Game game) {
+    private void add(Game game) {
         games.put("1", game);
     }
 
     private void setEventHandlers() {
         on(PlayerConnectionEvent.class, e -> {
             transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
+        });
+        on(GameCreationEvent.class, e -> {
+            add(gameFactory.createGame(e.getAttributes()));
         });
     }
 }
