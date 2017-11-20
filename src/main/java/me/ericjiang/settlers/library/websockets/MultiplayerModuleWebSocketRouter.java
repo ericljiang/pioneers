@@ -40,7 +40,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
         try {
             String playerId = getQueryParameterString(session, "playerId");
             MultiplayerModule module = getModule(session);
-            module.onConnect(playerId, new WebSocketPlayer(session));
+            module.connect(playerId, new WebSocketPlayer(session));
         } catch (IllegalArgumentException e) {
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
         }
@@ -49,8 +49,8 @@ public abstract class MultiplayerModuleWebSocketRouter {
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
         String playerId = getQueryParameterString(session, "playerId");
-        MultiplayerModule target = getModule(session);
-        target.onDisconnect(playerId);
+        MultiplayerModule module = getModule(session);
+        module.disconnect(playerId);
     }
 
     @OnWebSocketMessage

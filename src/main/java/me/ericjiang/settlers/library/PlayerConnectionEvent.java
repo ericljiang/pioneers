@@ -7,10 +7,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public abstract class Game extends MultiplayerModule {
+public class PlayerConnectionEvent extends Event {
 
-    private final String name;
-
-    public abstract GameSummary summarize();
+    private final String playerId;
 
 }

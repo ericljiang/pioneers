@@ -1,23 +1,47 @@
 package me.ericjiang.settlers.library;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public abstract class MultiplayerModule {
 
-    private static final Multimap<Class<? extends Event>, Consumer> EVENT_HANDLERS = HashMultimap.create();
+    private final Map<String, Player> players;
 
-    public abstract void onConnect(String playerId, Player player);
+    @SuppressWarnings("rawtypes")
+    private final Multimap<Class<? extends Event>, Consumer> eventHandlers;
 
-    public abstract void onDisconnect(String playerId);
+    public MultiplayerModule() {
+        players = Maps.newConcurrentMap();
+        eventHandlers = HashMultimap.create();
+    }
 
+    public void connect(String playerId, Player player) {
+        players.put(playerId, player);
+        handleEvent(new PlayerConnectionEvent(playerId));
+    }
+
+    public void disconnect(String playerId) {
+        players.remove(playerId);
+    }
+
+    public void transmit(String playerId, Event event) {
+        players.get(playerId).transmit(event);
+    }
+
+    public void broadcast(Event event) {
+        players.values().forEach(p -> p.transmit(event));
+    }
+
+    @SuppressWarnings("unchecked")
     public <T extends Event> void handleEvent(T event) {
-        EVENT_HANDLERS.get(event.getClass())
+        eventHandlers.get(event.getClass())
                 .forEach(handler -> handler.accept(event));
     }
 
-    protected static <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
-        EVENT_HANDLERS.put(eventType, consumer);
+    protected <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
+        eventHandlers.put(eventType, consumer);
     }
 }

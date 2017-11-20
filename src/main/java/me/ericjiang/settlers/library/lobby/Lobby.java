@@ -4,41 +4,17 @@ import java.util.Collection;
 import java.util.Map;
 import me.ericjiang.settlers.library.Game;
 import me.ericjiang.settlers.library.MultiplayerModule;
-import me.ericjiang.settlers.library.Player;
+import me.ericjiang.settlers.library.PlayerConnectionEvent;
+
 import com.google.common.collect.Maps;
 
-public class Lobby extends  MultiplayerModule {
+public class Lobby extends MultiplayerModule {
 
     private final Map<String, Game> games;
 
-    private final Map<String, Player> players;
-
     public Lobby() {
         games = Maps.newConcurrentMap();
-        players = Maps.newConcurrentMap();
-        games.put("1", new Game("yeah") {
-
-            @Override
-            public void onDisconnect(String playerId) {
-
-            }
-
-            @Override
-            public void onConnect(String playerId, Player player) {
-
-            }
-        });
-    }
-
-    @Override
-    public void onConnect(String playerId, Player player) {
-        players.put(playerId, player);
-        player.transmit(new LobbyUpdateEvent(this));
-    }
-
-    @Override
-    public void onDisconnect(String playerId) {
-        players.remove(playerId);
+        setEventHandlers();
     }
 
     public Game getGame(String gameId) {
@@ -47,5 +23,15 @@ public class Lobby extends  MultiplayerModule {
 
     public Collection<Game> getAllGames() {
         return games.values();
+    }
+
+    public void add(Game game) {
+        games.put("1", game);
+    }
+
+    private void setEventHandlers() {
+        on(PlayerConnectionEvent.class, e -> {
+            transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
+        });
     }
 }

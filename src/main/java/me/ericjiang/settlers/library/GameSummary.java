@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @SuppressWarnings("unused")
-public class GameSummary {
+public abstract class GameSummary {
 
     private final String name;
 

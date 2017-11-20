@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import me.ericjiang.settlers.library.lobby.Lobby;
 import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
 import me.ericjiang.settlers.library.websockets.GameWebSocketRouter;
+import me.ericjiang.settlers.simple.SimpleGame;
 
 public class Settlers {
 
@@ -25,6 +26,7 @@ public class Settlers {
     public static void main(String[] args) {
         Gson gson = new Gson();
         Lobby lobby = new Lobby();
+        lobby.add(new SimpleGame("yeah"));
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);
 
