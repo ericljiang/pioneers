@@ -25,6 +25,7 @@ public abstract class MultiplayerModule {
 
     public void disconnect(String playerId) {
         players.remove(playerId);
+        handleEvent(new PlayerDisconnectionEvent(playerId));
     }
 
     public void transmit(String playerId, Event event) {
@@ -41,7 +42,7 @@ public abstract class MultiplayerModule {
                 .forEach(handler -> handler.accept(event));
     }
 
-    protected <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
+    public <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
         eventHandlers.put(eventType, consumer);
     }
 }

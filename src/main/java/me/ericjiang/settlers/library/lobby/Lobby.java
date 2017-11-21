@@ -1,11 +1,13 @@
 package me.ericjiang.settlers.library.lobby;
 
-import java.util.Collection;
 import java.util.Map;
+
+import lombok.Getter;
 import me.ericjiang.settlers.library.Game;
 import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.PlayerConnectionEvent;
+import me.ericjiang.settlers.library.PlayerDisconnectionEvent;
 import me.ericjiang.settlers.library.data.GameDao;
 
 public class Lobby extends MultiplayerModule {
@@ -14,6 +16,7 @@ public class Lobby extends MultiplayerModule {
 
     private final GameDao gameDao;
 
+    @Getter
     private final Map<String, Game> games;
 
     public Lobby(GameFactory gameFactory, GameDao gameDao) {
@@ -27,15 +30,6 @@ public class Lobby extends MultiplayerModule {
         return games.get(gameId);
     }
 
-    public Collection<Game> getAllGames() {
-        return games.values();
-    }
-
-    private void add(Game game) {
-        games.put(gameDao.getNewId(), game);
-        broadcast(new LobbyUpdateEvent(this));
-    }
-
     private void setEventHandlers() {
         on(PlayerConnectionEvent.class, e -> {
             transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
@@ -43,5 +37,16 @@ public class Lobby extends MultiplayerModule {
         on(GameCreationEvent.class, e -> {
             add(gameFactory.createGame(e.getAttributes()));
         });
+    }
+
+    private void add(Game game) {
+        game.on(PlayerConnectionEvent.class, e -> broadcastState());
+        game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
+        games.put(gameDao.getNewId(), game);
+        broadcastState();
+    }
+
+    private void broadcastState() {
+        broadcast(new LobbyUpdateEvent(this));
     }
 }

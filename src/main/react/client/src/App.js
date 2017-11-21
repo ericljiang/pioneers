@@ -44,7 +44,7 @@ class Lobby extends Component {
   constructor() {
     super();
     this.createGame = this.createGame.bind(this);
-    this.state = { games: [] };
+    this.state = { games: {} };
   }
 
   componentWillMount() {
@@ -58,8 +58,8 @@ class Lobby extends Component {
   render() {
     return (
       <div>
-        {this.state.games.map((game, index) =>
-          <p>{game.name}</p>
+        {Object.entries(this.state.games).map(gameEntry =>
+          <p>{gameEntry[0]} {gameEntry[1].name}</p>
         )}
         <button onClick={this.createGame}>Create game</button>
       </div>
