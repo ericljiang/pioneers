@@ -6,21 +6,20 @@ import me.ericjiang.settlers.library.Game;
 import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.PlayerConnectionEvent;
-
-import com.google.common.collect.Maps;
+import me.ericjiang.settlers.library.data.GameDao;
 
 public class Lobby extends MultiplayerModule {
 
     private final GameFactory gameFactory;
 
+    private final GameDao gameDao;
+
     private final Map<String, Game> games;
 
-    private int gameCounter;
-
-    public Lobby(GameFactory gameFactory) {
+    public Lobby(GameFactory gameFactory, GameDao gameDao) {
         this.gameFactory = gameFactory;
-        this.games = Maps.newConcurrentMap();
-        this.gameCounter = 0;
+        this.gameDao = gameDao;
+        this.games = gameDao.loadGames();
         setEventHandlers();
     }
 
@@ -33,7 +32,7 @@ public class Lobby extends MultiplayerModule {
     }
 
     private void add(Game game) {
-        games.put(String.valueOf(gameCounter++), game);
+        games.put(gameDao.getNewId(), game);
         broadcast(new LobbyUpdateEvent(this));
     }
 
