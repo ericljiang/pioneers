@@ -15,9 +15,12 @@ public class Lobby extends MultiplayerModule {
 
     private final Map<String, Game> games;
 
+    private int gameCounter;
+
     public Lobby(GameFactory gameFactory) {
         this.gameFactory = gameFactory;
         this.games = Maps.newConcurrentMap();
+        this.gameCounter = 0;
         setEventHandlers();
     }
 
@@ -30,7 +33,8 @@ public class Lobby extends MultiplayerModule {
     }
 
     private void add(Game game) {
-        games.put("1", game);
+        games.put(String.valueOf(gameCounter++), game);
+        broadcast(new LobbyUpdateEvent(this));
     }
 
     private void setEventHandlers() {

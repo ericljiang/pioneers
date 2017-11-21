@@ -42,7 +42,8 @@ class Message extends Component {
 class Lobby extends Component {
   constructor() {
     super();
-    this.state = { games: [] };
+    this.createGame = this.createGame.bind(this);
+    this.state = { ws: null, games: [] };
   }
 
   componentWillMount() {
@@ -52,14 +53,17 @@ class Lobby extends Component {
       console.log(data);
       this.setState({ games: data.games });
     };
-    ws.onopen = function() {
-      ws.send(JSON.stringify({
-        type: "GameCreationEvent",
-        attributes: {
-          name: "foo"
-        }
-      }));
-    };
+    this.setState({ ws: ws });
+  }
+
+  createGame() {
+    console.log("Creating game...");
+    this.state.ws.send(JSON.stringify({
+      type: "GameCreationEvent",
+      attributes: {
+        name: "foo"
+      }
+    }));
   }
 
   render() {
@@ -68,6 +72,7 @@ class Lobby extends Component {
         {this.state.games.map((game, index) =>
           <p>{game.name}</p>
         )}
+        <button onClick={this.createGame}>Create game</button>
       </div>
     );
   }
