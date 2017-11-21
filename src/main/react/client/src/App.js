@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import getGreeting from './settlersClient.js';
+import { lobby } from './lobby.js';
 
 class App extends Component {
   render() {
@@ -43,27 +44,15 @@ class Lobby extends Component {
   constructor() {
     super();
     this.createGame = this.createGame.bind(this);
-    this.state = { ws: null, games: [] };
+    this.state = { games: [] };
   }
 
   componentWillMount() {
-    var ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=1");
-    ws.onmessage = m => {
-      var data = JSON.parse(m.data);
-      console.log(data);
-      this.setState({ games: data.games });
-    };
-    this.setState({ ws: ws });
+    lobby.onMessage(data => this.setState({ games: data.games }));
   }
 
   createGame() {
-    console.log("Creating game...");
-    this.state.ws.send(JSON.stringify({
-      type: "GameCreationEvent",
-      attributes: {
-        name: "foo"
-      }
-    }));
+    lobby.createGame("foo");
   }
 
   render() {
