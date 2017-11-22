@@ -10,19 +10,19 @@ public class SimpleGameDao extends GameDao<SimpleGame> {
 
     private int counter = 0;
 
-	@Override
-	public Map<String, SimpleGame> loadGames() {
-		return Maps.newHashMap();
-	}
+    @Override
+    public Map<String, SimpleGame> loadGames() {
+        return Maps.newHashMap();
+    }
 
-	@Override
-	public String getNewId() {
-		return String.valueOf(counter++);
-	}
+    @Override
+    public String getNewId() {
+        return String.valueOf(counter++);
+    }
 
-	@Override
-	public void save(String gameId, SimpleGame game) {
+    @Override
+    public void save(String gameId, SimpleGame game) {
 
-	}
+    }
 
 }
