@@ -5,11 +5,11 @@ import static spark.Spark.*;
 import com.google.gson.Gson;
 import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.data.GameDao;
-import me.ericjiang.settlers.library.data.GameDaoPostgres;
 import me.ericjiang.settlers.library.lobby.Lobby;
 import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
 import me.ericjiang.settlers.library.websockets.GameWebSocketRouter;
 import me.ericjiang.settlers.simple.SimpleGame;
+import me.ericjiang.settlers.simple.SimpleGameDao;
 import me.ericjiang.settlers.simple.SimpleGameFactory;
 
 public class Settlers {
@@ -29,9 +29,9 @@ public class Settlers {
 
     public static void main(String[] args) {
         Gson gson = new Gson();
-        GameFactory gameFactory = new SimpleGameFactory();
-        GameDao gameDao = new GameDaoPostgres(SimpleGame.class);
-        Lobby lobby = new Lobby(gameFactory, gameDao);
+        GameFactory<SimpleGame> gameFactory = new SimpleGameFactory();
+        GameDao<SimpleGame> gameDao = new SimpleGameDao();
+        Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory, gameDao);
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);
 

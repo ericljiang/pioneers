@@ -15,10 +15,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
 
-    private final Lobby lobby;
+    private final Lobby<?> lobby;
 
     @Override
-    protected Lobby getModule(Session session) {
+    protected Lobby<?> getModule(Session session) {
         return lobby;
     }
 

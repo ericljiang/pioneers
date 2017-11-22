@@ -13,16 +13,16 @@ import me.ericjiang.settlers.library.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.PlayerDisconnectionEvent;
 import me.ericjiang.settlers.library.data.GameDao;
 
-public class Lobby extends MultiplayerModule {
+public class Lobby<G extends Game> extends MultiplayerModule {
 
-    private final GameFactory gameFactory;
+    private final GameFactory<G> gameFactory;
 
-    private final GameDao gameDao;
+    private final GameDao<G> gameDao;
 
     @Getter
     private final Map<String, Game> games;
 
-    public Lobby(GameFactory gameFactory, GameDao gameDao) {
+    public Lobby(GameFactory<G> gameFactory, GameDao<G> gameDao) {
         this.gameFactory = gameFactory;
         this.gameDao = gameDao;
         this.games = Maps.newHashMap();
@@ -41,7 +41,7 @@ public class Lobby extends MultiplayerModule {
             transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
         });
         on(GameCreationEvent.class, e -> {
-            Game game = gameFactory.createGame(e.getAttributes());
+            G game = gameFactory.createGame(e.getAttributes());
             add(game);
         });
     }
@@ -49,15 +49,15 @@ public class Lobby extends MultiplayerModule {
     /**
      * Add a new game to the lobby.
      */
-    private void add(Game game) {
+    private void add(G game) {
         add(gameDao.getNewId(), game);
     }
 
     /**
      * Add a previously created game to the lobby.
      */
-    private void add(String gameId, Game game) {
-        gameDao.register(game);
+    private void add(String gameId, G game) {
+        gameDao.register(gameId, game);
         game.on(PlayerConnectionEvent.class, e -> broadcastState());
         game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
         games.put(gameId, game);

@@ -15,7 +15,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
 
-    private final Lobby lobby;
+    private final Lobby<?> lobby;
 
     @Override
     protected Game getModule(Session session) {
