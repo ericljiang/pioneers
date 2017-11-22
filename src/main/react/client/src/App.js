@@ -43,7 +43,6 @@ class Message extends Component {
 class Lobby extends Component {
   constructor() {
     super();
-    this.createGame = this.createGame.bind(this);
     this.state = { games: {} };
   }
 
@@ -51,19 +50,39 @@ class Lobby extends Component {
     lobby.onMessage(data => this.setState({ games: data.games }));
   }
 
-  createGame() {
-    lobby.createGame("foo");
+  render() {
+    return (
+      <div>
+        <CreateGameForm />
+        {Object.entries(this.state.games).map(gameEntry =>
+          <p>{gameEntry[0]} {gameEntry[1].name}</p>
+        )}
+      </div>
+    );
+  }
+}
+
+class CreateGameForm extends Component {
+  constructor() {
+    super();
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event) {
+    lobby.createGame(this.input.value);
+    event.preventDefault();
   }
 
   render() {
     return (
-      <div>
-        {Object.entries(this.state.games).map(gameEntry =>
-          <p>{gameEntry[0]} {gameEntry[1].name}</p>
-        )}
-        <button onClick={this.createGame}>Create game</button>
-      </div>
-    );
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" ref={(input) => this.input = input} />
+        </label>
+        <input type="submit" value="Create game" />
+      </form>
+    )
   }
 }
 
