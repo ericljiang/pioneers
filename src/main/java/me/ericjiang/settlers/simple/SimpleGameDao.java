@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import me.ericjiang.settlers.library.data.GameDao;
+import me.ericjiang.settlers.library.game.GameDao;
 
 public class SimpleGameDao extends GameDao<SimpleGame> {
 

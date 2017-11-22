@@ -6,12 +6,12 @@ import com.google.common.collect.Maps;
 
 import lombok.Getter;
 import lombok.val;
-import me.ericjiang.settlers.library.Game;
-import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.MultiplayerModule;
-import me.ericjiang.settlers.library.PlayerConnectionEvent;
-import me.ericjiang.settlers.library.PlayerDisconnectionEvent;
-import me.ericjiang.settlers.library.data.GameDao;
+import me.ericjiang.settlers.library.game.Game;
+import me.ericjiang.settlers.library.game.GameDao;
+import me.ericjiang.settlers.library.game.GameFactory;
+import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
+import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 
 public class Lobby<G extends Game> extends MultiplayerModule {
 

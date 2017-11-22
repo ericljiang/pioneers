@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import me.ericjiang.settlers.library.player.Player;
+import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
+import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 
 public abstract class MultiplayerModule {
 

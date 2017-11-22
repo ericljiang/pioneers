@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.library;
+package me.ericjiang.settlers.library.game;
 
 import lombok.AllArgsConstructor;
 

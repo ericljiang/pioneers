@@ -1,6 +1,6 @@
 package me.ericjiang.settlers.simple;
 
-import me.ericjiang.settlers.library.GameSummary;
+import me.ericjiang.settlers.library.game.GameSummary;
 
 public class SimpleGameSummary extends GameSummary {
 

@@ -1,4 +1,4 @@
-package me.ericjiang.settlers.library.websockets;
+package me.ericjiang.settlers.library;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModule;
+import me.ericjiang.settlers.library.player.WebSocketPlayer;
 import me.ericjiang.settlers.library.utility.RuntimeTypeAdapterFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;

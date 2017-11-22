@@ -3,11 +3,12 @@ package me.ericjiang.settlers;
 import static spark.Spark.*;
 
 import com.google.gson.Gson;
-import me.ericjiang.settlers.library.GameFactory;
-import me.ericjiang.settlers.library.data.GameDao;
+
+import me.ericjiang.settlers.library.game.GameDao;
+import me.ericjiang.settlers.library.game.GameFactory;
+import me.ericjiang.settlers.library.game.GameWebSocketRouter;
 import me.ericjiang.settlers.library.lobby.Lobby;
 import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
-import me.ericjiang.settlers.library.websockets.GameWebSocketRouter;
 import me.ericjiang.settlers.simple.SimpleGame;
 import me.ericjiang.settlers.simple.SimpleGameDao;
 import me.ericjiang.settlers.simple.SimpleGameFactory;

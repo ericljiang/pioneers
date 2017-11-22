@@ -1,8 +1,7 @@
-package me.ericjiang.settlers.library.websockets;
+package me.ericjiang.settlers.library.player;
 
 import java.io.IOException;
 import me.ericjiang.settlers.library.Event;
-import me.ericjiang.settlers.library.Player;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 

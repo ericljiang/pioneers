@@ -2,7 +2,7 @@ package me.ericjiang.settlers.simple;
 
 import java.util.Map;
 
-import me.ericjiang.settlers.library.GameFactory;
+import me.ericjiang.settlers.library.game.GameFactory;
 
 public class SimpleGameFactory extends GameFactory<SimpleGame> {
 

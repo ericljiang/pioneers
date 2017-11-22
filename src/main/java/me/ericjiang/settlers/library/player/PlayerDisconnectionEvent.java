@@ -1,7 +1,8 @@
-package me.ericjiang.settlers.library;
+package me.ericjiang.settlers.library.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.ericjiang.settlers.library.Event;
 
 @Getter
 @AllArgsConstructor
