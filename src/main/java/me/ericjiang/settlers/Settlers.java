@@ -29,8 +29,8 @@ public class Settlers {
 
     public static void main(String[] args) {
         Gson gson = new Gson();
+        GameFactory gameFactory = new SimpleGameFactory();
         GameDao gameDao = new GameDaoPostgres(SimpleGame.class);
-        GameFactory gameFactory = new SimpleGameFactory(gameDao);
         Lobby lobby = new Lobby(gameFactory, gameDao);
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);

@@ -3,12 +3,16 @@ package me.ericjiang.settlers.library.data;
 import java.util.Map;
 import me.ericjiang.settlers.library.Game;
 
-public interface GameDao {
+public abstract class GameDao {
 
-    Map<String, Game> loadGames();
+    public abstract Map<String, Game> loadGames();
 
-    String getNewId();
+    public abstract String getNewId();
 
-    void save(Game game);
+    public abstract void save(Game game);
+
+    public void register(Game game) {
+        // game.on(StateChangingEvent.class, e -> save(game));
+    }
 
 }

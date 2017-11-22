@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import java.util.Map;
 import me.ericjiang.settlers.library.Game;
 
-public class GameDaoPostgres implements GameDao {
+public class GameDaoPostgres extends GameDao {
 
     private final Class<? extends Game> gameType;
 
@@ -22,7 +22,7 @@ public class GameDaoPostgres implements GameDao {
 
     @Override
     public Map<String, Game> loadGames() {
-        // gson.fromJson("foo", gameType);
+        // Game game = gson.fromJson("foo", gameType);
         return Maps.newConcurrentMap();
     }
 

@@ -2,7 +2,10 @@ package me.ericjiang.settlers.library.lobby;
 
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
 import lombok.Getter;
+import lombok.val;
 import me.ericjiang.settlers.library.Game;
 import me.ericjiang.settlers.library.GameFactory;
 import me.ericjiang.settlers.library.MultiplayerModule;
@@ -22,7 +25,10 @@ public class Lobby extends MultiplayerModule {
     public Lobby(GameFactory gameFactory, GameDao gameDao) {
         this.gameFactory = gameFactory;
         this.gameDao = gameDao;
-        this.games = gameDao.loadGames();
+        this.games = Maps.newHashMap();
+        for (val e : gameDao.loadGames().entrySet()) {
+            add(e.getKey(), e.getValue());
+        }
         setEventHandlers();
     }
 
@@ -35,14 +41,26 @@ public class Lobby extends MultiplayerModule {
             transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
         });
         on(GameCreationEvent.class, e -> {
-            add(gameFactory.createGame(e.getAttributes()));
+            Game game = gameFactory.createGame(e.getAttributes());
+            add(game);
         });
     }
 
+    /**
+     * Add a new game to the lobby.
+     */
     private void add(Game game) {
+        add(gameDao.getNewId(), game);
+    }
+
+    /**
+     * Add a previously created game to the lobby.
+     */
+    private void add(String gameId, Game game) {
+        gameDao.register(game);
         game.on(PlayerConnectionEvent.class, e -> broadcastState());
         game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
-        games.put(gameDao.getNewId(), game);
+        games.put(gameId, game);
         broadcastState();
     }
 
