@@ -8,7 +8,8 @@ import {
 import logo from './logo.svg';
 import './App.css';
 import getGreeting from './settlersClient.js';
-import { lobby } from './lobby.js';
+import Lobby from './lobby.js';
+import Game from './game.js';
 
 class App extends Component {
   render() {
@@ -19,12 +20,15 @@ class App extends Component {
             <img src={logo} className="App-logo" alt="logo" />
             <h1 className="App-title">Welcome to React</h1>
           </header>
+
           <Link to="/message">Message</Link>
+
           <Route exact path="/" render={() => (
             <Redirect to="/lobby" />
           )} />
           <Route path="/message" component={Message} />
-          <Route path="/lobby" component={Lobby} />
+          <Route path="/lobby" component={LobbyView} />
+          <Route path="/game/:id" component={GameView} />
         </div>
       </Router>
     );
@@ -49,22 +53,24 @@ class Message extends Component {
   }
 }
 
-class Lobby extends Component {
+class LobbyView extends Component {
   constructor() {
     super();
-    this.state = { games: {} };
+    this.state = { lobby: null, games: {} };
   }
 
   componentWillMount() {
+    var lobby = new Lobby();
     lobby.onMessage(data => this.setState({ games: data.games }));
+    this.setState({ lobby: lobby });
   }
 
   render() {
     return (
       <div>
-        <CreateGameForm />
+        <CreateGameForm lobby={this.state.lobby} />
         {Object.entries(this.state.games).map(gameEntry =>
-          <Game id={gameEntry[0]} game={gameEntry[1]} />
+          <GameSummary id={gameEntry[0]} game={gameEntry[1]} />
         )}
       </div>
     );
@@ -72,13 +78,13 @@ class Lobby extends Component {
 }
 
 class CreateGameForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(event) {
-    lobby.createGame(this.input.value);
+    this.props.lobby.createGame(this.input.value);
     event.preventDefault();
   }
 
@@ -95,13 +101,31 @@ class CreateGameForm extends Component {
   }
 }
 
-function Game(props) {
+function GameSummary(props) {
+  var id = props.id;
+  var name = props.game.name;
   return (
     <div>
-      {props.id} {props.game.name}
-      <Link to="/message">Play</Link>
+      {id}: {name}
+      <Link to={"/game/" + id}>Play</Link>
     </div>
   );
+}
+
+class GameView extends Component {
+  constructor() {
+    super();
+    this.state = { game: null };
+  }
+
+  componentWillMount() {
+    var game = new Game(this.props.match.params.id);
+    this.setState({ game: game });
+  }
+
+  render() {
+    return <p>{this.props.match.params.id}</p>;
+  }
 }
 
 export default App;

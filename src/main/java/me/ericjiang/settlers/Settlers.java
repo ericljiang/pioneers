@@ -4,6 +4,7 @@ import static spark.Spark.*;
 
 import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.Arrays;
 import me.ericjiang.settlers.library.game.GameDao;
 import me.ericjiang.settlers.library.game.GameFactory;
 import me.ericjiang.settlers.library.game.GameWebSocketRouter;
@@ -31,9 +32,10 @@ public class Settlers {
         get("/api/hello", (req, res) -> new Greeting(), gson::toJson);
 
         // Routes in react-router
-        get("/lobby", (req, res) -> client);
-        get("/game", (req, res) -> client);
-        get("/message", (req, res) -> client);
+        String[] reactRoutes = { "/lobby", "/game/*", "/message" };
+        Arrays.stream(reactRoutes).forEach(path -> {
+            get(path, (req, res) -> client);
+        });
     }
 
     public static void main(String[] args) throws IOException {

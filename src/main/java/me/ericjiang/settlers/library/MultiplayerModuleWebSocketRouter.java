@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.player.WebSocketPlayer;
@@ -42,8 +43,9 @@ public abstract class MultiplayerModuleWebSocketRouter {
             String playerId = getQueryParameterString(session, "playerId");
             MultiplayerModule module = getModule(session);
             module.connect(playerId, new WebSocketPlayer(session));
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
+            e.printStackTrace(System.out);
         }
     }
 
@@ -62,12 +64,19 @@ public abstract class MultiplayerModuleWebSocketRouter {
     }
 
     protected String getQueryParameterString(Session session, String parameter) {
-        String value = session.getUpgradeRequest().getParameterMap().get(parameter).get(0);
-        if (value == null) {
-            IllegalArgumentException e = new IllegalArgumentException("Missing " + parameter + " query parameter");
-            e.printStackTrace();
-            throw e;
+        String playerId = getQueryParameterStringOptional(session, parameter).orElseThrow(() -> {
+            String message = String.format("WebSocket request is missing the query parameter '%s'", parameter);
+            return new IllegalArgumentException(message);
+        });
+        return playerId;
+    }
+
+    private Optional<String> getQueryParameterStringOptional(Session session, String parameter) {
+        try {
+            String value = session.getUpgradeRequest().getParameterMap().get(parameter).get(0);
+            return Optional.ofNullable(value);
+        } catch (NullPointerException e) {
+            return Optional.empty();
         }
-        return value;
     }
 }
