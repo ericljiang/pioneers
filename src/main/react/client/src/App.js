@@ -56,7 +56,7 @@ class Message extends Component {
 class LobbyView extends Component {
   constructor() {
     super();
-    this.state = { lobby: null, games: {} };
+    this.state = { lobby: null, games: [] };
   }
 
   componentWillMount() {

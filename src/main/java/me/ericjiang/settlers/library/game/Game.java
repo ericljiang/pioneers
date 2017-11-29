@@ -8,6 +8,8 @@ import me.ericjiang.settlers.library.MultiplayerModule;
 @AllArgsConstructor
 public abstract class Game extends MultiplayerModule {
 
+    private final String id;
+
     private final String name;
 
     public abstract GameSummary summarize();

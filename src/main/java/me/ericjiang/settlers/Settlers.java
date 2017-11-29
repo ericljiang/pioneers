@@ -41,9 +41,9 @@ public class Settlers {
     public static void main(String[] args) throws IOException {
         Gson gson = new Gson();
         String client = IOUtils.toString(Spark.class.getResourceAsStream("/public/index.html"));
-        GameFactory<SimpleGame> gameFactory = new SimpleGameFactory();
         GameDao<SimpleGame> gameDao = new SimpleGameDao();
-        Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory, gameDao);
+        GameFactory<SimpleGame> gameFactory = new SimpleGameFactory(gameDao);
+        Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory);
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);
 
