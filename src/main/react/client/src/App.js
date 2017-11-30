@@ -65,6 +65,10 @@ class LobbyView extends Component {
     this.setState({ lobby: lobby });
   }
 
+  componentWillUnmount() {
+    this.state.lobby.disconnect();
+  }
+
   render() {
     return (
       <div>
@@ -121,6 +125,10 @@ class GameView extends Component {
   componentWillMount() {
     var game = new Game(this.props.match.params.id);
     this.setState({ game: game });
+  }
+
+  componentWillUnmount() {
+    this.state.game.disconnect();
   }
 
   render() {
