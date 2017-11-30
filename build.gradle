@@ -28,7 +28,10 @@ dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.google.guava:guava:23.0'
-    compile "com.sparkjava:spark-core:2.7.0"
+    compile 'com.sparkjava:spark-core:2.7.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.10.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.10.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
     compile files('libs/lombok-edge.jar')
 
     // Use JUnit test framework
@@ -61,4 +64,3 @@ task copyClient(type: Copy) {
 
 build.dependsOn(npm_run_build)
 build.finalizedBy(copyClient)
-

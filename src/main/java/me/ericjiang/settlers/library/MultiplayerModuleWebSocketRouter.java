@@ -3,6 +3,8 @@ package me.ericjiang.settlers.library;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+@Slf4j
 @WebSocket
 public abstract class MultiplayerModuleWebSocketRouter {
 
@@ -45,7 +48,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
             module.connect(playerId, new WebSocketPlayer(session));
         } catch (RuntimeException e) {
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
-            e.printStackTrace(System.out);
+            log.error("Rejected WebSocket connection request", e);
         }
     }
 

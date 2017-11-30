@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.library.game.GameDao;
 
+@Slf4j
 public class SimpleGameDao extends GameDao<SimpleGame> {
 
     private int counter = 0;
@@ -17,7 +19,7 @@ public class SimpleGameDao extends GameDao<SimpleGame> {
 
     @Override
     public void save(SimpleGame game) {
-        System.out.println("Saving game");
+        log.info("Saving game");
     }
 
     @Override

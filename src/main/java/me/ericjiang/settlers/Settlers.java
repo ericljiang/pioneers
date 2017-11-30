@@ -3,6 +3,9 @@ package me.ericjiang.settlers;
 import static spark.Spark.*;
 
 import com.google.gson.Gson;
+
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.Arrays;
 import me.ericjiang.settlers.library.game.GameDao;
@@ -16,6 +19,7 @@ import me.ericjiang.settlers.simple.SimpleGameFactory;
 import spark.Spark;
 import spark.utils.IOUtils;
 
+@Slf4j
 public class Settlers {
 
     public Settlers(
@@ -46,6 +50,10 @@ public class Settlers {
         Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory);
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);
+
+        log.info("+-----------------+");
+        log.info("| Starting server |");
+        log.info("+-----------------+");
 
         new Settlers(gson, client, lobbyWebSocketHandler, gameWebSocketRouter);
     }
