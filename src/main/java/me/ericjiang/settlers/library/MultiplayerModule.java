@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +15,7 @@ import me.ericjiang.settlers.library.player.Player;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 
+@Slf4j
 public abstract class MultiplayerModule {
 
     private final Map<String, Player> players;
@@ -23,16 +26,22 @@ public abstract class MultiplayerModule {
     public MultiplayerModule() {
         players = Maps.newConcurrentMap();
         eventHandlers = HashMultimap.create();
+        on(PlayerConnectionEvent.class, e -> {
+            log.info(formatLog("Player %s connected", e.getPlayerId()));
+        });
+        on(PlayerDisconnectionEvent.class, e -> {
+            log.info(formatLog("Player %s disconnected (Reason: %s)", e.getPlayerId(), e.getReason()));
+        });
     }
+
+    protected abstract String getIdentifier();
 
     public void connect(String playerId, Player player) {
         players.put(playerId, player);
-        handleEvent(new PlayerConnectionEvent(playerId));
     }
 
     public void disconnect(String playerId) {
         players.remove(playerId);
-        handleEvent(new PlayerDisconnectionEvent(playerId));
     }
 
     public void transmit(String playerId, Event event) {
@@ -54,6 +63,14 @@ public abstract class MultiplayerModule {
 
     public <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
         eventHandlers.put(eventType, consumer);
+    }
+
+    protected String formatLog(String format, Object... args) {
+        return formatLog(String.format(format, args));
+    }
+
+    protected String formatLog(String message) {
+        return String.format("[%s] %s", getIdentifier(), message);
     }
 
     @SuppressWarnings("unchecked")

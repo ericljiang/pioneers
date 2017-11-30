@@ -10,4 +10,6 @@ public class PlayerDisconnectionEvent extends Event {
 
     private final String playerId;
 
+    private final String reason;
+
 }

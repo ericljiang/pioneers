@@ -19,7 +19,7 @@ public class SimpleGameDao extends GameDao<SimpleGame> {
 
     @Override
     public void save(SimpleGame game) {
-        log.info("Saving game");
+        log.info(String.format("Saving Game %s", game.getId()));
     }
 
     @Override

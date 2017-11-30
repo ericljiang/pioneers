@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModule;
+import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
+import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 import me.ericjiang.settlers.library.player.WebSocketPlayer;
 import me.ericjiang.settlers.library.utility.RuntimeTypeAdapterFactory;
 import org.eclipse.jetty.websocket.api.Session;
@@ -46,6 +48,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
             String playerId = getQueryParameterString(session, "playerId");
             MultiplayerModule module = getModule(session);
             module.connect(playerId, new WebSocketPlayer(session));
+            module.handleEvent(new PlayerConnectionEvent(playerId));
         } catch (RuntimeException e) {
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
             log.error("Rejected WebSocket connection request", e);
@@ -57,6 +60,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
         String playerId = getQueryParameterString(session, "playerId");
         MultiplayerModule module = getModule(session);
         module.disconnect(playerId);
+        module.handleEvent(new PlayerDisconnectionEvent(playerId, reason));
     }
 
     @OnWebSocketMessage
