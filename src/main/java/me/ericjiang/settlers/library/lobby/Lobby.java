@@ -24,7 +24,7 @@ public class Lobby<G extends Game> extends MultiplayerModule {
         this.gameFactory = gameFactory;
         this.games = Maps.newHashMap();
         gameFactory.loadGames().values().forEach(g -> add(g));
-        log.info("Loaded " + games.size() + " games to the Lobby");
+        log.info("Loaded {} games to the Lobby", games.size());
         setEventHandlers();
     }
 
@@ -35,7 +35,10 @@ public class Lobby<G extends Game> extends MultiplayerModule {
     private void setEventHandlers() {
         on(PlayerConnectionEvent.class, e -> {
             transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
-            log.info("Player " + e.getPlayerId() + " connected to the Lobby");
+            log.info("Player {} connected to the Lobby", e.getPlayerId());
+        });
+        on(PlayerDisconnectionEvent.class, e -> {
+            log.info("Player {} disconnected from the Lobby", e.getPlayerId());
         });
         on(GameCreationEvent.class, e -> {
             add(gameFactory.createGame(e.getAttributes()));
@@ -47,7 +50,7 @@ public class Lobby<G extends Game> extends MultiplayerModule {
         game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
         games.put(game.getId(), game);
         broadcastState();
-        log.info("Added Game " + game.getId() + " to the Lobby");
+        log.info("Added Game {} to the Lobby", game.getId());
     }
 
     private void broadcastState() {
