@@ -51,7 +51,7 @@ public class Lobby<G extends Game> extends MultiplayerModule {
         game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
         games.put(game.getId(), game);
         broadcastState();
-        log.info(formatLog("Added Game %s to the Lobby", game.getId()));
+        log.info(formatLog("Added Game %s", game.getId()));
     }
 
     private void broadcastState() {
