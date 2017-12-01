@@ -1,5 +1,5 @@
-export default function Lobby() {
-  this.ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=1");
+export default function Lobby(playerId) {
+  this.ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=" + playerId);
 
   this.ws.onopen = () => {
       console.log('Opened WebSocket connection to Lobby');
@@ -17,11 +17,13 @@ export default function Lobby() {
     };
   };
 
-  this.createGame = function(name) {
+  this.createGame = function(owner, name) {
+    console.log(owner);
     console.log("Creating game...");
     this.ws.send(JSON.stringify({
       type: "GameCreationEvent",
       attributes: {
+        owner: owner,
         name: name
       }
     }));

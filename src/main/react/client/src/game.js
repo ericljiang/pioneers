@@ -1,9 +1,9 @@
-export default function Game(gameId) {
+export default function Game(gameId, playerId) {
     if (typeof gameId === 'undefined') {
         throw new Error('Game constructor function missing argument "gameId"');
     }
 
-    this.ws = new WebSocket('ws://localhost:4567/ws/game?gameId=' + gameId + '&playerId=1');
+    this.ws = new WebSocket('ws://localhost:4567/ws/game?gameId=' + gameId + '&playerId=' + playerId);
 
     this.ws.onopen = () => {
         console.log('Opened WebSocket connection to Game %s', gameId);

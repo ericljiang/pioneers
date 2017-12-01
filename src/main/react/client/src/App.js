@@ -12,6 +12,16 @@ import Lobby from './lobby.js';
 import Game from './game.js';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.onSignIn = this.onSignIn.bind(this);
+    this.state = { playerId: null };
+  }
+
+  onSignIn(idToken) {
+    this.setState({ playerId: idToken });
+  }
+
   render() {
     return (
       <Router>
@@ -23,15 +33,42 @@ class App extends Component {
 
           <Link to="/message">Message</Link>
 
-          <Route exact path="/" render={() => (
-            <Redirect to="/lobby" />
-          )} />
-          <Route path="/message" component={Message} />
-          <Route path="/lobby" component={LobbyView} />
-          <Route path="/game/:id" component={GameView} />
+          <AuthContainer onSignIn={this.onSignIn}>
+            <Route exact path="/" render={() => (
+              <Redirect to="/lobby" />
+            )} />
+            <Route path="/message" component={Message} />
+            <Route path="/lobby" render={(props) => (
+              <LobbyView {...props} playerId={this.state.playerId} />
+            )} />
+            <Route path="/game/:id" render={(props) => (
+              <GameView {...props} playerId={this.state.playerId} />
+            )} />
+          </AuthContainer>
         </div>
       </Router>
     );
+  }
+}
+
+class AuthContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.onSignIn = this.onSignIn.bind(this);
+    this.state = { signedIn: false };
+  }
+
+  onSignIn(idToken) {
+    this.props.onSignIn(idToken);
+    this.setState({ signedIn: true });
+  }
+
+  render() {
+    if (this.state.signedIn) {
+      return this.props.children;
+    } else {
+      return <SignInPage onSignIn={this.onSignIn} />
+    }
   }
 }
 
@@ -53,14 +90,42 @@ class Message extends Component {
   }
 }
 
+class SignInPage extends Component {
+  constructor(props) {
+    super(props);
+    this.onSignIn = this.onSignIn.bind(this);
+  }
+
+  onSignIn(googleUser) {
+    this.props.onSignIn(googleUser.getAuthResponse().id_token);
+  }
+
+  componentDidMount() {
+    window.gapi.signin2.render('g-signin2', {
+      'scope': 'profile email',
+      'width': 240,
+      'height': 50,
+      'longtitle': true,
+      'theme': 'dark',
+      'onsuccess': this.onSignIn
+    });
+  }
+
+  render() {
+    return (
+     <div id="g-signin2"></div>
+    );
+  }
+}
+
 class LobbyView extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { lobby: null, games: [] };
   }
 
   componentWillMount() {
-    var lobby = new Lobby();
+    var lobby = new Lobby(this.props.playerId);
     lobby.onMessage(data => this.setState({ games: data.games }));
     this.setState({ lobby: lobby });
   }
@@ -72,7 +137,7 @@ class LobbyView extends Component {
   render() {
     return (
       <div>
-        <CreateGameForm lobby={this.state.lobby} />
+        <CreateGameForm playerId={this.props.playerId} lobby={this.state.lobby} />
         {Object.entries(this.state.games).map(gameEntry =>
           <GameSummary id={gameEntry[0]} game={gameEntry[1]} />
         )}
@@ -88,7 +153,7 @@ class CreateGameForm extends Component {
   }
 
   handleSubmit(event) {
-    this.props.lobby.createGame(this.input.value);
+    this.props.lobby.createGame(this.props.playerId, this.input.value);
     event.preventDefault();
   }
 
@@ -117,13 +182,13 @@ function GameSummary(props) {
 }
 
 class GameView extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { game: null };
   }
 
   componentWillMount() {
-    var game = new Game(this.props.match.params.id);
+    var game = new Game(this.props.match.params.id, this.props.playerId);
     this.setState({ game: game });
   }
 
