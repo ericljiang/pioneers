@@ -15,11 +15,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.onSignIn = this.onSignIn.bind(this);
-    this.state = { playerId: null };
+    this.state = { playerId: null, authToken: null };
   }
 
-  onSignIn(idToken) {
-    this.setState({ playerId: idToken });
+  onSignIn(playerId, authToken) {
+    this.setState({ playerId: playerId, authToken: authToken });
   }
 
   render() {
@@ -39,10 +39,10 @@ class App extends Component {
             )} />
             <Route path="/message" component={Message} />
             <Route path="/lobby" render={(props) => (
-              <LobbyView {...props} playerId={this.state.playerId} />
+              <LobbyView {...props} playerId={this.state.playerId} authToken={this.state.authToken} />
             )} />
             <Route path="/game/:id" render={(props) => (
-              <GameView {...props} playerId={this.state.playerId} />
+              <GameView {...props} playerId={this.state.playerId} authToken={this.state.authToken} />
             )} />
           </AuthContainer>
         </div>
@@ -58,8 +58,8 @@ class AuthContainer extends Component {
     this.state = { signedIn: false };
   }
 
-  onSignIn(idToken) {
-    this.props.onSignIn(idToken);
+  onSignIn(playerId, authToken) {
+    this.props.onSignIn(playerId, authToken);
     this.setState({ signedIn: true });
   }
 
@@ -97,7 +97,7 @@ class SignInPage extends Component {
   }
 
   onSignIn(googleUser) {
-    this.props.onSignIn(googleUser.getAuthResponse().id_token);
+    this.props.onSignIn(googleUser.getBasicProfile().getId(), googleUser.getAuthResponse().id_token);
   }
 
   componentDidMount() {
@@ -125,7 +125,7 @@ class LobbyView extends Component {
   }
 
   componentWillMount() {
-    var lobby = new Lobby(this.props.playerId);
+    var lobby = new Lobby(this.props.playerId, this.props.authToken);
     lobby.onMessage(data => this.setState({ games: data.games }));
     this.setState({ lobby: lobby });
   }
@@ -188,7 +188,7 @@ class GameView extends Component {
   }
 
   componentWillMount() {
-    var game = new Game(this.props.match.params.id, this.props.playerId);
+    var game = new Game(this.props.match.params.id, this.props.playerId, this.props.authToken);
     this.setState({ game: game });
   }
 

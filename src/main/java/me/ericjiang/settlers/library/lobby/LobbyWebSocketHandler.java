@@ -7,15 +7,19 @@ import com.google.common.collect.Lists;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
-import lombok.AllArgsConstructor;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModuleWebSocketRouter;
+import me.ericjiang.settlers.library.auth.Authenticator;
 
 @WebSocket
-@AllArgsConstructor
 public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
 
     private final Lobby<?> lobby;
+
+    public LobbyWebSocketHandler(Lobby<?> lobby, Authenticator authenticator) {
+        super(authenticator);
+        this.lobby = lobby;
+    }
 
     @Override
     protected Lobby<?> getModule(Session session) {

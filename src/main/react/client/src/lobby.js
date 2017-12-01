@@ -1,12 +1,14 @@
-export default function Lobby(playerId) {
-  this.ws = new WebSocket("ws://localhost:4567/ws/lobby?playerId=" + playerId);
+export default function Lobby(playerId, authToken) {
+  this.ws = new WebSocket('ws://localhost:4567/ws/lobby' +
+    '?playerId=' + playerId +
+    '&authToken=' + authToken);
 
   this.ws.onopen = () => {
-      console.log('Opened WebSocket connection to Lobby');
+    console.log('Opened WebSocket connection to Lobby');
   };
 
   this.ws.onclose = (closeEvent) => {
-      console.log('WebSocket connection to Lobby was closed. (Reason: %s)', closeEvent.reason);
+    console.log('WebSocket connection to Lobby was closed. (Reason: %s)', closeEvent.reason);
   }
 
   this.onMessage = function(callback) {
@@ -23,7 +25,6 @@ export default function Lobby(playerId) {
     this.ws.send(JSON.stringify({
       type: "GameCreationEvent",
       attributes: {
-        owner: owner,
         name: name
       }
     }));

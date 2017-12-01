@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Arrays;
+
+import me.ericjiang.settlers.library.auth.Authenticator;
+import me.ericjiang.settlers.library.auth.GoogleAuthenticator;
 import me.ericjiang.settlers.library.game.GameDao;
 import me.ericjiang.settlers.library.game.GameFactory;
 import me.ericjiang.settlers.library.game.GameWebSocketRouter;
@@ -48,8 +51,9 @@ public class Settlers {
         GameDao<SimpleGame> gameDao = new SimpleGameDao();
         GameFactory<SimpleGame> gameFactory = new SimpleGameFactory(gameDao);
         Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory);
-        LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby);
-        GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby);
+        Authenticator authenticator = new GoogleAuthenticator();
+        LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby, authenticator);
+        GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby, authenticator);
 
         log.info("+-----------------+");
         log.info("| Starting server |");
