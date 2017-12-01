@@ -1,12 +1,9 @@
 package me.ericjiang.settlers.library.auth;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -33,7 +30,7 @@ public class GoogleAuthenticator implements Authenticator {
             throw new GeneralSecurityException("Invalid ID token.");
         }
         String userId = idToken.getPayload().getSubject();
-        if (userId != playerId) {
+        if (!playerId.equals(userId)) {
             throw new GeneralSecurityException("ID token does not match playerId");
         }
     }

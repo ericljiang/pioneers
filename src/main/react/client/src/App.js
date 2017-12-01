@@ -197,7 +197,11 @@ class GameView extends Component {
   }
 
   render() {
-    return <p>{this.props.match.params.id}</p>;
+    return (
+      <div>
+        <p>{this.state.match.params.id}</p>
+      </div>
+    );
   }
 }
 

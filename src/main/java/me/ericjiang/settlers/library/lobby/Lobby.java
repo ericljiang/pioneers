@@ -42,7 +42,7 @@ public class Lobby<G extends Game> extends MultiplayerModule {
             transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
         });
         on(GameCreationEvent.class, e -> {
-            add(gameFactory.createGame(e.getAttributes()));
+            add(gameFactory.createGame(e.getPlayerId(), e.getAttributes()));
         });
     }
 

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Optional;
-import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
@@ -33,7 +32,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
 
     public MultiplayerModuleWebSocketRouter(Authenticator authenticator) {
         this.authenticator = authenticator;
-        RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class);
+        RuntimeTypeAdapterFactory<PlayerEvent> eventAdapterFactory = RuntimeTypeAdapterFactory.of(PlayerEvent.class);
         getEventTypes().forEach(t -> eventAdapterFactory.registerSubtype(t));
         this.gson = new GsonBuilder()
                 .registerTypeAdapterFactory(eventAdapterFactory)
@@ -45,7 +44,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
     /**
      * @return a list of Event type classes for this module can receive from clients
      */
-    protected abstract List<Class<? extends Event>> getEventTypes();
+    protected abstract List<Class<? extends PlayerEvent>> getEventTypes();
 
     @OnWebSocketConnect
     public void onConnect(Session session) throws IOException {
@@ -73,7 +72,9 @@ public abstract class MultiplayerModuleWebSocketRouter {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         MultiplayerModule module = getModule(session);
-        Event event = gson.fromJson(message, Event.class);
+        PlayerEvent event = gson.fromJson(message, PlayerEvent.class);
+        String playerId = getQueryParameterString(session, "playerId");
+        event.setPlayerId(playerId);
         module.handleEvent(event);
     }
 

@@ -10,10 +10,13 @@ public abstract class Game extends MultiplayerModule {
 
     private final String id;
 
+    private final String owner;
+
     private final String name;
 
-    public Game(String id, String name) {
+    public Game(String id, String owner, String name) {
         this.id = id;
+        this.owner = owner;
         this.name = name;
         log.info(formatLog("Game created"));
     }

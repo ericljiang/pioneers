@@ -1,9 +1,9 @@
 package me.ericjiang.settlers.library.game;
 
 import java.util.List;
-import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.MultiplayerModuleWebSocketRouter;
+import me.ericjiang.settlers.library.PlayerEvent;
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.lobby.Lobby;
 import org.eclipse.jetty.websocket.api.Session;
@@ -32,7 +32,7 @@ public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
     }
 
     @Override
-    protected List<Class<? extends Event>> getEventTypes() {
+    protected List<Class<? extends PlayerEvent>> getEventTypes() {
         return Lists.newArrayList();
     }
 }

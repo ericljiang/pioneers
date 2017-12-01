@@ -5,8 +5,8 @@ import me.ericjiang.settlers.library.game.GameSummary;
 
 public class SimpleGame extends Game {
 
-    public SimpleGame(String id, String name) {
-        super(id, name);
+    public SimpleGame(String id, String owner, String name) {
+        super(id, owner, name);
     }
 
     @Override
