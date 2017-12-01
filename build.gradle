@@ -7,9 +7,9 @@
  */
 
 plugins {
-    // id 'io.franzbecker.gradle-lombok' version '1.11'
     id "com.moowork.node" version "1.2.0"
     id 'com.github.kt3k.coveralls' version '2.8.2'
+	id 'io.franzbecker.gradle-lombok' version '1.11'
     id 'jacoco'
 }
 
@@ -34,7 +34,6 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-api:2.10.0'
     compile 'org.apache.logging.log4j:log4j-core:2.10.0'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
-    compile files('libs/lombok-edge.jar')
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
@@ -47,10 +46,10 @@ jacocoTestReport {
     }
 }
 
-// lombok {
-//     version = "1.16.18"
-//     sha256 = ""
-// }
+lombok {
+    version = "1.16.18"
+    sha256 = ""
+}
 
 node {
     // Set the work directory for unpacking node
