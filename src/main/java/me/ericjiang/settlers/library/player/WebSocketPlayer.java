@@ -14,10 +14,12 @@ public class WebSocketPlayer implements Player {
 
     private final Session session;
 
+    private final Gson gson;
+
     @Override
     public void transmit(Event event) {
         try {
-            session.getRemote().sendString(new Gson().toJson(event));
+            session.getRemote().sendString(gson.toJson(event, Event.class));
         } catch (IOException e) {
             session.close(StatusCode.SERVER_ERROR, "Failed to send message");
         }

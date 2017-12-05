@@ -32,7 +32,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
 
     public MultiplayerModuleWebSocketRouter(Authenticator authenticator) {
         this.authenticator = authenticator;
-        RuntimeTypeAdapterFactory<PlayerEvent> eventAdapterFactory = RuntimeTypeAdapterFactory.of(PlayerEvent.class);
+        RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventType");
         getEventTypes().forEach(t -> eventAdapterFactory.registerSubtype(t));
         this.gson = new GsonBuilder()
                 .registerTypeAdapterFactory(eventAdapterFactory)
@@ -44,7 +44,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
     /**
      * @return a list of Event type classes for this module can receive from clients
      */
-    protected abstract List<Class<? extends PlayerEvent>> getEventTypes();
+    protected abstract List<Class<? extends Event>> getEventTypes();
 
     @OnWebSocketConnect
     public void onConnect(Session session) throws IOException {
@@ -53,7 +53,7 @@ public abstract class MultiplayerModuleWebSocketRouter {
             String authToken = getQueryParameterString(session, "authToken");
             authenticator.verify(playerId, authToken);
             MultiplayerModule module = getModule(session);
-            module.connect(playerId, new WebSocketPlayer(session));
+            module.connect(playerId, new WebSocketPlayer(session, gson));
             module.handleEvent(new PlayerConnectionEvent(playerId));
         } catch (GeneralSecurityException | RuntimeException e) {
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
@@ -71,11 +71,16 @@ public abstract class MultiplayerModuleWebSocketRouter {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
+        log.debug(String.format("Received message from %s: %s", session.getUpgradeRequest().getRequestURI(), message));
         MultiplayerModule module = getModule(session);
-        PlayerEvent event = gson.fromJson(message, PlayerEvent.class);
-        String playerId = getQueryParameterString(session, "playerId");
-        event.setPlayerId(playerId);
-        module.handleEvent(event);
+        try {
+            PlayerEvent event = (PlayerEvent) gson.fromJson(message, Event.class);
+            String playerId = getQueryParameterString(session, "playerId");
+            event.setPlayerId(playerId);
+            module.handleEvent(event);
+        } catch (ClassCastException e) {
+            log.error("Client sent an Event that isn't a PlayerEvent", e);
+        }
     }
 
     protected String getQueryParameterString(Session session, String parameter) {

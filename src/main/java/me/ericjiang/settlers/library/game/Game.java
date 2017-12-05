@@ -3,6 +3,7 @@ package me.ericjiang.settlers.library.game;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.library.MultiplayerModule;
+import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 
 @Slf4j
 @Getter
@@ -18,6 +19,7 @@ public abstract class Game extends MultiplayerModule {
         this.id = id;
         this.owner = owner;
         this.name = name;
+        setEventHandlers();
         log.info(formatLog("Game created"));
     }
 
@@ -26,6 +28,12 @@ public abstract class Game extends MultiplayerModule {
     @Override
     protected String getIdentifier() {
         return String.format("Game %s", id);
+    }
+
+    private void setEventHandlers() {
+        on(PlayerConnectionEvent.class, e -> {
+            transmit(e.getPlayerId(), new GameUpdateEvent(this));
+        });
     }
 
 }

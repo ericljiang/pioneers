@@ -23,7 +23,7 @@ export default function Lobby(playerId, authToken) {
     console.log(owner);
     console.log("Creating game...");
     this.ws.send(JSON.stringify({
-      type: "GameCreationEvent",
+      eventType: "GameCreationEvent",
       attributes: {
         name: name
       }

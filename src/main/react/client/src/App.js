@@ -199,7 +199,7 @@ class GameView extends Component {
   render() {
     return (
       <div>
-        <p>{this.state.match.params.id}</p>
+        <p>{this.props.match.params.id}</p>
       </div>
     );
   }

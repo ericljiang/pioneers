@@ -12,7 +12,7 @@ import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 @Slf4j
 public abstract class MultiplayerModule extends EventListener {
 
-    private final Map<String, Player> players;
+    private final transient Map<String, Player> players;
 
     public MultiplayerModule() {
         players = Maps.newConcurrentMap();
