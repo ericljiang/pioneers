@@ -8,7 +8,7 @@ import {
 import logo from './logo.svg';
 import './App.css';
 import getGreeting from './settlersClient.js';
-import Lobby from './lobby.js';
+import LobbyConnection from './lobby.js';
 import GameConnection from './game.js';
 
 class App extends Component {
@@ -121,23 +121,26 @@ class SignInPage extends Component {
 class LobbyView extends Component {
   constructor(props) {
     super(props);
-    this.state = { lobby: null, games: [] };
+    this.state = {
+      lobbyConnection: null,
+      games: []
+    };
   }
 
   componentWillMount() {
-    var lobby = new Lobby(this.props.playerId, this.props.authToken);
-    lobby.onMessage(data => this.setState({ games: data.games }));
-    this.setState({ lobby: lobby });
+    var lobbyConnection = new LobbyConnection(this.props.playerId, this.props.authToken);
+    lobbyConnection.on("LobbyUpdateEvent", event => this.setState({ games: event.games }));
+    this.setState({ lobbyConnection: lobbyConnection });
   }
 
   componentWillUnmount() {
-    this.state.lobby.disconnect();
+    this.state.lobbyConnection.disconnect();
   }
 
   render() {
     return (
       <div>
-        <CreateGameForm playerId={this.props.playerId} lobby={this.state.lobby} />
+        <CreateGameForm playerId={this.props.playerId} onSubmit={this.state.lobbyConnection.createGame} />
         {Object.entries(this.state.games).map(gameEntry =>
           <GameSummary id={gameEntry[0]} game={gameEntry[1]} />
         )}
@@ -153,7 +156,7 @@ class CreateGameForm extends Component {
   }
 
   handleSubmit(event) {
-    this.props.lobby.createGame(this.props.playerId, this.input.value);
+    this.props.onSubmit(this.props.playerId, this.input.value);
     event.preventDefault();
   }
 
