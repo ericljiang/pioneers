@@ -1,4 +1,4 @@
-import Connection from './connection.js';
+import Connection from '../util/connection.js';
 
 export default class GameConnection extends Connection {
   constructor(gameId, playerId, authToken) {

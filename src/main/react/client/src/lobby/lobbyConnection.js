@@ -1,4 +1,4 @@
-import Connection from './connection.js';
+import Connection from '../util/connection.js';
 
 export default class LobbyConnection extends Connection {
   constructor(playerId, authToken) {
