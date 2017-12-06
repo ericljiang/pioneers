@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 public class EventListener {
 
     @SuppressWarnings("rawtypes")
-    private final Multimap<Class<? extends Event>, Consumer> eventHandlers;
+    private final transient Multimap<Class<? extends Event>, Consumer> eventHandlers;
 
     public EventListener() {
         eventHandlers = HashMultimap.create();
