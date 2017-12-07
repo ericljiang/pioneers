@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Set;
+
 import me.ericjiang.settlers.library.player.Player;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
@@ -40,6 +42,10 @@ public abstract class MultiplayerModule extends EventListener {
 
     public void broadcast(Event event) {
         players.values().forEach(p -> p.transmit(event));
+    }
+
+    public Set<String> getPlayers() {
+        return players.keySet();
     }
 
     protected String formatLog(String format, Object... args) {

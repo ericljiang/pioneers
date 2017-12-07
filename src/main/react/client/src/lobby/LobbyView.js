@@ -26,9 +26,11 @@ export default class LobbyView extends Component {
     return (
       <div>
         <CreateGameForm playerId={this.props.playerId} onSubmit={this.state.lobbyConnection.createGame} />
-        {Object.entries(this.state.games).map(gameEntry =>
-          <GameSummary id={gameEntry[0]} game={gameEntry[1]} />
-        )}
+        <table>
+          {this.state.games.map(game =>
+            <GameSummary game={game} />
+          )}
+        </table>
       </div>
     );
   }
