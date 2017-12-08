@@ -18,11 +18,14 @@ public abstract class GameSummary {
 
     private final Map<String, Player> players;
 
+    private final boolean pregame;
+
     public GameSummary(Game game) {
         this.id = game.getId();
         this.owner = game.getOwner();
         this.name = game.getName();
         this.players = game.getPlayers();
+        this.pregame = game.isPregame();
     }
 
 }

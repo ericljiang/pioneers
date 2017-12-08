@@ -1,6 +1,6 @@
 package me.ericjiang.settlers.library;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -13,7 +13,7 @@ public class EventListener {
     private final transient Multimap<Class<? extends Event>, Consumer> eventHandlers;
 
     public EventListener() {
-        eventHandlers = HashMultimap.create();
+        eventHandlers = LinkedListMultimap.create();
     }
 
     @SuppressWarnings("unchecked")

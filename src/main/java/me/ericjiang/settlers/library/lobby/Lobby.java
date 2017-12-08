@@ -43,10 +43,12 @@ public class Lobby<G extends Game> extends MultiplayerModule {
         return new LobbyUpdateEvent(this);
     }
 
+    @Override
+    protected boolean allowConnection(String playerId) {
+        return true;
+    }
+
     private void setEventHandlers() {
-        on(PlayerConnectionEvent.class, e -> {
-            transmit(e.getPlayerId(), new LobbyUpdateEvent(this));
-        });
         on(GameCreationEvent.class, e -> {
             add(gameFactory.createGame(e.getPlayerId(), e.getAttributes()));
         });

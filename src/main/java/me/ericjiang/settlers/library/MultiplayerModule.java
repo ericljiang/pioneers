@@ -28,7 +28,12 @@ public abstract class MultiplayerModule extends EventListener {
 
     protected abstract StateEvent toStateEvent();
 
+    protected abstract boolean allowConnection(String playerId);
+
     public void addConnection(String playerId, PlayerConnection connection) {
+        if (!allowConnection(playerId)) {
+            connection.close("Unauthorized");
+        }
         playerConnections.put(playerId, connection);
         connection.transmit(toStateEvent());
         if (playerConnections.get(playerId).size() == 1) {

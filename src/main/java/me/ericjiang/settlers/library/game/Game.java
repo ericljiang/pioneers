@@ -24,11 +24,14 @@ public abstract class Game extends MultiplayerModule {
 
     private final Map<String, Player> players;
 
+    private boolean pregame;
+
     public Game(String id, String owner, String name) {
         this.id = id;
         this.owner = owner;
         this.name = name;
         this.players = Maps.newConcurrentMap();
+        this.pregame = true;
         setEventHandlers();
         log.info(formatLog("Game created"));
     }
@@ -47,21 +50,36 @@ public abstract class Game extends MultiplayerModule {
         return new GameUpdateEvent(this);
     }
 
+    @Override
+    protected boolean allowConnection(String playerId) {
+        if (pregame) {
+            return true;
+        }
+        return players.containsKey(playerId);
+    }
+
+    protected void start() {
+        this.pregame = false;
+    }
+
     private void setEventHandlers() {
         on(PlayerConnectionEvent.class, e -> {
             String playerId = e.getPlayerId();
-            if (!players.containsKey(playerId)) {
+            if (pregame) {
                 players.put(playerId, createPlayer(playerId));
             }
-            Player player = players.get(playerId);
-            player.setOnline(true);
+            players.get(playerId).setOnline(true);
             broadcast(new GameUpdateEvent(this));
         });
 
         on(PlayerDisconnectionEvent.class, e -> {
             String playerId = e.getPlayerId();
             Player player = players.get(playerId);
-            player.setOnline(false);
+            if (pregame) {
+                players.remove(playerId);
+            } else {
+                player.setOnline(false);
+            }
             broadcast(new GameUpdateEvent(this));
         });
     }

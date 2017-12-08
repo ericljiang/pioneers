@@ -2,6 +2,7 @@ package me.ericjiang.settlers.library.player;
 
 import java.io.IOException;
 import me.ericjiang.settlers.library.Event;
+
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 
@@ -23,5 +24,10 @@ public class WebSocketPlayerConnection implements PlayerConnection {
         } catch (IOException e) {
             session.close(StatusCode.SERVER_ERROR, "Failed to send message");
         }
+    }
+
+    @Override
+    public void close(String reason) {
+        session.close(StatusCode.POLICY_VIOLATION, reason);
     }
 }
