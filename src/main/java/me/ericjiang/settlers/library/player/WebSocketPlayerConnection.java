@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class WebSocketPlayer implements Player {
+public class WebSocketPlayerConnection implements PlayerConnection {
 
     private final Session session;
 

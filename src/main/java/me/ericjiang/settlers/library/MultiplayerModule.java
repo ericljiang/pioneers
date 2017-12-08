@@ -1,23 +1,21 @@
 package me.ericjiang.settlers.library;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
-import java.util.Set;
-
-import me.ericjiang.settlers.library.player.Player;
+import me.ericjiang.settlers.library.player.PlayerConnection;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 
 @Slf4j
 public abstract class MultiplayerModule extends EventListener {
 
-    private final transient Map<String, Player> players;
+    private final transient Multimap<String, PlayerConnection> playerConnections;
 
     public MultiplayerModule() {
-        players = Maps.newConcurrentMap();
+        this.playerConnections = HashMultimap.create();
         on(PlayerConnectionEvent.class, e -> {
             log.info(formatLog("Player %s connected", e.getPlayerId()));
         });
@@ -28,24 +26,29 @@ public abstract class MultiplayerModule extends EventListener {
 
     protected abstract String getIdentifier();
 
-    public void connect(String playerId, Player player) {
-        players.put(playerId, player);
+    protected abstract StateEvent toStateEvent();
+
+    public void addConnection(String playerId, PlayerConnection connection) {
+        playerConnections.put(playerId, connection);
+        connection.transmit(toStateEvent());
+        if (playerConnections.get(playerId).size() == 1) {
+            handleEvent(new PlayerConnectionEvent(playerId));
+        }
     }
 
-    public void disconnect(String playerId) {
-        players.remove(playerId);
+    public void removeConnection(String playerId, PlayerConnection connection, String reason) {
+        playerConnections.remove(playerId, connection);
+        if (!playerConnections.containsKey(playerId)) {
+            handleEvent(new PlayerDisconnectionEvent(playerId, reason));
+        }
     }
 
     public void transmit(String playerId, Event event) {
-        players.get(playerId).transmit(event);
+        playerConnections.get(playerId).forEach(c -> c.transmit(event));
     }
 
     public void broadcast(Event event) {
-        players.values().forEach(p -> p.transmit(event));
-    }
-
-    public Set<String> getPlayers() {
-        return players.keySet();
+        playerConnections.values().forEach(c -> c.transmit(event));
     }
 
     protected String formatLog(String format, Object... args) {

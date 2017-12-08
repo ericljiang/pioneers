@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.library.MultiplayerModule;
+import me.ericjiang.settlers.library.StateEvent;
 import me.ericjiang.settlers.library.game.Game;
 import me.ericjiang.settlers.library.game.GameFactory;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
@@ -35,6 +36,11 @@ public class Lobby<G extends Game> extends MultiplayerModule {
     @Override
     protected String getIdentifier() {
         return "Lobby";
+    }
+
+    @Override
+    protected StateEvent toStateEvent() {
+        return new LobbyUpdateEvent(this);
     }
 
     private void setEventHandlers() {

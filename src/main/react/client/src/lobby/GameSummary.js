@@ -7,8 +7,14 @@ export default function GameSummary(props) {
     <tr>
       <td>{props.game.id}</td>
       <td>{props.game.name}</td>
-      <td>{props.game.players.length} players online</td>
+      <td>{playersOnline(props.game.players)} players online</td>
       <td><Link to={"/game/" + props.game.id}>Play</Link></td>
     </tr>
   );
+}
+
+function playersOnline(players) {
+  return Object.keys(players)
+    .filter(playerId => players[playerId].online)
+    .length;
 }

@@ -1,5 +1,6 @@
 package me.ericjiang.settlers.library;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -8,12 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.auth.Authenticator;
-import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
-import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
-import me.ericjiang.settlers.library.player.WebSocketPlayer;
+import me.ericjiang.settlers.library.player.PlayerConnection;
+import me.ericjiang.settlers.library.player.WebSocketPlayerConnection;
 import me.ericjiang.settlers.library.utility.RuntimeTypeAdapterFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
@@ -30,13 +31,18 @@ public abstract class MultiplayerModuleWebSocketRouter {
 
     private final Gson gson;
 
+    private final Map<Session, PlayerConnection> connections;
+
     public MultiplayerModuleWebSocketRouter(Authenticator authenticator) {
         this.authenticator = authenticator;
+
         RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventType");
         getEventTypes().forEach(t -> eventAdapterFactory.registerSubtype(t));
         this.gson = new GsonBuilder()
                 .registerTypeAdapterFactory(eventAdapterFactory)
                 .create();
+
+        this.connections = Maps.newConcurrentMap();
     }
 
     protected abstract MultiplayerModule getModule(Session session);
@@ -53,8 +59,9 @@ public abstract class MultiplayerModuleWebSocketRouter {
             String authToken = getQueryParameterString(session, "authToken");
             authenticator.verify(playerId, authToken);
             MultiplayerModule module = getModule(session);
-            module.connect(playerId, new WebSocketPlayer(session, gson));
-            module.handleEvent(new PlayerConnectionEvent(playerId));
+            PlayerConnection connection = new WebSocketPlayerConnection(session, gson);
+            connections.put(session, connection);
+            module.addConnection(playerId, connection);
         } catch (GeneralSecurityException | RuntimeException e) {
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
             log.error("Rejected WebSocket connection request", e);
@@ -65,8 +72,8 @@ public abstract class MultiplayerModuleWebSocketRouter {
     public void onClose(Session session, int statusCode, String reason) {
         String playerId = getQueryParameterString(session, "playerId");
         MultiplayerModule module = getModule(session);
-        module.disconnect(playerId);
-        module.handleEvent(new PlayerDisconnectionEvent(playerId, reason));
+        PlayerConnection connection = connections.get(session);
+        module.removeConnection(playerId, connection, reason);
     }
 
     @OnWebSocketMessage

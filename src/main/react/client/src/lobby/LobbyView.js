@@ -14,7 +14,9 @@ export default class LobbyView extends Component {
 
   componentWillMount() {
     var lobbyConnection = new LobbyConnection(this.props.playerId, this.props.authToken);
-    lobbyConnection.on("LobbyUpdateEvent", event => this.setState({ games: event.games }));
+    lobbyConnection.on("LobbyUpdateEvent", event => {
+      this.setState({ games: event.games });
+    });
     this.setState({ lobbyConnection: lobbyConnection });
   }
 
