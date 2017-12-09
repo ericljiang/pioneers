@@ -18,18 +18,18 @@ public abstract class Game extends MultiplayerModule {
 
     private final String id;
 
-    private final String owner;
-
     private final String name;
+
+    private final Player creator;
 
     private final Map<String, Player> players;
 
     private boolean pregame;
 
-    public Game(String id, String owner, String name) {
+    public Game(String id, String ownerId, String name) {
         this.id = id;
-        this.owner = owner;
         this.name = name;
+        this.creator = new Player(ownerId);
         this.players = Maps.newConcurrentMap();
         this.pregame = true;
         setEventHandlers();

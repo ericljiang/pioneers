@@ -12,9 +12,9 @@ public abstract class GameSummary {
 
     private final String id;
 
-    private final String owner;
-
     private final String name;
+
+    private final Player creator;
 
     private final Map<String, Player> players;
 
@@ -26,8 +26,8 @@ public abstract class GameSummary {
 
     public GameSummary(Game game) {
         this.id = game.getId();
-        this.owner = game.getOwner();
         this.name = game.getName();
+        this.creator = game.getCreator();
         this.players = game.getPlayers();
         this.pregame = game.isPregame();
         this.minimumPlayers = game.minimumPlayers();

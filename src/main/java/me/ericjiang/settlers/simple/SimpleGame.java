@@ -27,8 +27,7 @@ public class SimpleGame extends Game {
 
     @Override
     protected Player createPlayer(String playerId) {
-        // TODO:
-        return new Player();
+        return new Player(playerId);
     }
 
 }

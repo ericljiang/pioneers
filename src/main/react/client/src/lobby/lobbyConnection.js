@@ -2,21 +2,18 @@ import Connection from '../util/connection.js';
 
 export default class LobbyConnection extends Connection {
   constructor(playerId, authToken) {
-    var url = 'ws://localhost:4567/ws/lobby' +
-      '?playerId=' + playerId +
-      '&authToken=' + authToken;
     var name = "Lobby";
-    super(url, name);
+    var path = "lobby";
+    super(playerId, authToken, name, path);
     this.createGame = this.createGame.bind(this);
   }
 
   createGame(owner, name) {
-    console.log("Creating game...");
-    this.ws.send(JSON.stringify({
+    this.send({
       eventType: "GameCreationEvent",
       attributes: {
         name: name
       }
-    }));
+    });
   }
 }

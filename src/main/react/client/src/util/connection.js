@@ -1,8 +1,12 @@
 export default class Connection {
-  constructor(webSocketURL, targetName) {
-    this.eventHandlers = {};
-
-    this.ws = new WebSocket(webSocketURL);
+  constructor(playerId, authToken, targetName, path, params) {
+    var url = `ws://localhost:4567/ws/${path}?playerId=${playerId}&authToken=${authToken}`;
+    if (params) {
+      for (var param in params) {
+        url += `&${param}=${params[param]}`;
+      }
+    }
+    this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
       console.log(`Opened WebSocket connection to ${targetName}`);
@@ -20,17 +24,19 @@ export default class Connection {
         eventHandler(event);
       }
     }
+
+    this.eventHandlers = {};
   }
 
   disconnect() {
     this.ws.close(1000, 'User disconnect');
   }
 
-  on(eventType, eventHandler) {
-    this.eventHandlers[eventType] = eventHandler;
-  }
-
   send(event) {
     this.ws.send(JSON.stringify(event));
+  }
+
+  on(eventType, eventHandler) {
+    this.eventHandlers[eventType] = eventHandler;
   }
 }
