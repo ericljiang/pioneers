@@ -10,6 +10,7 @@ import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.StateEvent;
 import me.ericjiang.settlers.library.game.Game;
 import me.ericjiang.settlers.library.game.GameFactory;
+import me.ericjiang.settlers.library.game.StartGameEvent;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 
@@ -57,6 +58,7 @@ public class Lobby<G extends Game> extends MultiplayerModule {
     private void add(G game) {
         game.on(PlayerConnectionEvent.class, e -> broadcastState());
         game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
+        game.on(StartGameEvent.class, e -> broadcastState());
         games.put(game.getId(), game);
         broadcastState();
         log.info(formatLog("Added Game %s", game.getId()));

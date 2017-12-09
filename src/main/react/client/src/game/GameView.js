@@ -8,6 +8,7 @@ export default class GameView extends Component {
       gameConnection: null,
       game: null
     };
+    this.startGame = this.startGame.bind(this);
   }
 
   componentWillMount() {
@@ -23,6 +24,10 @@ export default class GameView extends Component {
     this.state.gameConnection.disconnect();
   }
 
+  startGame() {
+    this.state.gameConnection.startGame();
+  }
+
   render() {
     if (this.state.game) {
       return (
@@ -30,6 +35,7 @@ export default class GameView extends Component {
           <p>{this.state.game.id}</p>
           <p>{this.state.game.owner}</p>
           <p>{this.state.game.name}</p>
+          {this.state.game.pregame ? <button onClick={this.startGame}>Start</button> : null}
         </div>
       );
     } else {

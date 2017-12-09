@@ -36,9 +36,13 @@ public abstract class Game extends MultiplayerModule {
         log.info(formatLog("Game created"));
     }
 
+    public abstract int minimumPlayers();
+
+    public abstract int maximumPlayers();
+
     public abstract GameSummary summarize();
 
-    public abstract Player createPlayer(String playerId);
+    protected abstract Player createPlayer(String playerId);
 
     @Override
     protected String getIdentifier() {
@@ -81,6 +85,13 @@ public abstract class Game extends MultiplayerModule {
                 player.setOnline(false);
             }
             broadcast(new GameUpdateEvent(this));
+        });
+
+        on(StartGameEvent.class, e -> {
+            if (players.size() >= minimumPlayers() && players.size() <= maximumPlayers()) {
+                start();
+                broadcast(new GameUpdateEvent(this));
+            }
         });
     }
 

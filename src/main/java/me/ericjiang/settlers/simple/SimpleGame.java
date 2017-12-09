@@ -11,12 +11,22 @@ public class SimpleGame extends Game {
     }
 
     @Override
+    public int minimumPlayers() {
+        return 1;
+    }
+
+    @Override
+    public int maximumPlayers() {
+        return 2;
+    }
+
+    @Override
     public GameSummary summarize() {
         return new SimpleGameSummary(this);
     }
 
     @Override
-    public Player createPlayer(String playerId) {
+    protected Player createPlayer(String playerId) {
         // TODO:
         return new Player();
     }

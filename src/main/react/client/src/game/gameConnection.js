@@ -6,4 +6,11 @@ export default class GameConnection extends Connection {
     var name = `Game ${gameId}`;
     super(url, name);
   }
+
+  startGame() {
+    console.log("sending start event");
+    this.send({
+      eventType: "StartGameEvent"
+    });
+  }
 }

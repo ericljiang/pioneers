@@ -33,6 +33,6 @@ public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
 
     @Override
     protected List<Class<? extends Event>> getEventTypes() {
-        return Lists.newArrayList(GameUpdateEvent.class);
+        return Lists.newArrayList(GameUpdateEvent.class, StartGameEvent.class);
     }
 }

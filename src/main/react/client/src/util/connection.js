@@ -29,4 +29,8 @@ export default class Connection {
   on(eventType, eventHandler) {
     this.eventHandlers[eventType] = eventHandler;
   }
+
+  send(event) {
+    this.ws.send(JSON.stringify(event));
+  }
 }
