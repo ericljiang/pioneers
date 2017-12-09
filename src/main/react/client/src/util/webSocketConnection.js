@@ -1,4 +1,4 @@
-export default class Connection {
+export default class WebSocketConnection {
   constructor(playerId, authToken, targetName, path, params) {
     var url = `ws://localhost:4567/ws/${path}?playerId=${playerId}&authToken=${authToken}`;
     if (params) {
@@ -19,10 +19,8 @@ export default class Connection {
     this.ws.onmessage = (message) => {
       var event = JSON.parse(message.data);
       console.log(event);
-      var eventHandler = this.eventHandlers[event.eventType];
-      if (eventHandler) {
-        eventHandler(event);
-      }
+      console.log(this.eventHandlers);
+      this.eventHandlers[event.eventType].forEach(handler => handler(event));
     }
 
     this.eventHandlers = {};
@@ -37,6 +35,9 @@ export default class Connection {
   }
 
   on(eventType, eventHandler) {
-    this.eventHandlers[eventType] = eventHandler;
+    if (!this.eventHandlers[eventType]) {
+      this.eventHandlers[eventType] = [];
+    }
+    this.eventHandlers[eventType].push(eventHandler);
   }
 }

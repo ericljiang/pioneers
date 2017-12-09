@@ -1,6 +1,6 @@
-import Connection from '../util/connection.js';
+import WebSocketConnection from '../util/webSocketConnection.js';
 
-export default class LobbyConnection extends Connection {
+export default class LobbyConnection extends WebSocketConnection {
   constructor(playerId, authToken) {
     var name = "Lobby";
     var path = "lobby";
