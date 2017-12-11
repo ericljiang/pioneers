@@ -5,6 +5,6 @@ import java.security.GeneralSecurityException;
 
 public interface Authenticator {
 
-    void verify(String playerId, String authToken) throws GeneralSecurityException, IOException;
+    String verify(String playerId, String authToken) throws GeneralSecurityException, IOException;
 
 }

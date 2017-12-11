@@ -26,10 +26,10 @@ public abstract class Game extends MultiplayerModule {
 
     private boolean pregame;
 
-    public Game(String id, String ownerId, String name) {
+    public Game(String id, String creatorId, String name) {
         this.id = id;
         this.name = name;
-        this.creator = new Player(ownerId);
+        this.creator = new Player(creatorId);
         this.players = Maps.newConcurrentMap();
         this.pregame = true;
         setEventHandlers();

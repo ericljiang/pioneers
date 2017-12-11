@@ -1,6 +1,7 @@
 package me.ericjiang.settlers.library.auth;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -24,7 +25,7 @@ public class GoogleAuthenticator implements Authenticator {
     }
 
     @Override
-    public void verify(String playerId, String authToken) throws GeneralSecurityException, IOException {
+    public String verify(String playerId, String authToken) throws GeneralSecurityException, IOException {
         GoogleIdToken idToken = verifier.verify(authToken);
         if (idToken == null) {
             throw new GeneralSecurityException("Invalid ID token.");
@@ -33,6 +34,7 @@ public class GoogleAuthenticator implements Authenticator {
         if (!playerId.equals(userId)) {
             throw new GeneralSecurityException("ID token does not match playerId");
         }
+        return (String) idToken.getPayload().get("given_name");
     }
 
 }

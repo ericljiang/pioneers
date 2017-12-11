@@ -6,6 +6,7 @@ import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.MultiplayerModuleWebSocketRouter;
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.lobby.Lobby;
+import me.ericjiang.settlers.library.player.PlayerRepository;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
@@ -16,8 +17,8 @@ public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
 
     private final Lobby<?> lobby;
 
-    public GameWebSocketRouter(Lobby<?> lobby, Authenticator authenticator) {
-        super(authenticator);
+    public GameWebSocketRouter(Lobby<?> lobby, Authenticator authenticator, PlayerRepository playerRepository) {
+        super(authenticator, playerRepository);
         this.lobby = lobby;
     }
 

@@ -14,6 +14,8 @@ import java.util.Optional;
 import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.player.PlayerConnection;
+import me.ericjiang.settlers.library.player.PlayerRepository;
+import me.ericjiang.settlers.library.player.PlayerTypeAdapterFactory;
 import me.ericjiang.settlers.library.player.WebSocketPlayerConnection;
 import me.ericjiang.settlers.library.utility.RuntimeTypeAdapterFactory;
 import org.eclipse.jetty.websocket.api.Session;
@@ -29,17 +31,23 @@ public abstract class MultiplayerModuleWebSocketRouter {
 
     private final Authenticator authenticator;
 
+    private final PlayerRepository playerRepository;
+
     private final Gson gson;
 
     private final Map<Session, PlayerConnection> connections;
 
-    public MultiplayerModuleWebSocketRouter(Authenticator authenticator) {
+    public MultiplayerModuleWebSocketRouter(Authenticator authenticator, PlayerRepository playerRepository) {
         this.authenticator = authenticator;
+        this.playerRepository = playerRepository;
 
-        RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventType");
-        getEventTypes().forEach(t -> eventAdapterFactory.registerSubtype(t));
+        RuntimeTypeAdapterFactory<Event> eventTypeAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventType");
+        getEventTypes().forEach(t -> eventTypeAdapterFactory.registerSubtype(t));
+        PlayerTypeAdapterFactory playerTypeAdapterFactory = new PlayerTypeAdapterFactory(playerRepository);
+
         this.gson = new GsonBuilder()
-                .registerTypeAdapterFactory(eventAdapterFactory)
+                .registerTypeAdapterFactory(eventTypeAdapterFactory)
+                .registerTypeAdapterFactory(playerTypeAdapterFactory)
                 .create();
 
         this.connections = Maps.newConcurrentMap();
@@ -57,7 +65,10 @@ public abstract class MultiplayerModuleWebSocketRouter {
         try {
             String playerId = getQueryParameterString(session, "playerId");
             String authToken = getQueryParameterString(session, "authToken");
-            authenticator.verify(playerId, authToken);
+            String name = authenticator.verify(playerId, authToken);
+            if (!playerRepository.contains(playerId)) {
+                playerRepository.setDisplayName(playerId, name);
+            }
             MultiplayerModule module = getModule(session);
             PlayerConnection connection = new WebSocketPlayerConnection(session, gson);
             connections.put(session, connection);

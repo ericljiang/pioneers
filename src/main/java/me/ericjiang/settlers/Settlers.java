@@ -16,6 +16,8 @@ import me.ericjiang.settlers.library.game.GameFactory;
 import me.ericjiang.settlers.library.game.GameWebSocketRouter;
 import me.ericjiang.settlers.library.lobby.Lobby;
 import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
+import me.ericjiang.settlers.library.player.InMemoryPlayerRepository;
+import me.ericjiang.settlers.library.player.PlayerRepository;
 import me.ericjiang.settlers.simple.SimpleGame;
 import me.ericjiang.settlers.simple.SimpleGameDao;
 import me.ericjiang.settlers.simple.SimpleGameFactory;
@@ -52,8 +54,9 @@ public class Settlers {
         GameFactory<SimpleGame> gameFactory = new SimpleGameFactory(gameDao);
         Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory);
         Authenticator authenticator = new GoogleAuthenticator();
-        LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby, authenticator);
-        GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby, authenticator);
+        PlayerRepository playerRepository = new InMemoryPlayerRepository();
+        LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby, authenticator, playerRepository);
+        GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby, authenticator, playerRepository);
 
         log.info("+-----------------+");
         log.info("| Starting server |");
