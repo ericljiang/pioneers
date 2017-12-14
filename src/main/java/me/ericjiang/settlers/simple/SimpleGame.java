@@ -1,9 +1,11 @@
 package me.ericjiang.settlers.simple;
 
+import lombok.NoArgsConstructor;
 import me.ericjiang.settlers.library.game.Game;
 import me.ericjiang.settlers.library.game.GameSummary;
 import me.ericjiang.settlers.library.player.Player;
 
+@NoArgsConstructor
 public class SimpleGame extends Game {
 
     public SimpleGame(String id, String owner, String name) {

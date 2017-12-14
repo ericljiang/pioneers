@@ -1,5 +1,6 @@
 package me.ericjiang.settlers.library.game;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -11,8 +12,10 @@ public abstract class GameFactory<G extends Game> {
 
     protected abstract G createGameInstance(String id, String owner, Map<String, Object> attributes);
 
-    public Map<String, G> loadGames() {
-        return gameDao.loadGames();
+    public List<G> loadGames() {
+        List<G> games = gameDao.loadGames();
+        games.forEach(gameDao::register);
+        return games;
     }
 
     public G createGame(String owner, Map<String, Object> attributes) {

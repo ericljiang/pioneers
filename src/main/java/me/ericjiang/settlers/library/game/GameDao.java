@@ -1,8 +1,7 @@
 package me.ericjiang.settlers.library.game;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import me.ericjiang.settlers.library.Event;
 
 public abstract class GameDao<G extends Game> {
 
@@ -10,16 +9,10 @@ public abstract class GameDao<G extends Game> {
 
     public abstract void save(G game);
 
-    protected abstract List<G> deserializeGames();
-
-    public Map<String, G> loadGames() {
-        List<G> games = deserializeGames();
-        games.forEach(this::register);
-        return games.stream().collect(Collectors.toMap(Game::getId, g -> g));
-    }
+    public abstract List<G> loadGames();
 
     public void register(G game) {
-        game.on(StateChangingEvent.class, e -> save(game));
+        game.on(Event.class, e -> save(game));
     }
 
 }

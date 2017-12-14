@@ -26,6 +26,17 @@ public abstract class Game extends MultiplayerModule {
 
     private boolean pregame;
 
+    /**
+     * No-args constructor for Gson
+     */
+    protected Game() {
+        this.id = "";
+        this.name = "";
+        this.creator = null;
+        this.players = Maps.newConcurrentMap();
+        setEventHandlers();
+    }
+
     public Game(String id, String creatorId, String name) {
         this.id = id;
         this.name = name;

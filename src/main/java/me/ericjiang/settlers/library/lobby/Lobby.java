@@ -25,7 +25,7 @@ public class Lobby<G extends Game> extends MultiplayerModule {
     public Lobby(GameFactory<G> gameFactory) {
         this.gameFactory = gameFactory;
         this.games = Maps.newHashMap();
-        gameFactory.loadGames().values().forEach(g -> add(g));
+        gameFactory.loadGames().forEach(g -> add(g));
         log.info(formatLog("Loaded %d games", games.size()));
         setEventHandlers();
     }

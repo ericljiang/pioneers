@@ -7,11 +7,15 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.auth.GoogleAuthenticator;
 import me.ericjiang.settlers.library.game.GameDao;
+import me.ericjiang.settlers.library.game.GameDaoPostgres;
 import me.ericjiang.settlers.library.game.GameFactory;
 import me.ericjiang.settlers.library.game.GameWebSocketRouter;
 import me.ericjiang.settlers.library.lobby.Lobby;
@@ -19,7 +23,6 @@ import me.ericjiang.settlers.library.lobby.LobbyWebSocketHandler;
 import me.ericjiang.settlers.library.player.InMemoryPlayerRepository;
 import me.ericjiang.settlers.library.player.PlayerRepository;
 import me.ericjiang.settlers.simple.SimpleGame;
-import me.ericjiang.settlers.simple.SimpleGameDao;
 import me.ericjiang.settlers.simple.SimpleGameFactory;
 import spark.Spark;
 import spark.utils.IOUtils;
@@ -47,10 +50,11 @@ public class Settlers {
         });
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         Gson gson = new Gson();
         String client = IOUtils.toString(Spark.class.getResourceAsStream("/public/index.html"));
-        GameDao<SimpleGame> gameDao = new SimpleGameDao();
+        Connection connection = DriverManager.getConnection("jdbc:postgresql:settlers");
+        GameDao<SimpleGame> gameDao = new GameDaoPostgres<SimpleGame>(SimpleGame.class, connection);
         GameFactory<SimpleGame> gameFactory = new SimpleGameFactory(gameDao);
         Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory);
         Authenticator authenticator = new GoogleAuthenticator();
