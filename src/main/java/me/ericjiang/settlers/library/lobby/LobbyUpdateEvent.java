@@ -2,6 +2,7 @@ package me.ericjiang.settlers.library.lobby;
 
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.stream.Collectors;
 
 import me.ericjiang.settlers.library.StateEvent;
@@ -14,9 +15,12 @@ public class LobbyUpdateEvent extends StateEvent {
     private final List<GameSummary> games;
 
     public LobbyUpdateEvent(Lobby<?> lobby) {
-        this.games = lobby.getGames().values().stream()
-                .map(Game::summarize)
-                .collect(Collectors.toList());
+        SortedMap<String, Game> games = lobby.getGames();
+        synchronized(games) {
+            this.games = games.values().stream()
+                    .map(Game::summarize)
+                    .collect(Collectors.toList());
+        }
     }
 
 }

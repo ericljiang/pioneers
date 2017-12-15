@@ -1,8 +1,8 @@
 package me.ericjiang.settlers.library.lobby;
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +20,11 @@ public class Lobby<G extends Game> extends MultiplayerModule {
     private final GameFactory<G> gameFactory;
 
     @Getter
-    private final Map<String, Game> games;
+    private final SortedMap<String, Game> games;
 
     public Lobby(GameFactory<G> gameFactory) {
         this.gameFactory = gameFactory;
-        this.games = Maps.newHashMap();
+        this.games = Collections.synchronizedSortedMap(new TreeMap<>());
         gameFactory.loadGames().forEach(g -> add(g));
         log.info(formatLog("Loaded %d games", games.size()));
         setEventHandlers();
