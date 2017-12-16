@@ -15,15 +15,15 @@ import me.ericjiang.settlers.library.player.PlayerRepository;
 @WebSocket
 public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
 
-    private final Lobby<?> lobby;
+    private final Lobby lobby;
 
-    public LobbyWebSocketHandler(Lobby<?> lobby, Authenticator authenticator, PlayerRepository playerRepository) {
+    public LobbyWebSocketHandler(Lobby lobby, Authenticator authenticator, PlayerRepository playerRepository) {
         super(authenticator, playerRepository);
         this.lobby = lobby;
     }
 
     @Override
-    protected Lobby<?> getModule(Session session) {
+    protected Lobby getModule(Session session) {
         return lobby;
     }
 

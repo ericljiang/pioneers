@@ -1,17 +1,18 @@
 package me.ericjiang.settlers.library.game;
 
-import java.util.List;
+import java.util.Map;
+
 import me.ericjiang.settlers.library.Event;
 
-public abstract class GameDao<G extends Game> {
+public abstract class GameDao {
 
     public abstract String getNewId();
 
-    public abstract void save(G game);
+    public abstract void save(Game game);
 
-    public abstract List<G> loadGames();
+    public abstract Map<String, Game> loadGames();
 
-    public void register(G game) {
+    public void register(Game game) {
         game.on(Event.class, e -> save(game));
     }
 

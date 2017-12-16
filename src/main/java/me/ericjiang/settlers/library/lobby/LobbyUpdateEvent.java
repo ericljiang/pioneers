@@ -14,13 +14,10 @@ public class LobbyUpdateEvent extends StateEvent {
 
     private final List<GameSummary> games;
 
-    public LobbyUpdateEvent(Lobby<?> lobby) {
-        SortedMap<String, Game> games = lobby.getGames();
-        synchronized(games) {
-            this.games = games.values().stream()
-                    .map(Game::summarize)
-                    .collect(Collectors.toList());
-        }
+    public LobbyUpdateEvent(Lobby lobby) {
+        this.games = lobby.getGames().descendingMap().values().stream()
+                .map(Game::summarize)
+                .collect(Collectors.toList());
     }
 
 }

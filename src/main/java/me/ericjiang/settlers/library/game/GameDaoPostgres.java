@@ -1,6 +1,6 @@
 package me.ericjiang.settlers.library.game;
 
-import com.google.common.collect.Lists;
+import com.google.api.client.util.Maps;
 import com.google.gson.Gson;
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,20 +10,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
-public class GameDaoPostgres<G extends Game> extends GameDao<G> {
+public class GameDaoPostgres extends GameDao {
 
     private final Gson gson;
 
-    private final Class<G> gameClass;
+    private final Class<? extends Game> gameClass;
 
     private final Connection connection;
 
     private final PreparedStatement writeGame;
 
-    public GameDaoPostgres(Class<G> gameClass, Connection connection) {
+    public GameDaoPostgres(Class<? extends Game> gameClass, Connection connection) {
         this.gson = new Gson();
         this.gameClass = gameClass;
         this.connection = connection;
@@ -53,7 +54,7 @@ public class GameDaoPostgres<G extends Game> extends GameDao<G> {
     }
 
     @Override
-    public void save(G game) {
+    public void save(Game game) {
         String serializedGame = serialize(game);
         int id = Integer.parseInt(game.getId());
         log.info("Saving Game " + id);
@@ -66,33 +67,25 @@ public class GameDaoPostgres<G extends Game> extends GameDao<G> {
     }
 
     @Override
-    public List<G> loadGames() {
-        List<String> serializedGames = readGames();
-        List<G> games = deserialize(serializedGames);
+    public Map<String, Game> loadGames() {
+        Map<String, Game> games = readGames().entrySet().stream()
+                .collect(Collectors.toMap(e -> String.valueOf(e.getKey()),
+                                          e -> deserialize(e.getValue())));
         return games;
     }
 
-    private String serialize(G game) {
+    private String serialize(Game game) {
         return gson.toJson(game);
     }
 
-    private List<G> deserialize(List<String> serializedGames) {
-        List<G> games = Lists.newArrayList();
-        for (String s : serializedGames) {
-            try {
-                G game = gson.fromJson(s, gameClass);
-                if (game.isPregame()) {
-                    game.getPlayers().clear();
-                } else {
-                    game.getPlayers().values().forEach(p -> p.setOnline(false));
-                }
-                games.add((G) game);
-            } catch (RuntimeException e) {
-                String message = String.format("Failed to deserialize game as %s: %s", gameClass.getName(), s);
-                log.error(message, e);
-            }
+    private Game deserialize(String serializedGame) {
+        Game game = gson.fromJson(serializedGame, gameClass);
+        if (game.isPregame()) {
+            game.getPlayers().clear();
+        } else {
+            game.getPlayers().values().forEach(p -> p.setOnline(false));
         }
-        return games;
+        return game;
     }
 
     private void write(int id, String serializedGame) throws SQLException {
@@ -101,14 +94,15 @@ public class GameDaoPostgres<G extends Game> extends GameDao<G> {
         writeGame.executeUpdate();
     }
 
-    private List<String> readGames() {
-        List<String> serializedGames = Lists.newArrayList();
-        String sql = "select data from game";
+    private Map<Integer, String> readGames() {
+        Map<Integer, String> serializedGames = Maps.newHashMap();
+        String sql = "SELECT id, data FROM game";
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
-                String json = resultSet.getString(1);
-                serializedGames.add(json);
+                int id = resultSet.getInt(1);
+                String json = resultSet.getString(2);
+                serializedGames.put(id, json);
             }
         } catch (SQLException e) {
             String message = "Failed to read games from PostgreSQL";

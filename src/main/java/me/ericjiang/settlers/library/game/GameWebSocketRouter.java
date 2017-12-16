@@ -15,9 +15,9 @@ import com.google.common.collect.Lists;
 @WebSocket
 public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
 
-    private final Lobby<?> lobby;
+    private final Lobby lobby;
 
-    public GameWebSocketRouter(Lobby<?> lobby, Authenticator authenticator, PlayerRepository playerRepository) {
+    public GameWebSocketRouter(Lobby lobby, Authenticator authenticator, PlayerRepository playerRepository) {
         super(authenticator, playerRepository);
         this.lobby = lobby;
     }

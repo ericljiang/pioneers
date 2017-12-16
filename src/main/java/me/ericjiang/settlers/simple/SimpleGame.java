@@ -8,8 +8,11 @@ import me.ericjiang.settlers.library.player.Player;
 @NoArgsConstructor
 public class SimpleGame extends Game {
 
+    private String testValue;
+
     public SimpleGame(String id, String owner, String name) {
         super(id, owner, name);
+        this.testValue = "foo";
     }
 
     @Override

@@ -54,9 +54,9 @@ public class Settlers {
         Gson gson = new Gson();
         String client = IOUtils.toString(Spark.class.getResourceAsStream("/public/index.html"));
         Connection connection = DriverManager.getConnection("jdbc:postgresql:settlers");
-        GameDao<SimpleGame> gameDao = new GameDaoPostgres<SimpleGame>(SimpleGame.class, connection);
-        GameFactory<SimpleGame> gameFactory = new SimpleGameFactory(gameDao);
-        Lobby<SimpleGame> lobby = new Lobby<SimpleGame>(gameFactory);
+        GameDao gameDao = new GameDaoPostgres(SimpleGame.class, connection);
+        GameFactory gameFactory = new SimpleGameFactory(gameDao);
+        Lobby lobby = new Lobby(gameFactory);
         Authenticator authenticator = new GoogleAuthenticator();
         PlayerRepository playerRepository = new InMemoryPlayerRepository();
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby, authenticator, playerRepository);

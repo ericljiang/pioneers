@@ -1,9 +1,9 @@
 package me.ericjiang.settlers.library.lobby;
 
 import java.util.Collections;
-import java.util.SortedMap;
+import java.util.NavigableMap;
 import java.util.TreeMap;
-
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.library.MultiplayerModule;
@@ -15,17 +15,19 @@ import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
 
 @Slf4j
-public class Lobby<G extends Game> extends MultiplayerModule {
+public class Lobby extends MultiplayerModule {
 
-    private final GameFactory<G> gameFactory;
+    private final GameFactory gameFactory;
 
-    @Getter
-    private final SortedMap<String, Game> games;
+    @Getter(AccessLevel.PACKAGE)
+    private final NavigableMap<String, Game> games;
 
-    public Lobby(GameFactory<G> gameFactory) {
+    public Lobby(GameFactory gameFactory) {
         this.gameFactory = gameFactory;
-        this.games = Collections.synchronizedSortedMap(new TreeMap<>());
-        gameFactory.loadGames().forEach(g -> add(g));
+        this.games = Collections.synchronizedNavigableMap(new TreeMap<>(gameFactory.loadGames()));
+        games.values().forEach(g -> {
+            register(g);
+        });
         log.info(formatLog("Loaded %d games", games.size()));
         setEventHandlers();
     }
@@ -51,16 +53,17 @@ public class Lobby<G extends Game> extends MultiplayerModule {
 
     private void setEventHandlers() {
         on(GameCreationEvent.class, e -> {
-            add(gameFactory.createGame(e.getPlayerId(), e.getAttributes()));
+            Game game = gameFactory.createGame(e.getPlayerId(), e.getAttributes());
+            register(game);
+            games.put(game.getId(), game);
+            broadcastState();
         });
     }
 
-    private void add(G game) {
+    private void register(Game game) {
         game.on(PlayerConnectionEvent.class, e -> broadcastState());
         game.on(PlayerDisconnectionEvent.class, e -> broadcastState());
         game.on(StartGameEvent.class, e -> broadcastState());
-        games.put(game.getId(), game);
-        broadcastState();
         log.info(formatLog("Added Game %s", game.getId()));
     }
 
