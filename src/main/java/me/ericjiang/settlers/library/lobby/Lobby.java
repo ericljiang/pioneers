@@ -29,7 +29,9 @@ public class Lobby extends MultiplayerModule {
     public Lobby(GameFactory gameFactory, PlayerRepository playerRepository) {
         this.gameFactory = gameFactory;
         this.playerRepository = playerRepository;
-        this.games = Collections.synchronizedNavigableMap(new TreeMap<>(gameFactory.loadGames()));
+        this.games = Collections.synchronizedNavigableMap(
+                new TreeMap<>((id1, id2) -> Integer.parseInt(id1) - Integer.parseInt(id2)));
+        games.putAll(gameFactory.loadGames());
         games.values().forEach(g -> {
             register(g);
         });
