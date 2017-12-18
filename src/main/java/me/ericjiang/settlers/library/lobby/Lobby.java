@@ -13,17 +13,22 @@ import me.ericjiang.settlers.library.game.GameFactory;
 import me.ericjiang.settlers.library.game.StartGameEvent;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
+import me.ericjiang.settlers.library.player.PlayerNameChangeEvent;
+import me.ericjiang.settlers.library.player.PlayerRepository;
 
 @Slf4j
 public class Lobby extends MultiplayerModule {
 
     private final GameFactory gameFactory;
 
+    private final PlayerRepository playerRepository;
+
     @Getter(AccessLevel.PACKAGE)
     private final NavigableMap<String, Game> games;
 
-    public Lobby(GameFactory gameFactory) {
+    public Lobby(GameFactory gameFactory, PlayerRepository playerRepository) {
         this.gameFactory = gameFactory;
+        this.playerRepository = playerRepository;
         this.games = Collections.synchronizedNavigableMap(new TreeMap<>(gameFactory.loadGames()));
         games.values().forEach(g -> {
             register(g);
@@ -57,6 +62,24 @@ public class Lobby extends MultiplayerModule {
             register(game);
             games.put(game.getId(), game);
             broadcastState();
+        });
+
+        on(PlayerConnectionEvent.class, e -> {
+            String playerId = e.getPlayerId();
+            PlayerNameChangeEvent playerNameChangeEvent = new PlayerNameChangeEvent(playerRepository.getDisplayName(playerId));
+            playerNameChangeEvent.setPlayerId(playerId);
+            transmit(playerId, playerNameChangeEvent);
+        });
+
+        on(PlayerNameChangeEvent.class, e -> {
+            String playerId = e.getPlayerId();
+            log.info(formatLog("%s (%s) changed their name to %s",
+                    playerRepository.getDisplayName(playerId), playerId, e.getDisplayName()));
+            playerRepository.setDisplayName(e.getPlayerId(), e.getDisplayName());
+            transmit(playerId, e);
+            games.values().stream()
+                    .filter(g -> g.getPlayers().containsKey(playerId))
+                    .forEach(g -> g.handleEvent(e));
         });
     }
 

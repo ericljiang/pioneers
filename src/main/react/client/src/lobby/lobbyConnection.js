@@ -6,6 +6,7 @@ export default class LobbyConnection extends WebSocketConnection {
     var path = "lobby";
     super(playerId, authToken, name, path);
     this.createGame = this.createGame.bind(this);
+    this.changeDisplayName = this.changeDisplayName.bind(this);
   }
 
   createGame(owner, name) {
@@ -14,6 +15,13 @@ export default class LobbyConnection extends WebSocketConnection {
       attributes: {
         name: name
       }
+    });
+  }
+
+  changeDisplayName(name) {
+    this.send({
+      eventType: "PlayerNameChangeEvent",
+      displayName: name
     });
   }
 }

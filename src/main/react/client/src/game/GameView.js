@@ -12,7 +12,7 @@ export default class GameView extends Component {
 
   componentWillMount() {
     var gameConnection = new GameConnection(this.props.match.params.id, this.props.playerId, this.props.authToken);
-    gameConnection.on("GameUpdateEvent", (event) => {
+    gameConnection.on("GameUpdateEvent", event => {
       this.setState({ game: event.game });
     });
     this.setState({ gameConnection: gameConnection });

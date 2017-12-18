@@ -6,6 +6,7 @@ import me.ericjiang.settlers.library.MultiplayerModule;
 import me.ericjiang.settlers.library.MultiplayerModuleWebSocketRouter;
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.lobby.Lobby;
+import me.ericjiang.settlers.library.player.PlayerNameChangeEvent;
 import me.ericjiang.settlers.library.player.PlayerRepository;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -34,6 +35,6 @@ public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
 
     @Override
     protected List<Class<? extends Event>> getEventTypes() {
-        return Lists.newArrayList(GameUpdateEvent.class, StartGameEvent.class);
+        return Lists.newArrayList(GameUpdateEvent.class, StartGameEvent.class, PlayerNameChangeEvent.class);
     }
 }

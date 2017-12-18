@@ -16,7 +16,7 @@ export default class CreateGameForm extends Component {
       <form onSubmit={this.handleSubmit}>
         <label>
           Name:
-            <input type="text" ref={(input) => this.input = input} />
+          <input type="text" ref={(input) => this.input = input} />
         </label>
         <input type="submit" value="Create game" />
       </form>

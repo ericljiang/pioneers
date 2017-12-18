@@ -56,9 +56,9 @@ public class Settlers {
         Connection connection = DriverManager.getConnection("jdbc:postgresql:settlers");
         GameDao gameDao = new GameDaoPostgres(SimpleGame.class, connection);
         GameFactory gameFactory = new SimpleGameFactory(gameDao);
-        Lobby lobby = new Lobby(gameFactory);
-        Authenticator authenticator = new GoogleAuthenticator();
         PlayerRepository playerRepository = new InMemoryPlayerRepository();
+        Lobby lobby = new Lobby(gameFactory, playerRepository);
+        Authenticator authenticator = new GoogleAuthenticator();
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby, authenticator, playerRepository);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby, authenticator, playerRepository);
 

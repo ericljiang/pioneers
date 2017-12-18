@@ -11,6 +11,7 @@ import me.ericjiang.settlers.library.StateEvent;
 import me.ericjiang.settlers.library.player.Player;
 import me.ericjiang.settlers.library.player.PlayerConnectionEvent;
 import me.ericjiang.settlers.library.player.PlayerDisconnectionEvent;
+import me.ericjiang.settlers.library.player.PlayerNameChangeEvent;
 
 @Slf4j
 @Getter
@@ -103,6 +104,10 @@ public abstract class Game extends MultiplayerModule {
                 start();
                 broadcast(new GameUpdateEvent(this));
             }
+        });
+
+        on(PlayerNameChangeEvent.class, e -> {
+            broadcast(toStateEvent());
         });
     }
 

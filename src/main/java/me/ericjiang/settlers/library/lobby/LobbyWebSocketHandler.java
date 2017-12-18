@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import me.ericjiang.settlers.library.Event;
 import me.ericjiang.settlers.library.MultiplayerModuleWebSocketRouter;
 import me.ericjiang.settlers.library.auth.Authenticator;
+import me.ericjiang.settlers.library.player.PlayerNameChangeEvent;
 import me.ericjiang.settlers.library.player.PlayerRepository;
 
 @WebSocket
@@ -29,6 +30,10 @@ public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
 
     @Override
     protected List<Class<? extends Event>> getEventTypes() {
-        return Lists.newArrayList(LobbyUpdateEvent.class, GameCreationEvent.class);
+        return Lists.newArrayList(
+                LobbyUpdateEvent.class,
+                GameCreationEvent.class,
+                PlayerNameChangeEvent.class
+        );
     }
 }
