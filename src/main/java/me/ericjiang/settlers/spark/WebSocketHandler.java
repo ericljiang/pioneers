@@ -6,6 +6,7 @@ import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.settlers.core.actions.Action;
+import me.ericjiang.settlers.core.actions.InvalidActionException;
 import me.ericjiang.settlers.core.actions.PlayerAction;
 import me.ericjiang.settlers.core.game.Game;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -64,6 +65,8 @@ public class WebSocketHandler {
             action.accept(game);
         } catch (ClassCastException e) {
             throw new InternalError("Server received an Action that wasn't a PlayerAction.", e);
+        } catch (InvalidActionException e) {
+            // swallow
         }
     }
 

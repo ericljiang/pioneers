@@ -46,7 +46,7 @@ public class BoardDaoPostgresIntegrationTest extends PostgresDaoIntegrationTestB
 
     @Test
     public void shouldGetIntersectionWePut() {
-        Intersection.Coordinates coordinates = new Intersection.Coordinates(0, 0, Intersection.Coordinates.Direction.L);
+        Intersection.Coordinates coordinates = new Intersection.Coordinates(0, 0, Intersection.Coordinates.Direction.N);
         Intersection intersection = new Intersection(coordinates, "foo", false);
         boardDao.putIntersection("0", coordinates, intersection);
         assertEquals(intersection, boardDao.getIntersection("0", coordinates));

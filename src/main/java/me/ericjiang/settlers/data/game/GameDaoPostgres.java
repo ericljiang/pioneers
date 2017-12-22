@@ -139,7 +139,7 @@ public class GameDaoPostgres extends PostgresDao implements GameDao {
             preparedStatement.setString(1, gameId);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-            phase = Phase.valueOf(resultSet.getString("phase"));
+            phase = Phase.fromString(resultSet.getString("phase"));
         } catch (SQLException e) {
             log.error("Error getting game phase: " + sql, e);
             halt(500);

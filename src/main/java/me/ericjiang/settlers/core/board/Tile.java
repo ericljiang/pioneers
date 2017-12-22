@@ -2,6 +2,9 @@ package me.ericjiang.settlers.core.board;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import com.google.gson.annotations.SerializedName;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,7 +20,23 @@ public class Tile {
 
     private int numberToken;
 
-    public enum Resource { ORE, GRAIN, LUMBER, WOOL, BRICK, NONE }
+    public enum Resource {
+        @SerializedName("ore") ORE,
+        @SerializedName("grain") GRAIN,
+        @SerializedName("lumber") LUMBER,
+        @SerializedName("wool") WOOL,
+        @SerializedName("brick") BRICK,
+        @SerializedName("none") NONE;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+
+        public static Resource fromString(String string) {
+            return valueOf(string.toUpperCase());
+        }
+    }
 
     /**
      * http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
@@ -41,26 +60,26 @@ public class Tile {
         }
 
         public Set<Edge.Coordinates> getEdges() {
-            // (u,v) → (u,v,N) (u,v,E) (u+1,v-1,W) (u,v-1,N) (u-1,v,E) (u,v,W)
+            // (u,v) → (u,v,NE) (u,v,E) (u,v,SE) (u-1,v+1,NE) (u-1,v,E) (u,v-1,SE)
             Set<Edge.Coordinates> edges = new HashSet<Edge.Coordinates>();
-            edges.add(new Edge.Coordinates(column, row, Edge.Coordinates.Direction.N));
+            edges.add(new Edge.Coordinates(column, row, Edge.Coordinates.Direction.NE));
             edges.add(new Edge.Coordinates(column, row, Edge.Coordinates.Direction.E));
-            edges.add(new Edge.Coordinates(column + 1, row - 1, Edge.Coordinates.Direction.W));
-            edges.add(new Edge.Coordinates(column, row - 1, Edge.Coordinates.Direction.N));
+            edges.add(new Edge.Coordinates(column, row, Edge.Coordinates.Direction.SE));
+            edges.add(new Edge.Coordinates(column - 1, row + 1, Edge.Coordinates.Direction.NE));
             edges.add(new Edge.Coordinates(column - 1, row, Edge.Coordinates.Direction.E));
-            edges.add(new Edge.Coordinates(column, row, Edge.Coordinates.Direction.W));
+            edges.add(new Edge.Coordinates(column, row - 1, Edge.Coordinates.Direction.SE));
             return edges;
         }
 
         public Set<Intersection.Coordinates> getCorners() {
-            // (u,v) → (u+1,v,L) (u,v,R) (u+1,v-1,L) (u-1,v,R) (u,v,L) (u-1,v+1,R)
+            // (u,v) → (u,v,N) (u+1,v-1,S) (u,v+1,N) (u,v,S) (u-1,v+1,N) (u,v-1,S)
             Set<Intersection.Coordinates> corners = new HashSet<Intersection.Coordinates>();
-            corners.add(new Intersection.Coordinates(column + 1, row, Intersection.Coordinates.Direction.L));
-            corners.add(new Intersection.Coordinates(column, row, Intersection.Coordinates.Direction.R));
-            corners.add(new Intersection.Coordinates(column + 1, row - 1, Intersection.Coordinates.Direction.L));
-            corners.add(new Intersection.Coordinates(column - 1, row, Intersection.Coordinates.Direction.R));
-            corners.add(new Intersection.Coordinates(column, row, Intersection.Coordinates.Direction.L));
-            corners.add(new Intersection.Coordinates(column - 1, row + 1, Intersection.Coordinates.Direction.R));
+            corners.add(new Intersection.Coordinates(column, row, Intersection.Coordinates.Direction.N));
+            corners.add(new Intersection.Coordinates(column + 1, row - 1, Intersection.Coordinates.Direction.S));
+            corners.add(new Intersection.Coordinates(column, row + 1, Intersection.Coordinates.Direction.N));
+            corners.add(new Intersection.Coordinates(column, row, Intersection.Coordinates.Direction.S));
+            corners.add(new Intersection.Coordinates(column - 1, row + 1, Intersection.Coordinates.Direction.N));
+            corners.add(new Intersection.Coordinates(column, row - 1, Intersection.Coordinates.Direction.S));
             return corners;
         }
     }

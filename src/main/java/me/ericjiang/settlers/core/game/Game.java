@@ -4,25 +4,20 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
 import com.google.gson.annotations.SerializedName;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import me.ericjiang.settlers.core.actions.Action;
-import me.ericjiang.settlers.core.actions.DisconnectAction;
-import me.ericjiang.settlers.core.actions.GameUpdate;
-import me.ericjiang.settlers.core.actions.JoinAction;
-import me.ericjiang.settlers.core.actions.LeaveAction;
-import me.ericjiang.settlers.core.actions.PhaseUpdate;
-import me.ericjiang.settlers.core.actions.StartAction;
+import me.ericjiang.settlers.core.actions.*;
 import me.ericjiang.settlers.core.player.Player;
 import me.ericjiang.settlers.data.board.BoardDao;
 import me.ericjiang.settlers.data.game.GameDao;
@@ -35,7 +30,7 @@ public abstract class Game {
      * Base-64 encoded UUID without padding
      */
     @Getter
-    protected final String id;
+    private final String id;
 
     @Getter
     private final LocalDateTime creationTime;
@@ -53,7 +48,7 @@ public abstract class Game {
     /**
      * Sequence of play. Determined on game start.
      */
-    private transient PeekingIterator<Color> playerSequence;
+    private transient Iterator<Color> playerSequence;
 
     /**
      * Maps playerIds to their connections
@@ -63,7 +58,7 @@ public abstract class Game {
      */
     private final transient Map<String, Player> playerConnections;
 
-    private transient GameDao gameDao;
+    protected transient GameDao gameDao;
 
     protected transient BoardDao boardDao;
 
@@ -89,7 +84,7 @@ public abstract class Game {
             } else {
                 Map<Color, String> players = playerDao.playersForGame(id);
                 playerSlots = ImmutableBiMap.copyOf(players);
-                playerSequence = Iterators.peekingIterator(Iterators.unmodifiableIterator(Iterators.cycle(players.keySet())));
+                playerSequence = Iterators.unmodifiableIterator(Iterators.cycle(players.keySet()));
                 while (playerSequence.next() != gameDao.getActivePlayer(id)) {
                     // advance iterator
                 }
@@ -183,8 +178,47 @@ public abstract class Game {
         broadcast(startAction);
     }
 
+    public abstract void handleBuildAction(BuildSettlementAction buildAction);
+
     // End of Action handlers
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected void broadcast(Action action) {
+        log.info("Broadcasting action " + action.getId());
+        for (Player player : playerConnections.values()) {
+            player.update(action);
+        }
+    }
+
+    /**
+     * Validate that the action was sent by the active player
+     *
+     * @param action - the action to validate
+     */
+    protected void validateActionByActivePlayer(PlayerAction action) {
+        if (gameDao.getActivePlayer(id) != playerSlots.inverse().get(action.getPlayerId())) {
+            throw new InvalidActionException();
+        }
+    }
+
+    /**
+     * Validate that the action is valid for the phase
+     *
+     * @param validPhases - phases in which the action is valid
+     */
+    protected void validatePhase(Phase... validPhases) {
+        if (Arrays.stream(validPhases).anyMatch(v -> v == gameDao.getPhase(id))) {
+            throw new InvalidActionException();
+        }
+    }
+
+    protected void changePhase(Phase phase, boolean nextTurn) {
+        gameDao.setPhase(id, phase);
+        if (nextTurn) {
+            gameDao.setActivePlayer(id, playerSequence.next());
+        }
+        broadcast(new PhaseUpdate(phase, gameDao.getActivePlayer(id)));
+    }
 
     private void start() {
         // add players to game and assign position
@@ -200,14 +234,7 @@ public abstract class Game {
         }
 
         // exit setup phase
-        changePhase(Phase.ROLL, false);
-    }
-
-    private void broadcast(Action action) {
-        log.info("Broadcasting action " + action.getId());
-        for (Player player : playerConnections.values()) {
-            player.update(action);
-        }
+        changePhase(Phase.INITIAL_PLACEMENT, true);
     }
 
     /**
@@ -231,16 +258,24 @@ public abstract class Game {
         });
     }
 
-    private void changePhase(Phase phase, boolean nextTurn) {
-        gameDao.setPhase(id, phase);
-        if (nextTurn) {
-            gameDao.setActivePlayer(id, playerSequence.next());
-        }
-        broadcast(new PhaseUpdate(phase, playerSequence.peek()));
-    }
-
     public enum Phase {
-        SETUP, ROLL, TRADE, BUILD
+        @SerializedName("initialPlacement") INITIAL_PLACEMENT,
+        @SerializedName("setup") SETUP,
+        @SerializedName("roll") ROLL,
+        @SerializedName("trade") TRADE,
+        @SerializedName("build") BUILD;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+
+        public static Phase fromString(String string) {
+            if (string == null) {
+                return null;
+            }
+            return valueOf(string.toUpperCase());
+        }
     }
 
     public enum Color {
