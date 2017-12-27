@@ -124,7 +124,7 @@ task copyClient(type: Copy) {
 }
 
 // Heroku task
-task stage(dependsOn: ['clean', 'installDist'])
+task stage(dependsOn: ['clean', 'installDist', 'copyClient'])
 
 build.dependsOn(npm_run_build)
 build.finalizedBy(copyClient)
