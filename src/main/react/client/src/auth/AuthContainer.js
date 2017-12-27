@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SignInPage from './SignInPage.js'
+// import MockSignInPage from './MockSignInPage.js'
 
 export default class AuthContainer extends Component {
   constructor(props) {
@@ -18,6 +19,7 @@ export default class AuthContainer extends Component {
       return this.props.children;
     } else {
       return <SignInPage onSignIn={this.onSignIn} />
+      // return <MockSignInPage onSignIn={this.onSignIn} />
     }
   }
 }

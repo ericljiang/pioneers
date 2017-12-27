@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import me.ericjiang.settlers.library.auth.Authenticator;
 import me.ericjiang.settlers.library.auth.GoogleAuthenticator;
+// import me.ericjiang.settlers.library.auth.MockAuthenticator;
 import me.ericjiang.settlers.library.game.GameDao;
 import me.ericjiang.settlers.library.game.GameDaoPostgres;
 import me.ericjiang.settlers.library.game.GameFactory;
@@ -60,6 +61,7 @@ public class Settlers {
         PlayerRepository playerRepository = new InMemoryPlayerRepository();
         Lobby lobby = new Lobby(gameFactory, playerRepository);
         Authenticator authenticator = new GoogleAuthenticator();
+        // Authenticator authenticator = new MockAuthenticator();
         LobbyWebSocketHandler lobbyWebSocketHandler = new LobbyWebSocketHandler(lobby, authenticator, playerRepository);
         GameWebSocketRouter gameWebSocketRouter = new GameWebSocketRouter(lobby, authenticator, playerRepository);
 
