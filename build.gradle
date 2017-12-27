@@ -123,5 +123,8 @@ task copyClient(type: Copy) {
     into 'build/resources/main/public'
 }
 
+// Heroku task
+task stage(dependsOn: ['clean', 'installDist'])
+
 build.dependsOn(npm_run_build)
 build.finalizedBy(copyClient)
