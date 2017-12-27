@@ -3,6 +3,9 @@ language: java
 services:
   - postgresql
 
+addons:
+  postgresql: "9.4"
+
 before_script:
   - psql -c 'create database settlers;' -U postgres
   - psql settlers -af src/main/sql/create.sql -U postgres
