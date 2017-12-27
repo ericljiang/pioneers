@@ -1,20 +1,39 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
+import { withStyles } from 'material-ui/styles';
+import { TableCell, TableRow } from 'material-ui/Table';
 
-export default function GameSummary(props) {
-  var name = props.game.name;
-  return (
-    <tr>
-      <td>#{props.game.id}</td>
-      <td>{props.game.name}</td>
-      <td>{playersOnline(props.game.players)}/{props.game.pregame ? props.game.maximumPlayers : Object.keys(props.game.players).length}</td>
-      <td><Link to={"/game/" + props.game.id}>Play</Link></td>
-    </tr>
-  );
+const styles = {
+  row: {
+    cursor: 'pointer'
+  }
+};
+
+class GameSummary extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  playersOnline(players) {
+    return Object.keys(players)
+      .filter(playerId => players[playerId].online)
+      .length;
+  }
+
+  joinGame = () => {
+    this.props.history.push(`/game/${this.props.game.id}`);
+  }
+
+  render() {
+    return (
+      <TableRow hover className={this.props.classes.row} onClick={this.joinGame}>
+        <TableCell>{this.props.game.name}</TableCell>
+        <TableCell>
+          {this.playersOnline(this.props.game.players)}/{this.props.game.pregame ? this.props.game.maximumPlayers : Object.keys(this.props.game.players).length}
+        </TableCell>
+      </TableRow>
+    );
+  }
 }
 
-function playersOnline(players) {
-  return Object.keys(players)
-    .filter(playerId => players[playerId].online)
-    .length;
-}
+export default withStyles(styles)(withRouter(GameSummary));

@@ -44,9 +44,10 @@ public class Settlers {
         get("/api/hello", (req, res) -> new Greeting(), gson::toJson);
 
         // Routes in react-router
-        String[] reactRoutes = { "/lobby", "/game/*", "/message" };
+        String[] reactRoutes = { "/lobby", "/game", "/message" };
         Arrays.stream(reactRoutes).forEach(path -> {
             get(path, (req, res) -> client);
+            get(path + "/*", (req, res) -> client);
         });
     }
 
