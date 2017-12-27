@@ -1,5 +1,12 @@
 language: java
 
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database settlers;' -U postgres
+  - psql settlers -af src/main/sql/create.sql -U postgres
+
 after_success:
   - ./gradlew jacocoTestReport coveralls
   - bash <(curl -s https://codecov.io/bash)
