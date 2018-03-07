@@ -7,7 +7,6 @@
  */
 
 plugins {
-    id "com.moowork.node" version "1.2.0"
     id 'com.github.kt3k.coveralls' version '2.8.2'
 	id 'io.franzbecker.gradle-lombok' version '1.11'
     id 'jacoco'
@@ -51,17 +50,6 @@ jacocoTestReport {
 lombok {
     version = "1.16.18"
     sha256 = ""
-}
-
-node {
-    // Set the work directory for unpacking node
-    workDir = file("${project.buildDir}/nodejs")
-
-    // Set the work directory for NPM
-    npmWorkDir = file("${project.projectDir}/src/main/react/client")
-
-    // Set the work directory where node_modules should be located
-    nodeModulesDir = file("${project.projectDir}/src/main/react/client/node_modules")
 }
 
 test {
@@ -118,13 +106,5 @@ task resetdb {
     }
 }
 
-task copyClient(type: Copy) {
-    from 'src/main/react/client/build'
-    into 'build/resources/main/public'
-}
-
 // Heroku task
-task stage(dependsOn: ['clean', 'installDist', 'copyClient'])
-
-build.dependsOn(npm_run_build)
-build.finalizedBy(copyClient)
+task stage(dependsOn: ['clean', 'installDist'])
