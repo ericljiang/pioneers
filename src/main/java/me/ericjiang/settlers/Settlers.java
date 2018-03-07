@@ -29,9 +29,12 @@ import me.ericjiang.settlers.simple.SimpleGameFactory;
 public class Settlers {
 
     public Settlers(
+            int port,
             Gson gson,
             LobbyWebSocketHandler lobbyWebSocketHandler,
             GameWebSocketRouter gameWebSocketRouter) {
+
+        port(port);
 
         staticFiles.location("/public");
 
@@ -42,8 +45,9 @@ public class Settlers {
     }
 
     public static void main(String[] args) throws IOException, SQLException {
+        int port = getPort();
         Gson gson = new Gson();
-        Connection connection = DriverManager.getConnection("jdbc:postgresql:settlers");
+        Connection connection = getDatabaseConnection();
         GameDao gameDao = new GameDaoPostgres(SimpleGame.class, connection);
         GameFactory gameFactory = new SimpleGameFactory(gameDao);
         PlayerRepository playerRepository = new InMemoryPlayerRepository();
@@ -57,6 +61,20 @@ public class Settlers {
         log.info("| Starting server |");
         log.info("+-----------------+");
 
-        new Settlers(gson, lobbyWebSocketHandler, gameWebSocketRouter);
+        new Settlers(port, gson, lobbyWebSocketHandler, gameWebSocketRouter);
+    }
+
+    private static Connection getDatabaseConnection() throws SQLException {
+        String dbUrl = System.getenv("JDBC_DATABASE_URL");
+        dbUrl = (dbUrl != null) ? dbUrl : "jdbc:postgresql:settlers";
+        Connection connection = DriverManager.getConnection(dbUrl);
+        log.info("Connected to database at " + dbUrl);
+        return connection;
+    }
+
+    private static int getPort() {
+        String port = System.getenv("PORT");
+        // return default port if heroku-port isn't set (i.e. on localhost)
+        return port != null ? Integer.parseInt(port) : 4567;
     }
 }
