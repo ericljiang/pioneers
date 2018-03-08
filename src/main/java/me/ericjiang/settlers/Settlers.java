@@ -42,6 +42,7 @@ public class Settlers {
         webSocket("/ws/game", gameWebSocketRouter);
 
         get("/api/hello", (req, res) -> new Greeting(), gson::toJson);
+        get("/ping", (req, res) -> "pong");
     }
 
     public static void main(String[] args) throws IOException, SQLException {
