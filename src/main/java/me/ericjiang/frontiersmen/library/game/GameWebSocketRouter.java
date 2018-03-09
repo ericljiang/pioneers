@@ -26,10 +26,8 @@ public class GameWebSocketRouter extends MultiplayerModuleWebSocketRouter {
     @Override
     protected MultiplayerModule getModule(Session session) {
         String gameId = getQueryParameterString(session, "gameId");
-        MultiplayerModule game = lobby.getGame(gameId);
-        if (game == null) {
-            throw new IllegalArgumentException("No Game found with id " + gameId);
-        }
+        MultiplayerModule game = lobby.getGame(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("No Game found with id " + gameId));
         return game;
     }
 

@@ -2,6 +2,7 @@ package me.ericjiang.frontiersmen.library.lobby;
 
 import java.util.Collections;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.TreeMap;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,8 +40,8 @@ public class Lobby extends MultiplayerModule {
         setEventHandlers();
     }
 
-    public Game getGame(String gameId) {
-        return games.get(gameId);
+    public Optional<Game> getGame(String gameId) {
+        return Optional.ofNullable(games.get(gameId));
     }
 
     @Override
