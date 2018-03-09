@@ -61,9 +61,9 @@ test {
 }
 
 // Define the main class for the application
-mainClassName = 'me.ericjiang.settlers.Settlers'
+mainClassName = 'me.ericjiang.frontiersmen.Frontiersmen'
 
-def database = 'settlers'
+def database = 'frontiersmen'
 
 task createdb {
     doLast {
