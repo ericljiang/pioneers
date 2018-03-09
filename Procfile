@@ -1,1 +1,1 @@
-web: ./build/install/settlers/bin/settlers
+web: ./build/install/frontiersmen/bin/frontiersmen

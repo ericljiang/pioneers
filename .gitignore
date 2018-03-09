@@ -170,12 +170,12 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
-settlers.iml
+frontiersmen.iml
 .idea/compiler.xml
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
-.idea/modules/settlers_main.iml
-.idea/modules/settlers_test.iml
+.idea/modules/frontiersmen_main.iml
+.idea/modules/frontiersmen_test.iml
 
 # End of https://www.gitignore.io/api/java,gradle,eclipse,visualstudiocode

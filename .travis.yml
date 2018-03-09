@@ -4,15 +4,11 @@ services:
   - postgresql
 
 addons:
-  postgresql: "9.6"
+  postgresql: "9.4"
 
 before_script:
-  - psql -c 'select version()' -U postgres
-  - psql -c 'create database settlers;' -U postgres
-  - psql settlers -af src/main/sql/create.sql -U postgres
-
-after_script:
-  - psql -c 'drop database settlers;' -U postgres
+  - psql -c 'create database frontiersmen;' -U postgres
+  - psql frontiersmen -af src/main/sql/create.sql -U postgres
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
