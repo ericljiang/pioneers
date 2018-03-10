@@ -1,22 +1,29 @@
 package me.ericjiang.frontiersmen.library;
 
 import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * An object that registers Event handlers and can handle Events.
+ */
 public class EventListener {
 
     @SuppressWarnings("rawtypes")
-    private final transient LinkedListMultimap<Class<? extends Event>, Consumer> eventHandlers;
+    private final transient Multimap<Class<? extends Event>, Consumer> eventHandlers;
 
     public EventListener() {
+        // Using a LinkedListMultimap keeps entries in insertion order
         eventHandlers = LinkedListMultimap.create();
     }
 
     /**
-     * Process event with each registered handler in registration order
+     * Process event with each applicable registered handler. This method
+     * ensures that event handlers are triggered in the same order they are
+     * registered.
      */
     @SuppressWarnings("unchecked")
     public <T extends Event> void handleEvent(T event) {
@@ -34,6 +41,9 @@ public class EventListener {
         eventHandlers.put(eventType, consumer);
     }
 
+    /**
+     * Creates a set of Classes for each supertype of the provided event type.
+     */
     @SuppressWarnings("unchecked")
     private Set<Class<? extends Event>> getAllSuperclasses(Class<? extends Event> eventType) {
         Set<Class<? extends Event>> classes = Sets.newHashSet(eventType);
