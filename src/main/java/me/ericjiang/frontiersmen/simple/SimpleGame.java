@@ -8,6 +8,7 @@ import me.ericjiang.frontiersmen.library.player.Player;
 @NoArgsConstructor
 public class SimpleGame extends Game {
 
+    @SuppressWarnings("unused")
     private String testValue;
 
     public SimpleGame(String id, String owner, String name) {
