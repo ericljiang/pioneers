@@ -13,6 +13,7 @@ public abstract class GameDao {
     public abstract Map<String, Game> loadGames();
 
     public void register(Game game) {
+        save(game);
         game.on(Event.class, e -> save(game));
     }
 

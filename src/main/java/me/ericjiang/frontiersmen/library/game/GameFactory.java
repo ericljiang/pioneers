@@ -19,8 +19,7 @@ public abstract class GameFactory {
 
     public Game createGame(String owner, Map<String, Object> attributes) {
         Game game = createGameInstance(gameDao.getNewId(), owner, attributes);
-        gameDao.register(game);
-        gameDao.save(game);
+        game.on(StartGameEvent.class, e -> gameDao.register(game));
         return game;
     }
 
