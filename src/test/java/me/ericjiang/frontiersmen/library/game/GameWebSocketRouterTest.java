@@ -39,5 +39,6 @@ public class GameWebSocketRouterTest extends EasyMockSupport {
         replayAll();
 
         gameWebSocketRouter.getModule(session);
+        verifyAll();
     }
 }

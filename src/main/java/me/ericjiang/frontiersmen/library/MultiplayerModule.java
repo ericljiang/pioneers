@@ -4,7 +4,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import lombok.extern.slf4j.Slf4j;
-
+import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
+import me.ericjiang.frontiersmen.library.player.ClientDisconnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
 import me.ericjiang.frontiersmen.library.player.PlayerConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
@@ -38,6 +39,8 @@ public abstract class MultiplayerModule extends EventListener {
         connection.transmit(toStateEvent());
         if (playerConnections.get(playerId).size() == 1) {
             handleEvent(new PlayerConnectionEvent(playerId));
+        } else {
+            handleEvent(new ClientConnectionEvent(playerId));
         }
     }
 
@@ -45,6 +48,8 @@ public abstract class MultiplayerModule extends EventListener {
         playerConnections.remove(playerId, connection);
         if (!playerConnections.containsKey(playerId)) {
             handleEvent(new PlayerDisconnectionEvent(playerId, reason));
+        } else {
+            handleEvent(new ClientDisconnectionEvent(playerId, reason));
         }
     }
 

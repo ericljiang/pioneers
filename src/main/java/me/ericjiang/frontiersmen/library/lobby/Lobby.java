@@ -12,6 +12,7 @@ import me.ericjiang.frontiersmen.library.StateEvent;
 import me.ericjiang.frontiersmen.library.game.Game;
 import me.ericjiang.frontiersmen.library.game.GameFactory;
 import me.ericjiang.frontiersmen.library.game.StartGameEvent;
+import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerNameChangeEvent;
@@ -67,11 +68,14 @@ public class Lobby extends MultiplayerModule {
             broadcastState();
         });
 
-        on(PlayerConnectionEvent.class, e -> {
+        on(ClientConnectionEvent.class, e -> {
             String playerId = e.getPlayerId();
-            PlayerNameChangeEvent playerNameChangeEvent = new PlayerNameChangeEvent(playerRepository.getDisplayName(playerId));
-            playerNameChangeEvent.setPlayerId(playerId);
+            PlayerNameChangeEvent playerNameChangeEvent =
+                    new PlayerNameChangeEvent(playerId, playerRepository.getDisplayName(playerId));
             transmit(playerId, playerNameChangeEvent);
+        });
+
+        on(PlayerConnectionEvent.class, e -> {
         });
 
         on(PlayerNameChangeEvent.class, e -> {

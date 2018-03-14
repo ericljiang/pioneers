@@ -1,15 +1,12 @@
 package me.ericjiang.frontiersmen.library.player;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.ericjiang.frontiersmen.library.Event;
 
 @Getter
-@AllArgsConstructor
-public class PlayerDisconnectionEvent extends Event {
+public class PlayerDisconnectionEvent extends ClientDisconnectionEvent {
 
-    private final String playerId;
-
-    private final String reason;
+    public PlayerDisconnectionEvent(String playerId, String reason) {
+        super(playerId, reason);
+    }
 
 }
