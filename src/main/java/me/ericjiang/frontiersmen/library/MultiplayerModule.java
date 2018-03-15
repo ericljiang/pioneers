@@ -2,7 +2,7 @@ package me.ericjiang.frontiersmen.library;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-
+import com.google.common.collect.Multimaps;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.ClientDisconnectionEvent;
@@ -16,7 +16,7 @@ public abstract class MultiplayerModule extends EventListener {
     private final transient Multimap<String, PlayerConnection> playerConnections;
 
     public MultiplayerModule() {
-        this.playerConnections = HashMultimap.create();
+        this.playerConnections = Multimaps.synchronizedSetMultimap(HashMultimap.create());
         on(PlayerConnectionEvent.class, e -> {
             log.info(formatLog("Player %s connected", e.getPlayerId()));
         });

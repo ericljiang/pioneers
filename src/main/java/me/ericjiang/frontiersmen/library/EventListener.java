@@ -2,6 +2,7 @@ package me.ericjiang.frontiersmen.library;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
@@ -17,7 +18,7 @@ public class EventListener {
 
     public EventListener() {
         // Using a LinkedListMultimap keeps entries in insertion order
-        eventHandlers = LinkedListMultimap.create();
+        eventHandlers = Multimaps.synchronizedListMultimap(LinkedListMultimap.create());
     }
 
     /**
