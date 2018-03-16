@@ -1,10 +1,10 @@
 package me.ericjiang.frontiersmen.library;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -29,10 +29,12 @@ public class EventListener {
     @SuppressWarnings("unchecked")
     public <T extends Event> void handleEvent(T event) {
         Set<Class<? extends Event>> eventTypes = getAllSuperclasses(event.getClass());
-        eventHandlers.entries().stream()
-                .filter(entry -> eventTypes.contains(entry.getKey()))
-                .map(entry -> entry.getValue())
-                .forEach(handler -> handler.accept(event));
+        synchronized (eventHandlers) {
+            ImmutableList.copyOf(eventHandlers.entries()).stream()
+                    .filter(entry -> eventTypes.contains(entry.getKey()))
+                    .map(entry -> entry.getValue())
+                    .forEach(handler -> handler.accept(event));
+        }
     }
 
     /**
