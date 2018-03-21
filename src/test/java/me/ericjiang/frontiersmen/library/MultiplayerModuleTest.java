@@ -40,6 +40,7 @@ public class MultiplayerModuleTest extends EasyMockSupport {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldTriggerClientAndPlayerConnectionEvents() {
         IMocksControl control = createStrictControl();
         Consumer<ClientConnectionEvent> clientConnectionEventHandler = control.createMock(Consumer.class);
@@ -63,6 +64,7 @@ public class MultiplayerModuleTest extends EasyMockSupport {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldTriggerClientAndPlayerDisonnectionEvents() {
         IMocksControl control = createStrictControl();
         Consumer<ClientDisconnectionEvent> clientDisconnectionEventHandler = control.createMock(Consumer.class);

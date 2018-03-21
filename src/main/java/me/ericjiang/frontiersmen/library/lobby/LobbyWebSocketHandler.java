@@ -1,13 +1,14 @@
 package me.ericjiang.frontiersmen.library.lobby;
 
 import java.util.List;
-
+import java.util.Optional;
 import com.google.common.collect.Lists;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import me.ericjiang.frontiersmen.library.Event;
+import me.ericjiang.frontiersmen.library.MultiplayerModule;
 import me.ericjiang.frontiersmen.library.MultiplayerModuleWebSocketRouter;
 import me.ericjiang.frontiersmen.library.auth.Authenticator;
 import me.ericjiang.frontiersmen.library.player.PlayerNameChangeEvent;
@@ -24,8 +25,8 @@ public class LobbyWebSocketHandler extends MultiplayerModuleWebSocketRouter {
     }
 
     @Override
-    protected Lobby getModule(Session session) {
-        return lobby;
+    protected Optional<? extends MultiplayerModule> getModule(Session session) {
+        return Optional.of(lobby);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package me.ericjiang.frontiersmen.library.game;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.Optional;
 
@@ -31,14 +32,20 @@ public class GameWebSocketRouterTest extends EasyMockSupport {
         this.gameWebSocketRouter = new GameWebSocketRouter(lobby, authenticator, playerRepository);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionForNonexistantGameId() {
+    @Test
+    public void shouldNotReturnGameIfLobbyDoesNotReturnGame() {
+        gameWebSocketRouter = createMockBuilder(GameWebSocketRouter.class)
+                .withConstructor(lobby, authenticator, playerRepository)
+                .addMockedMethod("getGameId")
+                .createMock();
         Session session = createNiceMock(Session.class);
+        String gameId = "1";
 
-        expect(lobby.getGame(anyString())).andReturn(Optional.empty());
+        expect(gameWebSocketRouter.getGameId(session)).andStubReturn(gameId);
+        expect(lobby.getGame(gameId)).andReturn(Optional.empty());
         replayAll();
 
-        gameWebSocketRouter.getModule(session);
+        assertFalse(gameWebSocketRouter.getModule(session).isPresent());
         verifyAll();
     }
 }
