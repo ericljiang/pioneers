@@ -4,5 +4,5 @@ import me.ericjiang.frontiersmen.library.Event;
 
 public interface PlayerConnection {
     void transmit(Event event);
-    void close(String reason);
+    String getParameter(String parameter);
 }

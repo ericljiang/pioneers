@@ -1,6 +1,6 @@
 package me.ericjiang.frontiersmen.library.game;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import lombok.extern.slf4j.Slf4j;

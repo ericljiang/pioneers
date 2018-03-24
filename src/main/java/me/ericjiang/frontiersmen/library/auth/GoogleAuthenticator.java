@@ -8,7 +8,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.Optional;
 
 public class GoogleAuthenticator implements Authenticator {
 
@@ -25,9 +24,13 @@ public class GoogleAuthenticator implements Authenticator {
     }
 
     @Override
-    public String verify(String playerId, String authToken) throws GeneralSecurityException, IOException {
-        GoogleIdToken idToken = Optional.ofNullable(verifier.verify(authToken))
-                .orElseThrow(() -> new GeneralSecurityException("Invalid ID token."));
+    public String verify(String playerId, String authToken) throws GeneralSecurityException {
+        GoogleIdToken idToken;
+        try {
+            idToken = verifier.verify(authToken);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to verify Google ID token.", e);
+        }
         String userId = idToken.getPayload().getSubject();
         if (!playerId.equals(userId)) {
             throw new GeneralSecurityException("ID token does not match playerId.");

@@ -1,5 +1,7 @@
 package me.ericjiang.frontiersmen.library;
 
+import java.security.GeneralSecurityException;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -31,9 +33,9 @@ public abstract class MultiplayerModule extends EventListener {
 
     protected abstract boolean allowConnection(String playerId);
 
-    public void addConnection(String playerId, PlayerConnection connection) {
+    public void addConnection(String playerId, PlayerConnection connection) throws GeneralSecurityException {
         if (!allowConnection(playerId)) {
-            connection.close("Unauthorized");
+            throw new GeneralSecurityException("Unauthorized connection.");
         }
         playerConnections.put(playerId, connection);
         connection.transmit(toStateEvent());

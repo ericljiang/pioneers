@@ -6,6 +6,8 @@ import org.easymock.EasyMockSupport;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.security.GeneralSecurityException;
 import java.util.function.Consumer;
 import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.ClientDisconnectionEvent;
@@ -41,7 +43,7 @@ public class MultiplayerModuleTest extends EasyMockSupport {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void shouldTriggerClientAndPlayerConnectionEvents() {
+    public void shouldTriggerClientAndPlayerConnectionEvents() throws GeneralSecurityException {
         IMocksControl control = createStrictControl();
         Consumer<ClientConnectionEvent> clientConnectionEventHandler = control.createMock(Consumer.class);
         Consumer<PlayerConnectionEvent> playerConnectionEventHandler = control.createMock(Consumer.class);
@@ -65,7 +67,7 @@ public class MultiplayerModuleTest extends EasyMockSupport {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void shouldTriggerClientAndPlayerDisonnectionEvents() {
+    public void shouldTriggerClientAndPlayerDisonnectionEvents() throws GeneralSecurityException {
         IMocksControl control = createStrictControl();
         Consumer<ClientDisconnectionEvent> clientDisconnectionEventHandler = control.createMock(Consumer.class);
         Consumer<PlayerDisconnectionEvent> playerDisconnectionEventHandler = control.createMock(Consumer.class);

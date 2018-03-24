@@ -3,7 +3,6 @@ package me.ericjiang.frontiersmen.config;
 import dagger.Module;
 import dagger.Provides;
 import java.util.Optional;
-import com.google.gson.Gson;
 
 @Module
 public class FrontiersmenModule {
@@ -19,9 +18,5 @@ public class FrontiersmenModule {
         return Optional.ofNullable(System.getenv(HEROKU_PORT_VARIABLE))
         .map(s -> Integer.parseInt(s))
         .orElse(DEFAULT_PORT);
-    }
-
-    @Provides static Gson gson() {
-        return new Gson();
     }
 }

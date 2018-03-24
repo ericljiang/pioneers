@@ -1,6 +1,5 @@
 package me.ericjiang.frontiersmen.library.auth;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public interface Authenticator {
@@ -10,6 +9,6 @@ public interface Authenticator {
      * @param authToken
      * @return The user's display name
      */
-    String verify(String playerId, String authToken) throws GeneralSecurityException, IOException;
+    String verify(String playerId, String authToken) throws GeneralSecurityException;
 
 }

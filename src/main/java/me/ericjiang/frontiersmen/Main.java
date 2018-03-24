@@ -13,8 +13,7 @@ public class Main {
         staticFiles.location("/public");
 
         webSocket("/ws/lobby", frontiersmen.lobbyWebSocketHandler());
-        webSocket("/ws/game", frontiersmen.gameWebSocketRouter());
-        get("/api/hello", (req, res) -> new Greeting(), frontiersmen.gson()::toJson);
+        webSocket("/ws/game", frontiersmen.gameWebSocketHandler());
         get("/ping", (req, res) -> "pong");
     }
 }

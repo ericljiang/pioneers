@@ -1,10 +1,10 @@
 package me.ericjiang.frontiersmen.config;
 
-import com.google.gson.Gson;
 import dagger.Component;
+import me.ericjiang.frontiersmen.websockets.WebSocketTranslator;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
-import me.ericjiang.frontiersmen.library.game.GameWebSocketRouter;
-import me.ericjiang.frontiersmen.library.lobby.LobbyWebSocketHandler;
 
 @Component(modules = {
     DatabaseModule.class,
@@ -17,10 +17,8 @@ public interface Frontiersmen {
 
     int port();
 
-    Gson gson();
+    @Named("lobbyWebSocketHandler") WebSocketTranslator lobbyWebSocketHandler();
 
-    LobbyWebSocketHandler lobbyWebSocketHandler();
-
-    GameWebSocketRouter gameWebSocketRouter();
+    @Named("gameWebSocketHandler") WebSocketTranslator gameWebSocketHandler();
 
 }
