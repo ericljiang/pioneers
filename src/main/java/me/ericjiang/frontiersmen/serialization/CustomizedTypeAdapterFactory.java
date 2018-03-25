@@ -2,7 +2,7 @@
  * Modified from https://stackoverflow.com/a/11272452 by Jesse Wilson
  */
 
-package me.ericjiang.frontiersmen.library.utility;
+package me.ericjiang.frontiersmen.serialization;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

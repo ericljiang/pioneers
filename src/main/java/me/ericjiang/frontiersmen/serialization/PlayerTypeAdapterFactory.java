@@ -1,7 +1,9 @@
-package me.ericjiang.frontiersmen.library.player;
+package me.ericjiang.frontiersmen.serialization;
 
 import com.google.gson.JsonElement;
-import me.ericjiang.frontiersmen.library.utility.CustomizedTypeAdapterFactory;
+
+import me.ericjiang.frontiersmen.library.player.Player;
+import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 
 public class PlayerTypeAdapterFactory extends CustomizedTypeAdapterFactory<Player> {
 

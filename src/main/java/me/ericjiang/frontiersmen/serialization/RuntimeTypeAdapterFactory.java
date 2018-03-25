@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package me.ericjiang.frontiersmen.library.utility;
+package me.ericjiang.frontiersmen.serialization;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

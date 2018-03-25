@@ -2,12 +2,16 @@ package me.ericjiang.frontiersmen.config;
 
 import dagger.Module;
 import dagger.Provides;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
+
 import me.ericjiang.frontiersmen.library.auth.Authenticator;
 import me.ericjiang.frontiersmen.library.game.GameFactory;
 import me.ericjiang.frontiersmen.library.lobby.Lobby;
-import me.ericjiang.frontiersmen.library.lobby.LobbyWebSocketHandler;
+import me.ericjiang.frontiersmen.library.lobby.LobbyEventRouter;
 import me.ericjiang.frontiersmen.library.player.PlayerRepository;
+import me.ericjiang.frontiersmen.websockets.WebSocketTranslator;
 
 @Module(includes = {
     AuthenticatorModule.class,
@@ -16,11 +20,17 @@ import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 })
 public class LobbyModule {
 
-    @Provides @Singleton static LobbyWebSocketHandler provideLobbyWebSocketHandler(
+    @Provides @Named("lobbyWebSocketHandler") static WebSocketTranslator provideLobbyWebSocketHandler(
+            LobbyEventRouter lobbyEventRouter,
+            PlayerRepository playerRepository) {
+        return new WebSocketTranslator(lobbyEventRouter, playerRepository);
+    }
+
+    @Provides @Singleton static LobbyEventRouter provideLobbyEventRouter(
             Lobby lobby,
             Authenticator authenticator,
             PlayerRepository playerRepository) {
-        return new LobbyWebSocketHandler(lobby, authenticator, playerRepository);
+        return new LobbyEventRouter(lobby, authenticator, playerRepository);
     }
 
     /**
