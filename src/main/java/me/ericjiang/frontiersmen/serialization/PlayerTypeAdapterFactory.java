@@ -16,9 +16,11 @@ public class PlayerTypeAdapterFactory extends CustomizedTypeAdapterFactory<Playe
 
     @Override
     protected void beforeWrite(Player source, JsonElement toSerialize) {
-        String id = toSerialize.getAsJsonObject().get("id").getAsString();
-        String name = playerRepository.getDisplayName(id);
-        toSerialize.getAsJsonObject().addProperty("name", name);
+        if (toSerialize.isJsonObject()) {
+            String id = toSerialize.getAsJsonObject().get("id").getAsString();
+            String name = playerRepository.getDisplayName(id);
+            toSerialize.getAsJsonObject().addProperty("name", name);
+        }
     }
 
 }

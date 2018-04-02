@@ -18,20 +18,11 @@ public abstract class GameSummary {
 
     private final Map<String, Player> players;
 
-    private final boolean pregame;
-
-    private final int minimumPlayers;
-
-    private final int maximumPlayers;
-
     public GameSummary(Game game) {
         this.id = game.getId();
         this.name = game.getName();
         this.creator = game.getCreator();
         this.players = game.getPlayers();
-        this.pregame = game.isPregame();
-        this.minimumPlayers = game.minimumPlayers();
-        this.maximumPlayers = game.maximumPlayers();
     }
 
 }

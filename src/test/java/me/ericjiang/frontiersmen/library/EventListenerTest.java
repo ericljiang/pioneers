@@ -12,6 +12,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class EventListenerTest extends EasyMockSupport {
 
     private EventListener eventListener;
@@ -23,7 +24,6 @@ public class EventListenerTest extends EasyMockSupport {
 
     @Test
     public void shouldTriggerEventHandlers() {
-        @SuppressWarnings("unchecked")
         Consumer<Event> eventHandler = createMock(Consumer.class);
         eventHandler.accept(anyObject());
         expectLastCall();
@@ -39,7 +39,6 @@ public class EventListenerTest extends EasyMockSupport {
         List<Consumer<Event>> eventHandlers = Lists.newArrayList();
         IMocksControl control = createStrictControl();
         for (int i = 0; i < 10; i++) {
-            @SuppressWarnings("unchecked")
             Consumer<Event> eventHandler = control.createMock(Consumer.class);
             eventHandlers.add(eventHandler);
             eventHandler.accept(anyObject());
@@ -56,7 +55,6 @@ public class EventListenerTest extends EasyMockSupport {
 
     @Test
     public void shouldTriggerHandlersForEventSupertypes() {
-        @SuppressWarnings("unchecked")
         Consumer<SuperEvent> superEventHandler = createMock(Consumer.class);
         superEventHandler.accept(anyObject());
         expectLastCall();
@@ -68,7 +66,6 @@ public class EventListenerTest extends EasyMockSupport {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void shouldTriggerEventHandlersInOrderAcrossEventTypes() {
         List<Consumer<? extends Event>> eventHandlers = Lists.newArrayList();
         IMocksControl control = createStrictControl();

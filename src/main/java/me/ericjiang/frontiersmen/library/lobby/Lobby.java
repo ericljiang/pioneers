@@ -11,12 +11,14 @@ import me.ericjiang.frontiersmen.library.MultiplayerModule;
 import me.ericjiang.frontiersmen.library.StateEvent;
 import me.ericjiang.frontiersmen.library.game.Game;
 import me.ericjiang.frontiersmen.library.game.GameFactory;
-import me.ericjiang.frontiersmen.library.game.StartGameEvent;
 import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerNameChangeEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerRepository;
+import me.ericjiang.frontiersmen.library.pregame.Pregame;
+import me.ericjiang.frontiersmen.library.pregame.StartGameEvent;
+import me.ericjiang.frontiersmen.library.pregame.TransitionToGameEvent;
 
 @Slf4j
 public class Lobby extends MultiplayerModule {
@@ -28,10 +30,15 @@ public class Lobby extends MultiplayerModule {
     @Getter(AccessLevel.PACKAGE)
     private final NavigableMap<String, Game> games;
 
+    @Getter(AccessLevel.PACKAGE)
+    private final NavigableMap<String, Pregame> pregames;
+
     public Lobby(GameFactory gameFactory, PlayerRepository playerRepository) {
         this.gameFactory = gameFactory;
         this.playerRepository = playerRepository;
         this.games = Collections.synchronizedNavigableMap(
+                new TreeMap<>((id1, id2) -> Integer.parseInt(id1) - Integer.parseInt(id2)));
+        this.pregames = Collections.synchronizedNavigableMap(
                 new TreeMap<>((id1, id2) -> Integer.parseInt(id1) - Integer.parseInt(id2)));
         games.putAll(gameFactory.loadGames());
         games.values().forEach(g -> {
@@ -39,6 +46,10 @@ public class Lobby extends MultiplayerModule {
         });
         log.info(formatLog("Loaded %d games", games.size()));
         setEventHandlers();
+    }
+
+    public Optional<Pregame> getPregame(String gameId) {
+        return Optional.ofNullable(pregames.get(gameId));
     }
 
     public Optional<Game> getGame(String gameId) {
@@ -62,9 +73,17 @@ public class Lobby extends MultiplayerModule {
 
     private void setEventHandlers() {
         on(GameCreationEvent.class, e -> {
-            Game game = gameFactory.createGame(e.getPlayerId(), e.getAttributes());
-            register(game);
-            games.put(game.getId(), game);
+            Pregame pregame = gameFactory.createPregame(e.getName(), e.getPlayerId(), e.getAttributes());
+            String gameId = pregame.getGameId();
+            pregame.on(StartGameEvent.class, startGameEvent -> {
+                Game game = pregame.getGame();
+                register(game);
+                games.put(gameId, game);
+                pregames.remove(gameId);
+                pregame.handleEvent(new TransitionToGameEvent());
+            });
+            pregames.put(gameId, pregame);
+            register(pregame);
             broadcastState();
         });
 
@@ -88,6 +107,13 @@ public class Lobby extends MultiplayerModule {
                     .filter(g -> g.getPlayers().containsKey(playerId))
                     .forEach(g -> g.handleEvent(e));
         });
+    }
+
+    private void register(Pregame pregame) {
+        pregame.on(PlayerConnectionEvent.class, e -> broadcastState());
+        pregame.on(PlayerDisconnectionEvent.class, e -> broadcastState());
+        pregame.on(StartGameEvent.class, e -> broadcastState());
+        log.info(formatLog("Added Pregame %s", pregame.getGameId()));
     }
 
     private void register(Game game) {

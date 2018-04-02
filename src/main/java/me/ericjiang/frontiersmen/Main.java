@@ -13,6 +13,7 @@ public class Main {
         staticFiles.location("/public");
 
         webSocket("/ws/lobby", frontiersmen.lobbyWebSocketHandler());
+        webSocket("/ws/pregame", frontiersmen.pregameWebSocketHandler());
         webSocket("/ws/game", frontiersmen.gameWebSocketHandler());
         get("/ping", (req, res) -> "pong");
     }

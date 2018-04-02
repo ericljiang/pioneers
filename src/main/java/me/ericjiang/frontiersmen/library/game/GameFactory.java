@@ -3,13 +3,16 @@ package me.ericjiang.frontiersmen.library.game;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
+import me.ericjiang.frontiersmen.library.pregame.Pregame;
+import me.ericjiang.frontiersmen.library.pregame.TransitionToGameEvent;
 
 @AllArgsConstructor
 public abstract class GameFactory {
 
     private final GameDao gameDao;
 
-    protected abstract Game createGameInstance(String id, String owner, Map<String, Object> attributes);
+    protected abstract Game createGameInstance(String name, String gameId, String creatorId,
+            Map<String, Object> attributes);
 
     public Map<String, Game> loadGames() {
         Map<String, Game> games = gameDao.loadGames();
@@ -17,10 +20,11 @@ public abstract class GameFactory {
         return games;
     }
 
-    public Game createGame(String owner, Map<String, Object> attributes) {
-        Game game = createGameInstance(gameDao.getNewId(), owner, attributes);
-        game.on(StartGameEvent.class, e -> gameDao.register(game));
-        return game;
+    public Pregame createPregame(String name, String creatorId, Map<String, Object> attributes) {
+        String gameId = gameDao.getNewId();
+        Game game = createGameInstance(name, gameId, creatorId, attributes);
+        game.on(TransitionToGameEvent.class, e -> gameDao.register(game));
+        return new Pregame(game, attributes);
     }
 
 }

@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
@@ -40,8 +41,8 @@ public class EventListener {
     /**
      * Register an event handler
      */
-    public <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
-        eventHandlers.put(eventType, consumer);
+    public <T extends Event> void on(Class<T> eventType, Consumer<T> eventHandler) {
+        eventHandlers.put(eventType, eventHandler);
     }
 
     /**
