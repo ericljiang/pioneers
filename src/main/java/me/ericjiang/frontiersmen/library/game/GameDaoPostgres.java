@@ -80,11 +80,7 @@ public class GameDaoPostgres extends GameDao {
 
     private Game deserialize(String serializedGame) {
         Game game = gson.fromJson(serializedGame, gameClass);
-        if (game.isPregame()) {
-            game.getPlayers().clear();
-        } else {
-            game.getPlayers().values().forEach(p -> p.setOnline(false));
-        }
+        game.getPlayers().values().forEach(p -> p.setOnline(false));
         return game;
     }
 

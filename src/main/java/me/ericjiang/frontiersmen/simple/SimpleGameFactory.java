@@ -12,8 +12,8 @@ public class SimpleGameFactory extends GameFactory {
     }
 
     @Override
-    protected Game createGameInstance(String id, String owner, Map<String, Object> attributes) {
-        return new SimpleGame(id, owner, (String) attributes.get("name"));
+    protected Game createGameInstance(String name, String gameId, String creatorId, Map<String, Object> attributes) {
+        return new SimpleGame(name, gameId, creatorId);
     }
 
 }

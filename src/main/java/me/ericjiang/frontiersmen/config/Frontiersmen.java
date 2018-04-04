@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 @Component(modules = {
     DatabaseModule.class,
     FrontiersmenModule.class,
+    PregameModule.class,
     GameModule.class,
     LobbyModule.class
 })
@@ -18,6 +19,8 @@ public interface Frontiersmen {
     int port();
 
     @Named("lobbyWebSocketHandler") WebSocketTranslator lobbyWebSocketHandler();
+
+    @Named("pregameWebSocketHandler") WebSocketTranslator pregameWebSocketHandler();
 
     @Named("gameWebSocketHandler") WebSocketTranslator gameWebSocketHandler();
 

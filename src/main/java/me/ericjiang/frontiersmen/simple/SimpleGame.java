@@ -11,9 +11,14 @@ public class SimpleGame extends Game {
     @SuppressWarnings("unused")
     private String testValue;
 
-    public SimpleGame(String id, String owner, String name) {
-        super(id, owner, name);
+    public SimpleGame(String name, String gameId, String creatorId) {
+        super(name, gameId, creatorId);
         this.testValue = "foo";
+    }
+
+    @Override
+    public GameSummary summarize() {
+        return new SimpleGameSummary(this);
     }
 
     @Override
@@ -27,13 +32,8 @@ public class SimpleGame extends Game {
     }
 
     @Override
-    public GameSummary summarize() {
-        return new SimpleGameSummary(this);
-    }
-
-    @Override
-    protected Player createPlayer(String playerId) {
-        return new Player(playerId);
+    protected Player createPlayer(String playerId, int seat) {
+        return new Player(playerId, seat);
     }
 
 }

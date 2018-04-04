@@ -1,4 +1,4 @@
-package me.ericjiang.frontiersmen.library.game;
+package me.ericjiang.frontiersmen.library.pregame;
 
 import me.ericjiang.frontiersmen.library.PlayerEvent;
 

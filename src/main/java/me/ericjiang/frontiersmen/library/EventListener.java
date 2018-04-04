@@ -40,8 +40,8 @@ public class EventListener {
     /**
      * Register an event handler
      */
-    public <T extends Event> void on(Class<T> eventType, Consumer<T> consumer) {
-        eventHandlers.put(eventType, consumer);
+    public <T extends Event> void on(Class<T> eventType, Consumer<T> eventHandler) {
+        eventHandlers.put(eventType, eventHandler);
     }
 
     /**

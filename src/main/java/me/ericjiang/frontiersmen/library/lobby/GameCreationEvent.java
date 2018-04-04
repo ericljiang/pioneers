@@ -10,6 +10,8 @@ import me.ericjiang.frontiersmen.library.PlayerEvent;
 @AllArgsConstructor
 public class GameCreationEvent extends PlayerEvent {
 
+    private final String name;
+
     private final Map<String, Object> attributes;
 
 }
