@@ -9,6 +9,7 @@ import me.ericjiang.frontiersmen.library.MultiplayerModule;
 import me.ericjiang.frontiersmen.library.StateEvent;
 import me.ericjiang.frontiersmen.library.game.Game;
 import me.ericjiang.frontiersmen.library.player.Player;
+import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
 
 @Slf4j
 @Getter
@@ -52,18 +53,20 @@ public class Pregame extends MultiplayerModule {
 
         on(TakeSeatEvent.class, e -> {
             takeSeat(e.getSeat(), e.getPlayerId());
-            broadcast(toStateEvent());
         });
 
         on(LeaveSeatEvent.class, e -> {
             leaveSeat(e.getSeat(), e.getPlayerId());
-            broadcast(toStateEvent());
         });
 
         on(TransitionToGameEvent.class, e -> {
             game.setPlayers(playerSeats);
             game.handleEvent(e);
             broadcast(e);
+        });
+
+        on(PlayerDisconnectionEvent.class, e -> {
+            evictPlayer(e.getPlayerId());
         });
     }
 
@@ -99,13 +102,9 @@ public class Pregame extends MultiplayerModule {
                         playerId, seat, maximumPlayers));
             }
             // remove from current seat
-            for (int i = 0; i < playerSeats.length; i++) {
-                if (playerSeats[i] != null && playerId.equals(playerSeats[i].getId())) {
-                    log.debug("Removing Player {} from seat {}", playerId, seat);
-                    playerSeats[i] = null;
-                }
-            }
+            evictPlayer(playerId);
             playerSeats[seat] = new Player(playerId);
+            broadcast(toStateEvent());
         }
     }
 
@@ -117,6 +116,7 @@ public class Pregame extends MultiplayerModule {
                         playerId, seat));
             }
             playerSeats[seat] = null;
+            broadcast(toStateEvent());
         }
     }
 
@@ -124,6 +124,18 @@ public class Pregame extends MultiplayerModule {
         synchronized(playerSeats) {
             return playerSeats[seat] != null;
         }
+    }
+
+    private void evictPlayer(String playerId) {
+        synchronized(playerSeats) {
+            for (int i = 0; i < playerSeats.length; i++) {
+                if (playerSeats[i] != null && playerId.equals(playerSeats[i].getId())) {
+                    log.debug("Removing Player {} from seat {}", playerId, i);
+                    playerSeats[i] = null;
+                }
+            }
+        }
+        broadcast(toStateEvent());
     }
 
 }
