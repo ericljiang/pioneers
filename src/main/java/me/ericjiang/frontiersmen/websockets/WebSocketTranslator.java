@@ -28,6 +28,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 @WebSocket
 public class WebSocketTranslator {
 
+    private static final long TIMEOUT_IN_MS = 7 * 1000;
+
     private final MultiplayerModuleEventRouter eventRouter;
 
     private final Gson gson;
@@ -51,6 +53,7 @@ public class WebSocketTranslator {
 
     @OnWebSocketConnect
     public void onConnect(Session session) throws IOException {
+        session.setIdleTimeout(TIMEOUT_IN_MS);
         try {
             PlayerConnection connection = new WebSocketPlayerConnection(session, gson);
             connections.put(session, connection);
