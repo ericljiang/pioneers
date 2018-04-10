@@ -8,9 +8,11 @@ import com.google.common.collect.Multimaps;
 import lombok.extern.slf4j.Slf4j;
 import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.ClientDisconnectionEvent;
+import me.ericjiang.frontiersmen.library.player.PingEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
 import me.ericjiang.frontiersmen.library.player.PlayerConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
+import me.ericjiang.frontiersmen.library.player.PongEvent;
 
 @Slf4j
 public abstract class MultiplayerModule extends EventListener {
@@ -24,6 +26,9 @@ public abstract class MultiplayerModule extends EventListener {
         });
         on(PlayerDisconnectionEvent.class, e -> {
             log.info(formatLog("Player %s disconnected (Reason: %s)", e.getPlayerId(), e.getReason()));
+        });
+        on(PingEvent.class, e -> {
+            transmit(e.getPlayerId(), new PongEvent());
         });
     }
 

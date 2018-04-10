@@ -11,9 +11,11 @@ import java.security.GeneralSecurityException;
 import java.util.function.Consumer;
 import me.ericjiang.frontiersmen.library.player.ClientConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.ClientDisconnectionEvent;
+import me.ericjiang.frontiersmen.library.player.PingEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
 import me.ericjiang.frontiersmen.library.player.PlayerConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
+import me.ericjiang.frontiersmen.library.player.PongEvent;
 
 public class MultiplayerModuleTest extends EasyMockSupport {
 
@@ -88,6 +90,20 @@ public class MultiplayerModuleTest extends EasyMockSupport {
         module.addConnection(PLAYER_ID, connection2);
         module.removeConnection(PLAYER_ID, connection1, "");
         module.removeConnection(PLAYER_ID, connection2, "");
+        verifyAll();
+    }
+
+    @Test
+    public void shouldPongOnPing() throws GeneralSecurityException {
+        PlayerConnection playerConnection = createNiceMock(PlayerConnection.class);
+        playerConnection.transmit(isA(PongEvent.class));
+        expectLastCall();
+        replayAll();
+
+        module.addConnection(PLAYER_ID, playerConnection);
+        PingEvent ping = new PingEvent();
+        ping.setPlayerId(PLAYER_ID);
+        module.handleEvent(ping);
         verifyAll();
     }
 }

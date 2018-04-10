@@ -15,17 +15,20 @@ public class GoogleAuthenticator implements Authenticator {
 
     @Override
     public String verify(String playerId, String authToken) throws GeneralSecurityException {
-        GoogleIdToken idToken;
         try {
-            idToken = verifier.verify(authToken);
+            GoogleIdToken idToken = verifier.verify(authToken);
+            if (idToken == null) {
+                throw new GeneralSecurityException("Invalid authorization token.");
+            }
+            String userId = idToken.getPayload().getSubject();
+            if (!playerId.equals(userId)) {
+                throw new GeneralSecurityException(String.format(
+                        "Authorization token does not belong to player %s.", playerId));
+            }
+            return (String) idToken.getPayload().get("given_name");
         } catch (IOException e) {
             throw new RuntimeException("Failed to verify Google ID token.", e);
         }
-        String userId = idToken.getPayload().getSubject();
-        if (!playerId.equals(userId)) {
-            throw new GeneralSecurityException("ID token does not match playerId.");
-        }
-        return (String) idToken.getPayload().get("given_name");
     }
 
 }

@@ -30,16 +30,30 @@ public class GoogleAuthenticatorTest extends EasyMockSupport {
     }
 
     @Test(expected = GeneralSecurityException.class)
-    public void test() throws GeneralSecurityException, IOException {
+    public void shouldFailOnInvalidToken() throws GeneralSecurityException, IOException {
+        expect(tokenVerifier.verify(AUTH_TOKEN)).andReturn(null);
+        replayAll();
+
+        authenticator.verify(PLAYER_ID, AUTH_TOKEN);
+        verifyAll();
+    }
+
+    /**
+     * Valid token, wrong player ID.
+     */
+    @Test(expected = GeneralSecurityException.class)
+    public void shouldFailOnIdMismatch() throws GeneralSecurityException, IOException {
+        String wrongPlayerId = "0";
         GoogleIdToken idToken = createMock(GoogleIdToken.class);
         Payload payload = new Payload();
-        payload.setSubject("0");
+        payload.setSubject(wrongPlayerId);
 
         expect(tokenVerifier.verify(AUTH_TOKEN)).andReturn(idToken);
         expect(idToken.getPayload()).andReturn(payload);
         replayAll();
 
         authenticator.verify(PLAYER_ID, AUTH_TOKEN);
+        verifyAll();
     }
 
 }

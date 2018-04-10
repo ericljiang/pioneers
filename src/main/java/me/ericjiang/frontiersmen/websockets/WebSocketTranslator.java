@@ -13,8 +13,10 @@ import java.util.Map;
 import me.ericjiang.frontiersmen.library.Event;
 import me.ericjiang.frontiersmen.library.MultiplayerModuleEventRouter;
 import me.ericjiang.frontiersmen.library.PlayerEvent;
+import me.ericjiang.frontiersmen.library.player.PingEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
 import me.ericjiang.frontiersmen.library.player.PlayerRepository;
+import me.ericjiang.frontiersmen.library.player.PongEvent;
 import me.ericjiang.frontiersmen.serialization.PlayerTypeAdapterFactory;
 import me.ericjiang.frontiersmen.serialization.RuntimeTypeAdapterFactory;
 import org.eclipse.jetty.websocket.api.Session;
@@ -28,7 +30,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 @WebSocket
 public class WebSocketTranslator {
 
-    private static final long TIMEOUT_IN_MS = 7 * 1000;
+    private static final long TIMEOUT_IN_MS = 12 * 1000;
 
     private final MultiplayerModuleEventRouter eventRouter;
 
@@ -41,6 +43,8 @@ public class WebSocketTranslator {
 
         RuntimeTypeAdapterFactory<Event> eventTypeAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventType");
         eventRouter.getEventTypes().forEach(t -> eventTypeAdapterFactory.registerSubtype(t));
+        eventTypeAdapterFactory.registerSubtype(PingEvent.class);
+        eventTypeAdapterFactory.registerSubtype(PongEvent.class);
         PlayerTypeAdapterFactory playerTypeAdapterFactory = new PlayerTypeAdapterFactory(playerRepository);
 
         this.gson = new GsonBuilder()
