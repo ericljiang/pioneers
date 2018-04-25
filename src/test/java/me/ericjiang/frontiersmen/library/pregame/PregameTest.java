@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 
 import com.google.common.collect.Maps;
 
-import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.junit.Before;
 import org.junit.Test;

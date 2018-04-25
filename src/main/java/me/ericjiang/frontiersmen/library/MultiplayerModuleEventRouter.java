@@ -19,8 +19,8 @@ public abstract class MultiplayerModuleEventRouter {
     public void acceptConnection(PlayerConnection connection) throws GeneralSecurityException {
         String playerId = connection.getParameter("playerId");
         String authToken = connection.getParameter("authToken");
-        String name = authenticator.verify(playerId, authToken);
         if (!playerRepository.contains(playerId)) {
+            String name = authenticator.getIdentityProvider().getName(authToken);
             playerRepository.setDisplayName(playerId, name);
         }
         MultiplayerModule module = getModule(connection).orElseThrow(() -> {

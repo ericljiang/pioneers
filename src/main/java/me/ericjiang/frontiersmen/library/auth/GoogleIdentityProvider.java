@@ -9,25 +9,36 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @AllArgsConstructor
-public class GoogleAuthenticator implements Authenticator {
+public class GoogleIdentityProvider implements IdentityProvider {
 
     private final GoogleIdTokenVerifier verifier;
 
     @Override
-    public String verify(String playerId, String authToken) throws GeneralSecurityException {
+    public void verify(String playerId, String authToken) throws GeneralSecurityException {
         try {
             GoogleIdToken idToken = verifier.verify(authToken);
             if (idToken == null) {
-                throw new GeneralSecurityException("Invalid authorization token.");
+                throw new GeneralSecurityException();
             }
             String userId = idToken.getPayload().getSubject();
             if (!playerId.equals(userId)) {
-                throw new GeneralSecurityException(String.format(
-                        "Authorization token does not belong to player %s.", playerId));
+                throw new GeneralSecurityException();
             }
-            return (String) idToken.getPayload().get("given_name");
         } catch (IOException e) {
             throw new RuntimeException("Failed to verify Google ID token.", e);
+        }
+    }
+
+    @Override
+    public String getName(String authToken) {
+        try {
+            GoogleIdToken idToken = verifier.verify(authToken);
+            if (idToken == null) {
+                throw new GeneralSecurityException();
+            }
+            return (String) idToken.getPayload().get("given_name");
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

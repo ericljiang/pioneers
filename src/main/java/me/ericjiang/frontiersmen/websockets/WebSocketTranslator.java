@@ -71,20 +71,6 @@ public class WebSocketTranslator {
         }
     }
 
-    @OnWebSocketClose
-    public void onClose(Session session, int statusCode, String reason) {
-        try {
-            PlayerConnection connection = connections.remove(session);
-            eventRouter.removeConnection(connection, reason);
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid WebSocket request", e);
-            session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
-        } catch (RuntimeException e) {
-            log.error("Error closing client connection", e);
-            session.close();
-        }
-    }
-
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         log.debug(String.format("Received message from %s: %s", session.getUpgradeRequest().getRequestURI(), message));
@@ -98,9 +84,22 @@ public class WebSocketTranslator {
             log.error("Client sent an Event that isn't a PlayerEvent", e);
         } catch (IllegalArgumentException e) {
             log.error("Invalid WebSocket request", e);
-            session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
         } catch (RuntimeException e) {
             log.error("Error processing client message", e);
+        }
+    }
+
+    @OnWebSocketClose
+    public void onClose(Session session, int statusCode, String reason) {
+        try {
+            PlayerConnection connection = connections.remove(session);
+            eventRouter.removeConnection(connection, reason);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid WebSocket request", e);
+            session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Error closing client connection", e);
+            session.close();
         }
     }
 }
