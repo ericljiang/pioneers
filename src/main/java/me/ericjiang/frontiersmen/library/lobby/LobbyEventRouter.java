@@ -11,14 +11,13 @@ import me.ericjiang.frontiersmen.library.MultiplayerModuleEventRouter;
 import me.ericjiang.frontiersmen.library.auth.Authenticator;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
 import me.ericjiang.frontiersmen.library.player.PlayerNameChangeEvent;
-import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 
 public class LobbyEventRouter extends MultiplayerModuleEventRouter {
 
     private final Lobby lobby;
 
-    public LobbyEventRouter(Lobby lobby, Authenticator authenticator, PlayerRepository playerRepository) {
-        super(authenticator, playerRepository);
+    public LobbyEventRouter(Lobby lobby, Authenticator authenticator) {
+        super(authenticator);
         this.lobby = lobby;
     }
 

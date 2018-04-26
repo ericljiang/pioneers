@@ -6,11 +6,11 @@ public interface IdentityProvider {
 
     /**
      * @param playerId
-     * @param authToken
+     * @param idToken
      * @throws GeneralSecurityException
      */
-    void verify(String playerId, String authToken) throws GeneralSecurityException;
+    void verify(String playerId, String idToken) throws GeneralSecurityException;
 
-    String getName(String authToken) throws GeneralSecurityException;
+    String getName(String idToken) throws GeneralSecurityException;
 
 }

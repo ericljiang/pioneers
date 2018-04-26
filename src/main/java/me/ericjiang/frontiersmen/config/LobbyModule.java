@@ -30,7 +30,7 @@ public class LobbyModule {
             Lobby lobby,
             Authenticator authenticator,
             PlayerRepository playerRepository) {
-        return new LobbyEventRouter(lobby, authenticator, playerRepository);
+        return new LobbyEventRouter(lobby, authenticator);
     }
 
     /**

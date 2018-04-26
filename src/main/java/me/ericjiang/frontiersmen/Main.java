@@ -23,13 +23,18 @@ public class Main {
         webSocket("/ws/game", frontiersmen.gameWebSocketHandler());
 
         get("/ping", (req, res) -> "pong");
-        get("/api/auth-ticket", (req, res) -> {
+        get("/api/auth-ticket", "application/json", (req, res) -> {
             String playerId = req.queryParams("playerId");
-            String authToken = req.queryParams("authToken");
+            String idToken = req.queryParams("idToken");
             Authenticator authenticator = frontiersmen.authenticator();
-            Ticket ticket = authenticator.getTicket(playerId, authToken);
+            Ticket ticket = authenticator.getTicket(playerId, idToken);
             log.info("Sending auth ticket to player {}", playerId);
             return ticket;
         }, new Gson()::toJson);
+
+        after("/api/auth-ticket", (req, res) -> {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Methods", "GET");
+        });
     }
 }

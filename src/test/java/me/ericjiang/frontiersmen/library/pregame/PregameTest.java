@@ -35,8 +35,6 @@ public class PregameTest extends EasyMockSupport {
         replayAll();
         TakeSeatEvent takeSeatEvent = new TakeSeatEvent(0);
         takeSeatEvent.setPlayerId(PLAYER_ID);
-        LeaveSeatEvent leaveSeatEvent = new LeaveSeatEvent(0);
-        takeSeatEvent.setPlayerId(PLAYER_ID);
         pregame.handleEvent(takeSeatEvent);
         assertNotNull(pregame.getPlayerSeats()[0]);
         verifyAll();

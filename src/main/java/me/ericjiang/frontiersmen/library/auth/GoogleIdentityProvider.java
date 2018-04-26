@@ -14,9 +14,9 @@ public class GoogleIdentityProvider implements IdentityProvider {
     private final GoogleIdTokenVerifier verifier;
 
     @Override
-    public void verify(String playerId, String authToken) throws GeneralSecurityException {
+    public void verify(String playerId, String idTokenString) throws GeneralSecurityException {
         try {
-            GoogleIdToken idToken = verifier.verify(authToken);
+            GoogleIdToken idToken = verifier.verify(idTokenString);
             if (idToken == null) {
                 throw new GeneralSecurityException();
             }
@@ -30,9 +30,9 @@ public class GoogleIdentityProvider implements IdentityProvider {
     }
 
     @Override
-    public String getName(String authToken) {
+    public String getName(String idTokenString) {
         try {
-            GoogleIdToken idToken = verifier.verify(authToken);
+            GoogleIdToken idToken = verifier.verify(idTokenString);
             if (idToken == null) {
                 throw new GeneralSecurityException();
             }
