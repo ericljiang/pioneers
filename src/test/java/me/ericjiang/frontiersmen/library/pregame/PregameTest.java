@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 
 import com.google.common.collect.Maps;
 
-import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +34,6 @@ public class PregameTest extends EasyMockSupport {
     public void shouldPopulateSeat() {
         replayAll();
         TakeSeatEvent takeSeatEvent = new TakeSeatEvent(0);
-        takeSeatEvent.setPlayerId(PLAYER_ID);
-        LeaveSeatEvent leaveSeatEvent = new LeaveSeatEvent(0);
         takeSeatEvent.setPlayerId(PLAYER_ID);
         pregame.handleEvent(takeSeatEvent);
         assertNotNull(pregame.getPlayerSeats()[0]);

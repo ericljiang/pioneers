@@ -12,7 +12,6 @@ import org.junit.Test;
 import me.ericjiang.frontiersmen.library.auth.Authenticator;
 import me.ericjiang.frontiersmen.library.lobby.Lobby;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
-import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 
 public class GameEventRouterTest extends EasyMockSupport {
 
@@ -20,16 +19,13 @@ public class GameEventRouterTest extends EasyMockSupport {
 
     private Authenticator authenticator;
 
-    private PlayerRepository playerRepository;
-
     private GameEventRouter gameEventRouter;
 
     @Before
     public void before() {
         this.lobby = createNiceMock(Lobby.class);
         this.authenticator = createNiceMock(Authenticator.class);
-        this.playerRepository = createNiceMock(PlayerRepository.class);
-        this.gameEventRouter = new GameEventRouter(lobby, authenticator, playerRepository);
+        this.gameEventRouter = new GameEventRouter(lobby, authenticator);
     }
 
     @Test

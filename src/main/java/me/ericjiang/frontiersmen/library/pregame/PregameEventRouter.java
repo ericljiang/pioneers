@@ -9,7 +9,6 @@ import me.ericjiang.frontiersmen.library.MultiplayerModuleEventRouter;
 import me.ericjiang.frontiersmen.library.auth.Authenticator;
 import me.ericjiang.frontiersmen.library.lobby.Lobby;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
-import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 
 import com.google.common.collect.Lists;
 
@@ -19,8 +18,8 @@ public class PregameEventRouter extends MultiplayerModuleEventRouter {
 
     private final Lobby lobby;
 
-    public PregameEventRouter(Lobby lobby, Authenticator authenticator, PlayerRepository playerRepository) {
-        super(authenticator, playerRepository);
+    public PregameEventRouter(Lobby lobby, Authenticator authenticator) {
+        super(authenticator);
         this.lobby = lobby;
     }
 

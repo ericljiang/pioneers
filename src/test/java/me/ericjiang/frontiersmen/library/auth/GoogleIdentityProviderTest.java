@@ -13,7 +13,7 @@ import org.easymock.EasyMockSupport;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GoogleAuthenticatorTest extends EasyMockSupport {
+public class GoogleIdentityProviderTest extends EasyMockSupport {
 
     private static final String PLAYER_ID = "1";
 
@@ -21,12 +21,12 @@ public class GoogleAuthenticatorTest extends EasyMockSupport {
 
     private GoogleIdTokenVerifier tokenVerifier;
 
-    private GoogleAuthenticator authenticator;
+    private GoogleIdentityProvider identityProvider;
 
     @Before
     public void setup() {
         tokenVerifier = createMock(GoogleIdTokenVerifier.class);
-        authenticator = new GoogleAuthenticator(tokenVerifier);
+        identityProvider = new GoogleIdentityProvider(tokenVerifier);
     }
 
     @Test(expected = GeneralSecurityException.class)
@@ -34,7 +34,7 @@ public class GoogleAuthenticatorTest extends EasyMockSupport {
         expect(tokenVerifier.verify(AUTH_TOKEN)).andReturn(null);
         replayAll();
 
-        authenticator.verify(PLAYER_ID, AUTH_TOKEN);
+        identityProvider.verify(PLAYER_ID, AUTH_TOKEN);
         verifyAll();
     }
 
@@ -52,7 +52,7 @@ public class GoogleAuthenticatorTest extends EasyMockSupport {
         expect(idToken.getPayload()).andReturn(payload);
         replayAll();
 
-        authenticator.verify(PLAYER_ID, AUTH_TOKEN);
+        identityProvider.verify(PLAYER_ID, AUTH_TOKEN);
         verifyAll();
     }
 

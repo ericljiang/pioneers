@@ -29,7 +29,7 @@ public class PregameModule {
             Lobby lobby,
             Authenticator authenticator,
             PlayerRepository playerRepository) {
-        return new PregameEventRouter(lobby, authenticator, playerRepository);
+        return new PregameEventRouter(lobby, authenticator);
     }
 
 }

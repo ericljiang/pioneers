@@ -14,6 +14,7 @@ import me.ericjiang.frontiersmen.library.Event;
 import me.ericjiang.frontiersmen.library.MultiplayerModuleEventRouter;
 import me.ericjiang.frontiersmen.library.PlayerEvent;
 import me.ericjiang.frontiersmen.library.player.PingEvent;
+import me.ericjiang.frontiersmen.library.player.PlayerAuthenticationEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerConnection;
 import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 import me.ericjiang.frontiersmen.library.player.PongEvent;
@@ -45,6 +46,7 @@ public class WebSocketTranslator {
         eventRouter.getEventTypes().forEach(t -> eventTypeAdapterFactory.registerSubtype(t));
         eventTypeAdapterFactory.registerSubtype(PingEvent.class);
         eventTypeAdapterFactory.registerSubtype(PongEvent.class);
+        eventTypeAdapterFactory.registerSubtype(PlayerAuthenticationEvent.class);
         PlayerTypeAdapterFactory playerTypeAdapterFactory = new PlayerTypeAdapterFactory(playerRepository);
 
         this.gson = new GsonBuilder()
@@ -71,6 +73,26 @@ public class WebSocketTranslator {
         }
     }
 
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws IOException {
+        log.debug(String.format("Received message from %s", session.getUpgradeRequest().getRequestURI()));
+        try {
+            PlayerConnection connection = connections.get(session);
+            PlayerEvent event = (PlayerEvent) gson.fromJson(message, Event.class);
+            String playerId = connection.getPlayerId();
+            event.setPlayerId(playerId);
+            eventRouter.receiveEvent(connection, event);
+        } catch (ClassCastException e) {
+            log.error("Client sent an Event that isn't a PlayerEvent", e);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid WebSocket request", e);
+        } catch (RuntimeException e) {
+            log.error("Error processing client message", e);
+        } catch (GeneralSecurityException e) {
+            log.error("Unauthorized", e);
+        }
+    }
+
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
         try {
@@ -82,25 +104,6 @@ public class WebSocketTranslator {
         } catch (RuntimeException e) {
             log.error("Error closing client connection", e);
             session.close();
-        }
-    }
-
-    @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
-        log.debug(String.format("Received message from %s: %s", session.getUpgradeRequest().getRequestURI(), message));
-        try {
-            PlayerConnection connection = connections.get(session);
-            PlayerEvent event = (PlayerEvent) gson.fromJson(message, Event.class);
-            String playerId = connection.getParameter("playerId");
-            event.setPlayerId(playerId);
-            eventRouter.receiveEvent(connection, event);
-        } catch (ClassCastException e) {
-            log.error("Client sent an Event that isn't a PlayerEvent", e);
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid WebSocket request", e);
-            session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
-        } catch (RuntimeException e) {
-            log.error("Error processing client message", e);
         }
     }
 }

@@ -1,12 +1,14 @@
 package me.ericjiang.frontiersmen.config;
 
 import dagger.Component;
+import me.ericjiang.frontiersmen.library.auth.Authenticator;
 import me.ericjiang.frontiersmen.websockets.WebSocketTranslator;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Component(modules = {
+    AuthenticatorModule.class,
     DatabaseModule.class,
     FrontiersmenModule.class,
     PregameModule.class,
@@ -23,5 +25,7 @@ public interface Frontiersmen {
     @Named("pregameWebSocketHandler") WebSocketTranslator pregameWebSocketHandler();
 
     @Named("gameWebSocketHandler") WebSocketTranslator gameWebSocketHandler();
+
+    Authenticator authenticator();
 
 }

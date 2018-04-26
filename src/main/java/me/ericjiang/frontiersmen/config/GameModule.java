@@ -29,7 +29,7 @@ public class GameModule {
             Lobby lobby,
             Authenticator authenticator,
             PlayerRepository playerRepository) {
-        return new GameEventRouter(lobby, authenticator, playerRepository);
+        return new GameEventRouter(lobby, authenticator);
     }
 
 }
