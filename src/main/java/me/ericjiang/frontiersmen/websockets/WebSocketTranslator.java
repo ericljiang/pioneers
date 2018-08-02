@@ -64,7 +64,10 @@ public class WebSocketTranslator {
             PlayerConnection connection = new WebSocketPlayerConnection(session, gson);
             connections.put(session, connection);
             eventRouter.acceptConnection(connection);
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
+        } catch (GeneralSecurityException e) {
+            log.error("Rejected WebSocket connection request", e);
+            session.close(ErrorCode.AUTHENTICATION_ERROR, e.getMessage());
+        } catch (IllegalArgumentException e) {
             log.error("Rejected WebSocket connection request", e);
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
         } catch (RuntimeException e) {
@@ -90,6 +93,9 @@ public class WebSocketTranslator {
             log.error("Error processing client message", e);
         } catch (GeneralSecurityException e) {
             log.error("Unauthorized", e);
+            PlayerConnection connection = connections.remove(session);
+            eventRouter.removeConnection(connection, "Unauthorized");
+            session.close(ErrorCode.AUTHENTICATION_ERROR, "Unauthorized");
         }
     }
 
@@ -105,5 +111,9 @@ public class WebSocketTranslator {
             log.error("Error closing client connection", e);
             session.close();
         }
+    }
+
+    private static class ErrorCode {
+        public final static int AUTHENTICATION_ERROR = 4000;
     }
 }
