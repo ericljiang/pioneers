@@ -27,10 +27,16 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+/**
+ * Translates WebSocket messages and forwards them to a {@link MultiplayerModuleEventRouter}.
+ */
 @Slf4j
 @WebSocket
 public class WebSocketTranslator {
 
+    /**
+     * Number of milliseconds before closing an idle connection.
+     */
     private static final long TIMEOUT_IN_MS = 12 * 1000;
 
     private final MultiplayerModuleEventRouter eventRouter;
@@ -39,6 +45,10 @@ public class WebSocketTranslator {
 
     private final Map<Session, PlayerConnection> connections;
 
+    /**
+     * @param eventRouter the destination for any incoming connections
+     * @param playerRepository the {@link PlayerRepository} that will identify connection owners
+     */
     public WebSocketTranslator(MultiplayerModuleEventRouter eventRouter, PlayerRepository playerRepository) {
         this.eventRouter = eventRouter;
 
@@ -64,7 +74,10 @@ public class WebSocketTranslator {
             PlayerConnection connection = new WebSocketPlayerConnection(session, gson);
             connections.put(session, connection);
             eventRouter.acceptConnection(connection);
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
+        } catch (GeneralSecurityException e) {
+            log.error("Rejected WebSocket connection request", e);
+            session.close(CloseCode.AUTHENTICATION_ERROR, e.getMessage());
+        } catch (IllegalArgumentException e) {
             log.error("Rejected WebSocket connection request", e);
             session.close(StatusCode.POLICY_VIOLATION, e.getMessage());
         } catch (RuntimeException e) {
@@ -90,6 +103,9 @@ public class WebSocketTranslator {
             log.error("Error processing client message", e);
         } catch (GeneralSecurityException e) {
             log.error("Unauthorized", e);
+            PlayerConnection connection = connections.remove(session);
+            eventRouter.removeConnection(connection, "Unauthorized");
+            session.close(CloseCode.AUTHENTICATION_ERROR, "Unauthorized");
         }
     }
 
@@ -105,5 +121,12 @@ public class WebSocketTranslator {
             log.error("Error closing client connection", e);
             session.close();
         }
+    }
+
+    /**
+     * Custom WebSocket status codes.
+     */
+    public static class CloseCode {
+        public final static int AUTHENTICATION_ERROR = 4000;
     }
 }
