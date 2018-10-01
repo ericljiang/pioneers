@@ -7,6 +7,9 @@ import com.google.common.collect.Maps;
 
 public class TicketDaoInMemory implements TicketDao {
 
+    /**
+     * Maps PlayerId strings to Tickets
+     */
     private final Map<String, Ticket> tickets;
 
     public TicketDaoInMemory() {
@@ -19,8 +22,8 @@ public class TicketDaoInMemory implements TicketDao {
     }
 
     @Override
-    public void putTicket(String playerId, Ticket ticket) {
-        tickets.put(playerId, ticket);
+    public void putTicket(Ticket ticket) {
+        tickets.put(ticket.getPlayerId(), ticket);
     }
 
 }

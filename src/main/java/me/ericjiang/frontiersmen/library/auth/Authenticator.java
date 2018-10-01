@@ -31,13 +31,13 @@ public class Authenticator {
     public Ticket getTicket(String playerId, String idToken) throws GeneralSecurityException {
         identityProvider.verify(playerId, idToken);
         if (!playerRepository.contains(playerId)) {
-            String name = identityProvider.getName(idToken);
+            final String name = identityProvider.getName(idToken);
             playerRepository.setDisplayName(playerId, name);
         }
         return ticketDao.getTicket(playerId).orElseGet(() -> {
             log.info("Creating new auth ticket for player {}", playerId);
-            Ticket ticket = new Ticket(playerId);
-            ticketDao.putTicket(playerId, ticket);
+            final Ticket ticket = new Ticket(playerId);
+            ticketDao.putTicket(ticket);
             return ticketDao.getTicket(playerId).get();
         });
     }
@@ -46,13 +46,15 @@ public class Authenticator {
      * Compare the given ticket to the stored ticket.
      */
     public void checkTicket(Ticket ticket) throws GeneralSecurityException {
-        String playerId = ticket.getPlayerId();
-        Ticket storedTicket = ticketDao.getTicket(playerId).orElseThrow(() -> {
+        final String playerId = ticket.getPlayerId();
+        log.info("Checking auth ticket for player {}...", playerId);
+        final Ticket storedTicket = ticketDao.getTicket(playerId).orElseThrow(() -> {
             return new GeneralSecurityException(String.format("No ticket stored for player %s", playerId));
         });
         if (!storedTicket.equals(ticket)) {
             throw new GeneralSecurityException("Provided ticket does not match stored ticket!");
         }
+        log.info("Ticket for player {} verified. ✅", playerId);
     }
 
 }

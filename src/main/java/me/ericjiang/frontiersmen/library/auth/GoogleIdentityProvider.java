@@ -15,31 +15,35 @@ public class GoogleIdentityProvider implements IdentityProvider {
 
     @Override
     public void verify(String playerId, String idTokenString) throws GeneralSecurityException {
-        try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken == null) {
-                throw new GeneralSecurityException();
-            }
-            String userId = idToken.getPayload().getSubject();
-            if (!playerId.equals(userId)) {
-                throw new GeneralSecurityException();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to verify Google ID token.", e);
+        final GoogleIdToken idToken = parseIdToken(idTokenString);
+        final String userId = idToken.getPayload().getSubject();
+        if (!playerId.equals(userId)) {
+            throw new GeneralSecurityException(
+                    String.format("Player %s attempted to impersonate player %s", playerId, userId));
         }
     }
 
     @Override
     public String getName(String idTokenString) {
         try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken == null) {
-                throw new GeneralSecurityException();
-            }
+            final GoogleIdToken idToken = parseIdToken(idTokenString);
             return (String) idToken.getPayload().get("given_name");
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private GoogleIdToken parseIdToken(String idTokenString) throws GeneralSecurityException {
+        GoogleIdToken idToken = null;
+        try {
+            idToken = verifier.verify(idTokenString);
+        } catch (IOException e) {
+            throw new GeneralSecurityException("Invalid idTokenString", e);
+        }
+        if (idToken == null) {
+            throw new GeneralSecurityException("Invalid idTokenString");
+        }
+        return idToken;
     }
 
 }

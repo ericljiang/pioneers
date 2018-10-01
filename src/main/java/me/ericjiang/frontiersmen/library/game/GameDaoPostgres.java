@@ -31,7 +31,7 @@ public class GameDaoPostgres extends GameDao {
 
         try {
             String writeGameSql = "INSERT INTO game VALUES(?, ?::JSON) "
-            + "ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data";
+                    + "ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data";
             writeGame = connection.prepareStatement(writeGameSql);
         } catch (SQLException e) {
             String message = "Failed to prepare statements";

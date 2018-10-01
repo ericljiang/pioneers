@@ -5,9 +5,11 @@ import java.security.SecureRandom;
 
 import com.google.gson.Gson;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Ticket {
 
     private final String playerId;
