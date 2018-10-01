@@ -6,6 +6,6 @@ public interface TicketDao {
 
     Optional<Ticket> getTicket(String playerId);
 
-    void putTicket(String playerId, Ticket ticket);
+    void putTicket(Ticket ticket);
 
 }

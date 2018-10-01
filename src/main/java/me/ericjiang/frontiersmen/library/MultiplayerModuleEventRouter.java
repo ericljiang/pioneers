@@ -26,6 +26,7 @@ public abstract class MultiplayerModuleEventRouter {
     }
 
     public void acceptConnection(PlayerConnection connection) throws GeneralSecurityException {
+        log.info("Connection request from player {}", connection.getPlayerId());
         connectionsPendingAuthentication.add(connection);
     }
 
