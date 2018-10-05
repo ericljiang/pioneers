@@ -16,7 +16,7 @@ import me.ericjiang.frontiersmen.websockets.WebSocketTranslator;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Main {
+public class Server {
 
     private final int port;
 
@@ -30,12 +30,12 @@ public class Main {
 
     public static void main(String[] args) {
         final Frontiersmen frontiersmen = DaggerFrontiersmen.create();
-        final Main main = new Main(frontiersmen.port(),
+        final Server server = new Server(frontiersmen.port(),
                 frontiersmen.lobbyWebSocketHandler(),
                 frontiersmen.pregameWebSocketHandler(),
                 frontiersmen.gameWebSocketHandler(),
                 frontiersmen.authenticator());
-        main.initialize();
+        server.initialize();
     }
 
     public void initialize() {
@@ -49,8 +49,7 @@ public class Main {
         get("/ping", (req, res) -> "pong");
         get("/api/auth-ticket", "application/json", (req, res) -> {
             return getAuthTicket(req.queryParams("playerId"),
-                    req.queryParams("idToken"),
-                    authenticator);
+                    req.queryParams("idToken"));
         }, new Gson()::toJson);
 
         after("/api/auth-ticket", (req, res) -> {
@@ -59,7 +58,7 @@ public class Main {
         });
     }
 
-    private Ticket getAuthTicket(String playerId, String idToken, Authenticator authenticator) {
+    private Ticket getAuthTicket(String playerId, String idToken) {
         try {
             final Ticket ticket = authenticator.getTicket(playerId, idToken);
             log.info("Sending auth ticket to player {}", playerId);
