@@ -18,6 +18,14 @@ import me.ericjiang.frontiersmen.websockets.WebSocketTranslator;
 @RequiredArgsConstructor
 public class Server {
 
+    protected static final String LOBBY_WEBSOCKET_PATH = "/ws/lobby";
+    protected static final String PREGAME_WEBSOCKET_PATH = "/ws/pregame";
+    protected static final String GAME_WEBSOCKET_PATH = "/ws/game";
+
+    protected static final String PING_PATH = "/ping";
+
+    protected static final String AUTH_TICKET_PATH = "/api/auth-ticket";
+
     private final int port;
 
     private final WebSocketTranslator lobbyWebSocketHandler;
@@ -42,17 +50,17 @@ public class Server {
         port(port);
         staticFiles.location("/public");
 
-        webSocket("/ws/lobby", lobbyWebSocketHandler);
-        webSocket("/ws/pregame", pregameWebSocketHandler);
-        webSocket("/ws/game", gameWebSocketHandler);
+        webSocket(LOBBY_WEBSOCKET_PATH, lobbyWebSocketHandler);
+        webSocket(PREGAME_WEBSOCKET_PATH, pregameWebSocketHandler);
+        webSocket(GAME_WEBSOCKET_PATH, gameWebSocketHandler);
 
-        get("/ping", (req, res) -> "pong");
-        get("/api/auth-ticket", "application/json", (req, res) -> {
+        get(PING_PATH, (req, res) -> "pong");
+        get(AUTH_TICKET_PATH, "application/json", (req, res) -> {
             return getAuthTicket(req.queryParams("playerId"),
                     req.queryParams("idToken"));
         }, new Gson()::toJson);
 
-        after("/api/auth-ticket", (req, res) -> {
+        after(AUTH_TICKET_PATH, (req, res) -> {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Methods", "GET");
         });

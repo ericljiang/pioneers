@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 
@@ -70,7 +72,7 @@ public class ServerTest extends EasyMockSupport {
     public void shouldReturnPongOnPing() throws IOException {
         replayAll();
 
-        URL pingURL = new URL(String.format("http://localhost:%d/ping", TEST_PORT));
+        URL pingURL = new URL("http", "localhost", TEST_PORT, Server.PING_PATH);
         HttpURLConnection connection = (HttpURLConnection) pingURL.openConnection();
 
         int status = connection.getResponseCode();
@@ -84,12 +86,15 @@ public class ServerTest extends EasyMockSupport {
     }
 
     @Test
-    public void shouldReturnAuthTicket() throws IOException, GeneralSecurityException {
+    public void shouldReturnAuthTicket() throws IOException, GeneralSecurityException, URISyntaxException {
         expect(authenticator.getTicket(eq(PLAYER_ID), eq(ID_TOKEN))).andReturn(AUTH_TICKET);
         replayAll();
 
-        URL ticketURL = new URL(String.format("http://localhost:%d/api/auth-ticket?playerId=%s&idToken=%s",
-                    TEST_PORT, PLAYER_ID, ID_TOKEN));
+        URL ticketURL = new URI("http",
+                null, "localhost", 8080,
+                Server.AUTH_TICKET_PATH,
+                String.format("playerId=%s&idToken=%s", PLAYER_ID, ID_TOKEN),
+                null).toURL();
         HttpURLConnection connection = (HttpURLConnection) ticketURL.openConnection();
 
         int status = connection.getResponseCode();
@@ -103,12 +108,16 @@ public class ServerTest extends EasyMockSupport {
     }
 
     @Test
-    public void shouldDenyAuthTicket() throws IOException, GeneralSecurityException {
+    public void shouldDenyAuthTicket() throws IOException, GeneralSecurityException, URISyntaxException {
         expect(authenticator.getTicket(eq(PLAYER_ID), eq(ID_TOKEN))).andThrow(new GeneralSecurityException());
         replayAll();
 
-        URL ticketURL = new URL(String.format("http://localhost:%d/api/auth-ticket?playerId=%s&idToken=%s",
-                    TEST_PORT, PLAYER_ID, ID_TOKEN));
+        URL ticketURL = new URI("http",
+                null, "localhost", 8080,
+                Server.AUTH_TICKET_PATH,
+                String.format("playerId=%s&idToken=%s", PLAYER_ID, ID_TOKEN),
+                null).toURL();
+        System.out.println(ticketURL.toString());
         HttpURLConnection connection = (HttpURLConnection) ticketURL.openConnection();
 
         int status = connection.getResponseCode();

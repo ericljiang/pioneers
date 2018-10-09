@@ -1,24 +1,25 @@
 package me.ericjiang.frontiersmen.library.auth;
 
-import static org.junit.Assert.assertTrue;
+import static org.easymock.EasyMock.*;
 
 import java.security.GeneralSecurityException;
+import java.util.Optional;
 
+import org.easymock.EasyMockSupport;
 import org.junit.Before;
 import org.junit.Test;
 
-import me.ericjiang.frontiersmen.library.player.InMemoryPlayerRepository;
 import me.ericjiang.frontiersmen.library.player.PlayerRepository;
 
-public class AuthenticatorTest {
+public class AuthenticatorTest extends EasyMockSupport {
 
     private static final String PLAYER_ID = "1";
 
-    private static final String AUTH_TOKEN = "a";
+    private static final String ID_TOKEN = "a";
+
+    private static final Ticket AUTH_TICKET = new Ticket(PLAYER_ID);
 
     private IdentityProvider identityProvider;
-
-    private TicketDao ticketDao;
 
     private PlayerRepository playerRepository;
 
@@ -27,27 +28,38 @@ public class AuthenticatorTest {
     @Before
     public void setup() {
         this.identityProvider = new MockIdentityProvider();
-        this.ticketDao = new TicketDaoInMemory();
-        this.playerRepository = new InMemoryPlayerRepository();
-        this.authenticator = new Authenticator(identityProvider, ticketDao, playerRepository);
+        this.playerRepository = createMock(PlayerRepository.class);
+        this.authenticator = new Authenticator(identityProvider, playerRepository);
     }
 
     @Test
     public void shouldAcceptProvidedTicket() throws GeneralSecurityException {
-        Ticket ticket = authenticator.getTicket(PLAYER_ID, AUTH_TOKEN);
-        authenticator.checkTicket(ticket);
+        expect(playerRepository.getTicket(PLAYER_ID)).andReturn(Optional.of(AUTH_TICKET));
+        replayAll();
+
+        authenticator.checkTicket(AUTH_TICKET);
+        verifyAll();
     }
 
     @Test(expected = GeneralSecurityException.class)
     public void shouldFailUnknownTicket() throws GeneralSecurityException {
-        authenticator.getTicket(PLAYER_ID, AUTH_TOKEN);
+        expect(playerRepository.getTicket(PLAYER_ID)).andReturn(Optional.of(AUTH_TICKET));
+        replayAll();
+
         authenticator.checkTicket(new Ticket(PLAYER_ID));
+        verifyAll();
     }
 
     @Test
-    public void shouldRecordName() throws GeneralSecurityException {
-        authenticator.getTicket(PLAYER_ID, AUTH_TOKEN);
-        assertTrue(playerRepository.contains(PLAYER_ID));
+    public void shouldRecordNameOnFirstEncounter() throws GeneralSecurityException {
+        expect(playerRepository.hasPlayer(PLAYER_ID)).andReturn(false);
+        playerRepository.addPlayer(eq(PLAYER_ID), eq(identityProvider.getName("")), anyObject(Ticket.class));
+        expectLastCall();
+        expect(playerRepository.getTicket(PLAYER_ID)).andReturn(Optional.of(new Ticket(PLAYER_ID)));
+        replayAll();
+
+        authenticator.getTicket(PLAYER_ID, ID_TOKEN);
+        verifyAll();
     }
 
 }
