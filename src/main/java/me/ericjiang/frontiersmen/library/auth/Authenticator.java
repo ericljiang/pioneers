@@ -14,8 +14,6 @@ public class Authenticator {
     @Getter
     private final IdentityProvider identityProvider;
 
-    private final TicketDao ticketDao;
-
     private final PlayerRepository playerRepository;
 
     /**
@@ -30,15 +28,18 @@ public class Authenticator {
      */
     public Ticket getTicket(String playerId, String idToken) throws GeneralSecurityException {
         identityProvider.verify(playerId, idToken);
-        if (!playerRepository.contains(playerId)) {
+
+        if (!playerRepository.hasPlayer(playerId)) {
             final String name = identityProvider.getName(idToken);
-            playerRepository.setDisplayName(playerId, name);
-        }
-        return ticketDao.getTicket(playerId).orElseGet(() -> {
-            log.info("Creating new auth ticket for player {}", playerId);
             final Ticket ticket = new Ticket(playerId);
-            ticketDao.putTicket(ticket);
-            return ticketDao.getTicket(playerId).get();
+            playerRepository.addPlayer(playerId, name, ticket);
+        }
+        return playerRepository.getTicket(playerId).orElseGet(() -> {
+            log.info("Creating new auth ticket for player {}", playerId);
+            playerRepository.setTicket(new Ticket(playerId));
+            return playerRepository.getTicket(playerId).orElseThrow(() -> {
+                return new RuntimeException();
+            });
         });
     }
 
@@ -48,7 +49,7 @@ public class Authenticator {
     public void checkTicket(Ticket ticket) throws GeneralSecurityException {
         final String playerId = ticket.getPlayerId();
         log.info("Checking auth ticket for player {}...", playerId);
-        final Ticket storedTicket = ticketDao.getTicket(playerId).orElseThrow(() -> {
+        final Ticket storedTicket = playerRepository.getTicket(playerId).orElseThrow(() -> {
             return new GeneralSecurityException(String.format("No ticket stored for player %s", playerId));
         });
         if (!storedTicket.equals(ticket)) {
