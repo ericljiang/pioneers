@@ -115,7 +115,7 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
 
     @Override
     public Optional<Ticket> getTicket(String playerId) {
-        log.info("Getting ticket for %s from PostgreSQL database...", playerId);
+        log.info("Getting ticket for {} from PostgreSQL database...", playerId);
         try {
             readTicket.setString(1, playerId);
             try (ResultSet resultSet = readTicket.executeQuery()) {
