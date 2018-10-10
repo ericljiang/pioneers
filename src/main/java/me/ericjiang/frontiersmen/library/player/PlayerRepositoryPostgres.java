@@ -54,8 +54,11 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
         }
 
         try (ResultSet resultSet = hasPlayer.executeQuery()) {
-            resultSet.next();
-            return resultSet.getBoolean(1);
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1);
+            } else {
+                throw new SQLException("No rows returned");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -85,8 +88,11 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
         }
 
         try (ResultSet resultSet = readDisplayName.executeQuery()) {
-            resultSet.next();
-            return resultSet.getString(1);
+            if (resultSet.next()) {
+                return resultSet.getString(1);
+            } else {
+                throw new SQLException("No rows returned");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -110,12 +116,11 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
     public Optional<Ticket> getTicket(String playerId) {
         try {
             readTicket.setString(1, playerId);
-            final ResultSet resultSet = readTicket.executeQuery();
-            final Optional<Ticket> ticket = Optional.ofNullable(
-                    resultSet.next() ? resultSet.getString(1) : null)
-                    .map(secret -> new Ticket(playerId, secret));
-            resultSet.close();
-            return ticket;
+            try (ResultSet resultSet = readTicket.executeQuery()) {
+                return Optional.ofNullable(
+                        resultSet.next() ? resultSet.getString(1) : null)
+                        .map(secret -> new Ticket(playerId, secret));
+            }
         } catch (SQLException e) {
             log.error("Failed to read auth ticket from PostgreSQL", e);
             throw new RuntimeException(e);
