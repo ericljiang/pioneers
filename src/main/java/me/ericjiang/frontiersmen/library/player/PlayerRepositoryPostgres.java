@@ -81,7 +81,7 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
 
     @Override
     public String getDisplayName(String playerId) {
-        log.info("Getting display name for %s from PostgreSQL database...", playerId);
+        log.info("Getting display name for {} from PostgreSQL database...", playerId);
         try {
             readDisplayName.setString(1, playerId);
         } catch (SQLException e) {
