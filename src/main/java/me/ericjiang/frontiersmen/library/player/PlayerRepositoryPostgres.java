@@ -81,6 +81,7 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
 
     @Override
     public String getDisplayName(String playerId) {
+        log.info("Getting display name for %s from PostgreSQL database...", playerId);
         try {
             readDisplayName.setString(1, playerId);
         } catch (SQLException e) {
@@ -114,6 +115,7 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
 
     @Override
     public Optional<Ticket> getTicket(String playerId) {
+        log.info("Getting ticket for %s from PostgreSQL database...", playerId);
         try {
             readTicket.setString(1, playerId);
             try (ResultSet resultSet = readTicket.executeQuery()) {
