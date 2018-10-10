@@ -92,7 +92,8 @@ public class PlayerRepositoryPostgres implements PlayerRepository {
             if (resultSet.next()) {
                 return resultSet.getString(1);
             } else {
-                throw new SQLException("No rows returned");
+                log.error("No display name found for player {}", playerId);
+                return "?";
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
