@@ -16,8 +16,10 @@ import me.ericjiang.frontiersmen.library.player.PlayerConnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerDisconnectionEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerNameChangeEvent;
 import me.ericjiang.frontiersmen.library.player.PlayerRepository;
+import me.ericjiang.frontiersmen.library.pregame.LeaveSeatEvent;
 import me.ericjiang.frontiersmen.library.pregame.Pregame;
 import me.ericjiang.frontiersmen.library.pregame.StartGameEvent;
+import me.ericjiang.frontiersmen.library.pregame.TakeSeatEvent;
 import me.ericjiang.frontiersmen.library.pregame.TransitionToGameEvent;
 
 @Slf4j
@@ -112,6 +114,8 @@ public class Lobby extends MultiplayerModule {
     private void register(Pregame pregame) {
         pregame.on(PlayerConnectionEvent.class, e -> broadcastState());
         pregame.on(PlayerDisconnectionEvent.class, e -> broadcastState());
+        pregame.on(TakeSeatEvent.class, e -> broadcastState());
+        pregame.on(LeaveSeatEvent.class, e -> broadcastState());
         pregame.on(StartGameEvent.class, e -> broadcastState());
         log.info(formatLog("Added Pregame %s", pregame.getGameId()));
     }
