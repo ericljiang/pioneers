@@ -52,21 +52,30 @@ public class Pregame extends MultiplayerModule {
         });
 
         on(TakeSeatEvent.class, e -> {
-            takeSeat(e.getSeat(), e.getPlayerId());
+            synchronized(playerSeats) {
+                takeSeat(e.getSeat(), e.getPlayerId());
+                broadcast(toStateEvent());
+            }
         });
 
         on(LeaveSeatEvent.class, e -> {
-            leaveSeat(e.getSeat(), e.getPlayerId());
+            synchronized(playerSeats) {
+                leaveSeat(e.getSeat(), e.getPlayerId());
+                broadcast(toStateEvent());
+            }
+        });
+
+        on(PlayerDisconnectionEvent.class, e -> {
+            synchronized(playerSeats) {
+                evictPlayer(e.getPlayerId());
+                broadcast(toStateEvent());
+            }
         });
 
         on(TransitionToGameEvent.class, e -> {
             game.setPlayers(playerSeats);
             game.handleEvent(e);
             broadcast(e);
-        });
-
-        on(PlayerDisconnectionEvent.class, e -> {
-            evictPlayer(e.getPlayerId());
         });
     }
 
@@ -86,7 +95,9 @@ public class Pregame extends MultiplayerModule {
     }
 
     private boolean readyToStart() {
-        return Arrays.stream(playerSeats).filter(p -> p != null).count() >= minimumPlayers;
+        synchronized(playerSeats) {
+            return Arrays.stream(playerSeats).filter(p -> p != null).count() >= minimumPlayers;
+        }
     }
 
     private void takeSeat(int seat, String playerId) {
@@ -104,7 +115,6 @@ public class Pregame extends MultiplayerModule {
             // remove from current seat
             evictPlayer(playerId);
             playerSeats[seat] = new Player(playerId);
-            broadcast(toStateEvent());
         }
     }
 
@@ -116,7 +126,6 @@ public class Pregame extends MultiplayerModule {
                         playerId, seat));
             }
             playerSeats[seat] = null;
-            broadcast(toStateEvent());
         }
     }
 
@@ -135,7 +144,6 @@ public class Pregame extends MultiplayerModule {
                 }
             }
         }
-        broadcast(toStateEvent());
     }
 
 }
