@@ -49,18 +49,29 @@ dependencies {
     testCompile 'org.easymock:easymock:3.6'
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
-    }
-}
-
 test {
     testLogging {
         // show stacktrace and logs
         exceptionFormat = 'full'
         showStandardStreams = true
+    }
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                'me/ericjiang/frontiersmen/config/DaggerFrontiersmen*',
+                '**/*_MembersInjector.class',
+                '**/Dagger*Component.class',
+                '**/Dagger*Component$Builder.class',
+                '**/*Module_*Factory.class'
+            ])
+        })
+    }
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
     }
 }
 
