@@ -75,10 +75,10 @@ public class Lobby extends MultiplayerModule {
 
     private void setEventHandlers() {
         on(GameCreationEvent.class, e -> {
-            final Pregame pregame = gameFactory.createPregame(e.getName(), e.getPlayerId(), e.getAttributes());
-            final String gameId = pregame.getGameId();
+            Pregame pregame = gameFactory.createPregame(e.getName(), e.getPlayerId(), e.getAttributes());
+            String gameId = pregame.getGameId();
             pregame.on(StartGameEvent.class, startGameEvent -> {
-                final Game game = pregame.getGame();
+                Game game = pregame.getGame();
                 register(game);
                 games.put(gameId, game);
                 pregames.remove(gameId);
