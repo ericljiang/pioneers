@@ -1,9 +1,13 @@
 package me.ericjiang.frontiersmen.library.lobby;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
+
+import com.google.common.base.Preconditions;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +79,16 @@ public class Lobby extends MultiplayerModule {
 
     private void setEventHandlers() {
         on(GameCreationEvent.class, e -> {
+            final String creatorId = e.getPlayerId();
+            final String name = e.getName();
+            final Map<String, Object> attributes = e.getAttributes();
+
+            Preconditions.checkNotNull(creatorId);
+            Preconditions.checkNotNull(name);
+            Preconditions.checkNotNull(attributes);
+            Preconditions.checkArgument(!name.isEmpty());
+            Preconditions.checkArgument(name.length() <= 32);
+
             Pregame pregame = gameFactory.createPregame(e.getName(), e.getPlayerId(), e.getAttributes());
             String gameId = pregame.getGameId();
             pregame.on(StartGameEvent.class, startGameEvent -> {
@@ -100,10 +114,17 @@ public class Lobby extends MultiplayerModule {
         });
 
         on(PlayerNameChangeEvent.class, e -> {
-            String playerId = e.getPlayerId();
+            final String playerId = e.getPlayerId();
+            final String displayName = e.getDisplayName();
+
+            Preconditions.checkNotNull(playerId);
+            Preconditions.checkNotNull(displayName);
+            Preconditions.checkArgument(!displayName.isEmpty());
+            Preconditions.checkArgument(displayName.length() <= 32);
+
+            playerRepository.setDisplayName(playerId, displayName);
             log.info(formatLog("%s (%s) changed their name to %s",
-                    playerRepository.getDisplayName(playerId), playerId, e.getDisplayName()));
-            playerRepository.setDisplayName(e.getPlayerId(), e.getDisplayName());
+                    playerRepository.getDisplayName(playerId), playerId, displayName));
             transmit(playerId, e);
             games.values().stream()
                     .filter(g -> g.getPlayers().containsKey(playerId))
