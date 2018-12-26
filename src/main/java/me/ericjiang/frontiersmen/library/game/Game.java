@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
@@ -103,6 +104,10 @@ public abstract class Game extends MultiplayerModule {
     @Override
     protected boolean allowConnection(String playerId) {
         return players.containsKey(playerId);
+    }
+
+    protected void validateCurrentPlayer(Player player) {
+        Preconditions.checkArgument(player == getCurrentPlayer());
     }
 
     private void setEventHandlers() {
