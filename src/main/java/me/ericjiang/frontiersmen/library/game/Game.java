@@ -73,6 +73,7 @@ public abstract class Game extends MultiplayerModule {
     protected abstract Player createPlayer(String playerId, int seat);
 
     public void setPlayers(Player[] playerSeats) {
+        Preconditions.checkArgument(playerSeats.length > 0);
         for (int seat = 0; seat < playerSeats.length; seat++) {
             if (playerSeats[seat] != null) {
                 String playerId = playerSeats[seat].getId();
@@ -88,7 +89,9 @@ public abstract class Game extends MultiplayerModule {
     }
 
     public void endTurn() {
+        log.info("Player {}'s turn has ended.", currentPlayer.getId());
         currentPlayer = playerOrder.next();
+        log.info("It is now Player {}'s turn.", currentPlayer.getId());
     }
 
     @Override
@@ -106,8 +109,11 @@ public abstract class Game extends MultiplayerModule {
         return players.containsKey(playerId);
     }
 
-    protected void validateCurrentPlayer(Player player) {
-        Preconditions.checkArgument(player == getCurrentPlayer());
+    protected void validateCurrentPlayer(String playerId) {
+        if (!getCurrentPlayer().getId().equals(playerId)) {
+            final String message = String.format("Player %s is not the current player!", playerId);
+            throw new OutOfTurnEventException(message);
+        }
     }
 
     private void setEventHandlers() {

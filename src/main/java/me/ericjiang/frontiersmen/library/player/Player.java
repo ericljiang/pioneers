@@ -1,11 +1,14 @@
 package me.ericjiang.frontiersmen.library.player;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Player {
 
+    @EqualsAndHashCode.Include
     private final String id;
 
     private int seat;
