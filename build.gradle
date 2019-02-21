@@ -75,6 +75,24 @@ jacocoTestReport {
     }
 }
 
+task printTestReportLocation {
+    doLast {
+        println "Unit test report: build/reports/tests/test/index.html"
+        println "Coverage report: build/reports/jacoco/test/html/index.html"
+    }
+}
+
+// Support for https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters
+task copyCoverageReport(type: Copy) {
+    from file("$buildDir/reports/jacoco/test/jacocoTestReport.xml")
+    into file(".")
+    rename "jacocoTestReport.xml", "cov.xml"
+}
+
+test.finalizedBy jacocoTestReport
+jacocoTestReport.finalizedBy printTestReportLocation
+jacocoTestReport.finalizedBy copyCoverageReport
+
 sourceSets.main.java.srcDirs = ['build/generated/source/apt/main','src/main/java']
 
 // Define the main class for the application

@@ -179,3 +179,6 @@ frontiersmen.iml
 .idea/modules/frontiersmen_test.iml
 
 # End of https://www.gitignore.io/api/java,gradle,eclipse,visualstudiocode
+
+# https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters
+cov.xml
