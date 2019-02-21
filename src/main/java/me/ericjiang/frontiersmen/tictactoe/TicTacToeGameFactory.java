@@ -13,7 +13,8 @@ public class TicTacToeGameFactory extends GameFactory {
 
     @Override
     protected Game createGameInstance(String name, String gameId, String creatorId, Map<String, Object> attributes) {
-        return new TicTacToeGame(name, gameId, creatorId);
+        final TicTacToeBoard<Integer> board = new TicTacToeBoard<>();
+        return new TicTacToeGame(name, gameId, creatorId, board);
     }
 
 }
